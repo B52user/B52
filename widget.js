@@ -39,7 +39,7 @@ class B52Widget {
             var theUniqueName = "B52 " + Date.now().toString();
             var menu = this.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
             this.tv.triggerMouseEvent(menu, "click");
-            that = this;
+            var that = this;
             this.tv.createNewAlert(theUniqueName, () => {
                 that.tv.grabAlertMessage(theUniqueName, (res) => {
                     $("#B52Result").text(res);
@@ -54,7 +54,7 @@ class B52Widget {
         });
         this.Stlye();
     }
-    
+
     Stlye() {
         $("#B52Area.dark").css({
             "-webkit-user-drag": "element",

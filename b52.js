@@ -22,8 +22,8 @@ class B52Tv {
     clearB52s() {
         var query = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-delete-action']";
         var itemsCount = this.xpathItemCount(query);
-        for (i = 0; i < itemsCount; i++) {
-            item = this.xpathGetFirstItem(query);
+        for (var i = 0; i < itemsCount; i++) {
+            var item = this.xpathGetFirstItem(query);
             this.triggerMouseEvent(item, "mousedown");
         }
     }
@@ -52,7 +52,7 @@ class B52Tv {
         this.triggerMouseEvent(close, "click");
     }
     grabAlertMessage(name, thenRun) {
-        that = this;
+        var that = this;
         var existCondition = setInterval(function () {
             if ($("div[data-qa-dialog-name='alert-fired']").length) {
                 clearInterval(existCondition);
@@ -66,9 +66,9 @@ class B52Tv {
     }
     createNewAlert(alertName, thenRun) {
         var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
-        item = this.xpathGetFirstItem(more);
+        var item = this.xpathGetFirstItem(more);
         this.triggerMouseEvent(item, "mousedown");
-        that = this;
+        var that = this;
         setTimeout(function () {
             var newAlert = xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
             that.triggerMouseEvent(newAlert, "click");
@@ -93,7 +93,7 @@ class B52Tv {
     deleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
         this.triggerMouseEvent(del, "click");
-        that = this;
+        var that = this;
         setTimeout(function () {
             var yesButton = that.xpathGetFirstItem("//button[starts-with(@class,'actionButton') and @name='yes']");
             that.triggerMouseEvent(yesButton, "click");
