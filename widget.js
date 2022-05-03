@@ -30,7 +30,7 @@ class B52Widget {
 
         //events
         $("#B52ClearChart").click(() => {
-            this.tv.learB52s();
+            this.tv.clearB52s();
         });
         $("#B52Start100").click(() => {
             this.tv.runFavIndicator($("#B52Start100").text());
