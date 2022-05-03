@@ -89,7 +89,7 @@ class B52Tv {
                     thenRun();
                 }, 50);
             }, 250);
-        }, 150);
+        }, 250);
     }
     deleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
