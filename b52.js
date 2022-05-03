@@ -1,3 +1,5 @@
+const secretWord = "B52";
+
 class B52Tv {
     constructor() {
     }
