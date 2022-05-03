@@ -54,6 +54,7 @@ class B52Widget {
         });
         this.Stlye();
     }
+    
     Stlye() {
         $("#B52Area.dark").css({
             "-webkit-user-drag": "element",
