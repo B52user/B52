@@ -52,4 +52,30 @@ B52Widget.prototype.Build = function()
       $("#B52ConnectBinance").click(() => {
         binanceGetTickSize((size)=>{$("#B52ConnectionStatus").text(size.toString());});
       });
+      Stlye();
+}
+
+B52Widget.prototype.Stlye = function()
+{
+    $("#B52Area.dark").css({
+        "-webkit-user-drag": "element",
+        "resize": "both",
+        "position": "absolute",
+        "right": "57px",
+        "bottom": "25px",
+        "border": "1px solid gray",
+        "height": "350px",
+        "width": "240px",
+        "background-color": "black",
+        "padding": "5px"
+    });
+  
+  $("#B52Area.dark").find("div").css({
+      "padding": "2px"
+  });
+  
+  $("#B52Area.dark").find("button").css({
+     "border": "1px solid gray",
+     "background-color": "#3f5721"
+  });
 }
