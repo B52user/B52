@@ -13,7 +13,7 @@ class B52Tv {
         return sign.innerText;
     }
     xpathItemCount(xpath) {
-        return itemsCount = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
+        return document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
     }
     xpathGetFirstItem(xpath) {
         var items = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
