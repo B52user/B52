@@ -1,0 +1,21 @@
+#B52Area.dark {
+  -webkit-user-drag: "element";
+  resize: "both";
+  position: "absolute";
+  right: "57px";
+  bottom: "25px";
+  border: "1px solid gray";
+  height: "350px";
+  width: "240px";
+  background-color: "black";
+  padding: "5px";
+}
+
+#B52Area.dark div {
+    padding: "2px";
+}
+
+#B52Area.dark button {
+   border: "1px solid gray";
+   background-color: "#3f5721";
+}
