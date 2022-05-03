@@ -18,10 +18,11 @@ const B52AreaHtml = `
 </div>
 `;
 
-function B52Widget(B52Tv,theme)
+function B52Widget(B52Tv, BinanceAdapter,theme)
 {
     this.tv = B52Tv;
     this.theme = theme;
+    this.b = BinanceAdapter;
 }
 
 B52Widget.prototype.Build = function()
@@ -31,28 +32,28 @@ B52Widget.prototype.Build = function()
 
     //events
     $("#B52ClearChart").click(() => {
-        clearB52s();
+        this.tv.learB52s();
       });
       $("#B52Start100").click(() => {
-        runFavIndicator($("#B52Start100").text());
+        this.tv.runFavIndicator($("#B52Start100").text());
       });
       $("#B52StartBinance").click(() => {
         var theUniqueName = "B52 " + Date.now().toString();
-        var menu = xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
-        triggerMouseEvent(menu, "click");
-        createNewAlert(theUniqueName, () => {
-          grabAlertMessage(theUniqueName, (res) => {
+        var menu = this.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
+        this.tv.triggerMouseEvent(menu, "click");
+        this.tv.createNewAlert(theUniqueName, () => {
+          this.tv.grabAlertMessage(theUniqueName, (res) => {
             $("#B52Result").text(res);
             setTimeout(function() {
-              deleteAlert(getCurrentCurrencyPair(), theUniqueName);
+              deleteAlert(this.tv.getCurrentCurrencyPair(), theUniqueName);
             }, 50);
           });
         });
       });
       $("#B52ConnectBinance").click(() => {
-        binanceGetTickSize((size)=>{$("#B52ConnectionStatus").text(size.toString());});
+        this.b.binanceGetTickSize((size)=>{$("#B52ConnectionStatus").text(size.toString());});
       });
-      Stlye();
+      this.Stlye();
 }
 
 B52Widget.prototype.Stlye = function()
