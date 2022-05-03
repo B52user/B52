@@ -30,9 +30,10 @@ class B52Tv {
     runFavIndicator(name) {
         var arrow = this.xpathGetFirstItem("(//div[@data-name='show-favorite-indicators'])[1]");
         this.triggerMouseEvent(arrow, "click");
+        var that = this;
         setTimeout(function () {
-            var fav = this.xpathGetFirstItem("//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]");
-            this.triggerMouseEvent(fav, "click");
+            var fav = that.xpathGetFirstItem("//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]");
+            that.triggerMouseEvent(fav, "click");
         }, 200);
     }
     runStopAlert(currency, name) {
