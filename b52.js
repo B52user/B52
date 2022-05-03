@@ -71,7 +71,7 @@ class B52Tv {
         this.triggerMouseEvent(item, "mousedown");
         var that = this;
         setTimeout(function () {
-            var newAlert = xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
+            var newAlert = that.xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
             that.triggerMouseEvent(newAlert, "click");
             setTimeout(function () {
                 $("input[name='alert-name']")[0].value = alertName;
