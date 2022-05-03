@@ -12,6 +12,9 @@ class B52Tv {
         var sign = this.xpathGetFirstItem("//div[@id='header-toolbar-symbol-search']/div");
         return sign.innerText;
     }
+    xpathItemCount(xpath) {
+        return itemsCount = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
+    }
     xpathGetFirstItem(xpath) {
         var items = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
         return items.iterateNext();
