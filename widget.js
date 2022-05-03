@@ -39,11 +39,12 @@ class B52Widget {
             var theUniqueName = "B52 " + Date.now().toString();
             var menu = this.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
             this.tv.triggerMouseEvent(menu, "click");
+            that = this;
             this.tv.createNewAlert(theUniqueName, () => {
-                this.tv.grabAlertMessage(theUniqueName, (res) => {
+                that.tv.grabAlertMessage(theUniqueName, (res) => {
                     $("#B52Result").text(res);
                     setTimeout(function () {
-                        deleteAlert(this.tv.getCurrentCurrencyPair(), theUniqueName);
+                        that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
                     }, 50);
                 });
             });

@@ -47,13 +47,14 @@ class B52Tv {
         this.triggerMouseEvent(close, "click");
     }
     grabAlertMessage(name, thenRun) {
+        that = this;
         var existCondition = setInterval(function () {
             if ($("div[data-qa-dialog-name='alert-fired']").length) {
                 clearInterval(existCondition);
                 //stop it now
-                this.runStopAlert(getCurrentCurrencyPair(), name);
-                var theMessage = this.getAlertMessage();
-                this.closeAlert();
+                that.runStopAlert(getCurrentCurrencyPair(), name);
+                var theMessage = that.getAlertMessage();
+                that.closeAlert();
                 thenRun(theMessage);
             }
         }, 100);
@@ -62,15 +63,16 @@ class B52Tv {
         var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
         item = this.xpathGetFirstItem(more);
         this.triggerMouseEvent(item, "mousedown");
+        that = this;
         setTimeout(function () {
             var newAlert = xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
-            this.triggerMouseEvent(newAlert, "click");
+            that.triggerMouseEvent(newAlert, "click");
             setTimeout(function () {
                 $("input[name='alert-name']")[0].value = alertName;
-                this.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
-                this.triggerMouseEvent($("input[name='alert-name']")[0], "input");
-                this.triggerMouseEvent($("input[name='alert-name']")[0], "change");
-                this.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
+                that.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
+                that.triggerMouseEvent($("input[name='alert-name']")[0], "input");
+                that.triggerMouseEvent($("input[name='alert-name']")[0], "change");
+                that.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
                 setTimeout(function () {
                     const ke = new KeyboardEvent('keydown', {
                         bubbles: true,
@@ -86,9 +88,10 @@ class B52Tv {
     deleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
         this.triggerMouseEvent(del, "click");
+        that = this;
         setTimeout(function () {
-            var yesButton = this.xpathGetFirstItem("//button[starts-with(@class,'actionButton') and @name='yes']");
-            this.triggerMouseEvent(yesButton, "click");
+            var yesButton = that.xpathGetFirstItem("//button[starts-with(@class,'actionButton') and @name='yes']");
+            that.triggerMouseEvent(yesButton, "click");
         }, 150);
     }
 }
