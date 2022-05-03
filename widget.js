@@ -26,7 +26,7 @@ function B52Widget(B52Tv,theme)
 
 B52Widget.prototype.Build = function()
 {
-    $('body').append('<div id="B52Area" draggable="true" class="'+theme+'"></div>');
+    $('body').append('<div id="B52Area" draggable="true" class="'+this.theme+'"></div>');
     $('#B52Area').html(B52AreaHtml);
 
     //events
