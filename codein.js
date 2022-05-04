@@ -7,7 +7,9 @@ class B52TvService
 	
 	Start() {
 		this.service = setInterval(function () {
-    		this.arrayOfActions.forEach((a)=>{a();});	
+			for (i = 0; i < this.arrayOfActions.length; i++) {
+ 			   this.arrayOfActions[i]();
+			}
 		}
         , this.freq);
 	}
@@ -23,6 +25,8 @@ class B52TvService
 }
 
 var tvObserver = new B52TvService(100);
+tvObserver.AddAction(()=>{console.log("test");});
+tvObserver.Start();
 
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
