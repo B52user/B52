@@ -7,10 +7,9 @@ class B52TvService
 	
 	Start() {
 		this.service = setInterval(function () {
-            	//foreach execute action
-		this.arrayOfActions.forEach((a)=>{a();});	
+    		this.arrayOfActions.forEach((a)=>{a();});	
 		}
-        }, this.freq);
+        , this.freq);
 	}
 	Stop() {
 		clearInterval(this.service);
@@ -22,6 +21,8 @@ class B52TvService
 		this.freq = freq;
 	}
 }
+
+var tvObserver = new B52TvService(100);
 
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
