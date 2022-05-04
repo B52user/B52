@@ -88,7 +88,7 @@ class B52Tv {
                     document.body.dispatchEvent(ke);
                     thenRun();
                 }, 50);
-            }, 250);
+            }, 350);
         }, 250);
     }
     deleteAlert(currency, name) {
