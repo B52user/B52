@@ -1,5 +1,29 @@
 class B52TvService
 {
-	constructor(B52Tv){this.tv = B52Tv;}
+	AddAction(action)
+	{
+		this.arrayOfActions.push(action);
+	}
 	
+	Start() {
+		this.service = setInterval(function () {
+            	//foreach execute action
+		this.arrayOfActions.forEach((a)=>{a();});	
+		}
+        }, this.freq);
+	}
+	Stop() {
+		clearInterval(this.service);
+	}
+
+	constructor(freq){
+		this.arrayOfActions = [];
+		this.service = null;
+		this.freq = freq;
+	}
 }
+
+var tv = new B52Tv();
+var b = new BinanceAdapter(tv);
+var page = new B52Widget(tv,b,"dark");
+page.Build();
