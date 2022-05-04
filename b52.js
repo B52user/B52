@@ -168,7 +168,7 @@ class B52Widget {
             });
         });
         $("#B52ConnectBinance").click(() => {
-            this.b.binanceGetTickSize((size) => { $("#B52ConnectionStatus").text(size.toString()); });
+            this.b.GetTickSize((size) => { $("#B52ConnectionStatus").text(size.toString()); });
         });
         this.Stlye();
     }
