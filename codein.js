@@ -6,9 +6,10 @@ class B52TvService
 	}
 	
 	Start() {
+		var that = this;
 		this.service = setInterval(function () {
-			for (i = 0; i < this.arrayOfActions.length; i++) {
- 			   this.arrayOfActions[i]();
+			for (i = 0; i < that.arrayOfActions.length; i++) {
+ 			   that.arrayOfActions[i]();
 			}
 		}
         , this.freq);
@@ -27,6 +28,7 @@ class B52TvService
 var tvObserver = new B52TvService(100);
 tvObserver.AddAction(()=>{console.log("test");});
 tvObserver.Start();
+//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]
 
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
