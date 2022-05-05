@@ -49,29 +49,29 @@ class BinanceAdapter {
 		    
 		});	
 	}
-    	GetTickSize(resultFunc) {
-		var that = this;
-		var getSize = (then) => {
-			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
-			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
+	_getSize(then)
+	{
+			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==this.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+this.tv.getCurrentCurrencyPair());}
 			else
 			{
 				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
 				then(theMinSize);
 			}
-		};
+	}
+    	GetTickSize(resultFunc) {
 		if(this.ExchangeInfo==null)
 		{
-			this._getExchangeInfo(getSize(resultFunc));
+			this._getExchangeInfo(()=>{this._getSize(resultFunc);});
 		}
 		else
 		{
-			getSize(resultFunc);
+			this._getSize(resultFunc);
 		}
     	}
 }
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
-b.GetTicketSize((size)=>{console.log(size);});
+b.GetTickSize((s)=>{console.log(s);});
 setStrategySettings([{label:"Min buy quantity",value:0.1}]);
 
