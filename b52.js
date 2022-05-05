@@ -133,35 +133,47 @@ class BinanceAdapter {
         this.tv = B52Tv;
 	this.ExchangeInfo = null;
     }
-	_getExchangeInfo(then)
-	{
-		var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+	_getExchangeInfo() {
 		var that = this;
-		$.getJSON(url, function (tiketInfo) {
-			that.ExchangeInfo = tiketInfo;
-			then();
-		    
-		});	
+	    	return new Promise((s,f)=>
+		{
+			var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+			
+			$.getJSON(url, (tiketInfo) => {
+				that.ExchangeInfo = tiketInfo;
+				s();
+			});	
+			});
 	}
-	_getSize(then)
+	
+	_getSize()
 	{
-			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==this.tv.getCurrentCurrencyPair());
-			if(!theSymb.length) {console.log("ERROR! Not found symbol "+this.tv.getCurrentCurrencyPair());}
+		var that = this;
+		return new Promise((s,f)=>
+		{
+			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
 			else
 			{
 				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
-				then(theMinSize);
+				s(theMinSize);
 			}
+		});
 	}
-    	GetTickSize(resultFunc) {
-		if(this.ExchangeInfo==null)
+	
+    	GetTickSize() {
+		var that = this;
+		return new Promise((s,f) =>
 		{
-			this._getExchangeInfo(()=>{this._getSize(resultFunc);});
-		}
-		else
-		{
-			this._getSize(resultFunc);
-		}
+			if(this.ExchangeInfo==null)
+			{
+				this._getExchangeInfo().then(()=>{this._getSize().then(s);});
+			}
+			else
+			{
+				this._getSize().then(s);
+			}
+		});
     	}
 }
 
