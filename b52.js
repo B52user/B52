@@ -110,7 +110,7 @@ class BinanceAdapter {
     GetTickSize(resultFunc) {
         var url = "https://fapi.binance.com/fapi/v1/exchangeInfo?symbol=" + this.tv.getCurrentCurrencyPair();
         $.getJSON(url, function (tiketInfo) {
-            var theMinSize = parseFloat(tiketInfo.symbols[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+            var theMinSize = parseFloat(tiketInfo.symbols[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
             resultFunc(theMinSize);
         });
     }
