@@ -68,14 +68,16 @@ class B52Tv {
         var play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
         //try clicking if no try openning then clicking
         var alertMenu = "//div[@data-role='button' and @data-name='alerts']";
-        that.waitForElement(alertMenu).then((a)=>{
-            if(that.xpathItemCount(play)<1)
-            {
-                var menu = that.tv.xpathGetFirstItem();
-                that.triggerMouseEvent(a, "click");
-            }
-            that.waitForElement(play).then((e)=>{
-                that.triggerMouseEvent(e, "click");
+        return new Promise((s,f)=>{
+            that.waitForElement(alertMenu).then((a)=>{
+                if(that.xpathItemCount(play)<1)
+                {
+                    that.triggerMouseEvent(a, "click");
+                }
+                that.waitForElement(play).then((e)=>{
+                    that.triggerMouseEvent(e, "click");
+                    s();
+                });
             });
         });
     }
@@ -98,10 +100,12 @@ class B52Tv {
                 if ($("div[data-qa-dialog-name='alert-fired']").length) {
                     clearInterval(existCondition);
                     //stop it now
-                    that.runStopAlert(that.getCurrentCurrencyPair(), name);
                     var theMessage = that.getAlertMessage();
                     that.closeAlert();
-                    s(theMessage);
+                    that.runStopAlert(that.getCurrentCurrencyPair(), name).then(()=>{
+                        s(theMessage);
+                    });
+                    
                 }
             }, 100);
 	    });
