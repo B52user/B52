@@ -22,15 +22,17 @@ function setStrategySettings(sets)
 			var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
 			var inputNode = tv.xpathGetFirstItem(input);
 			inputNode.value = sets[i].value;
-			//tv.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
-                	//tv.triggerMouseEvent($("input[name='alert-name']")[0], "input");
-                	tv.triggerMouseEvent(inputNode, "change");
-                	//tv.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
+			tv.triggerMouseEvent(inputNode, "focus");
+            		tv.triggerMouseEvent(inputNode, "input");
+            		tv.triggerMouseEvent(inputNode, "change");
+            		tv.triggerMouseEvent(inputNode, "blur");
 		}
-		var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
-		tv.triggerMouseEvent(ok, "click");
+		setTimeout(function(){
+			var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
+			tv.triggerMouseEvent(ok, "click");
+		},5000);
 	},150);
 }
 
-setStrategySettings([{label:"Min buy quantity",value:0.01}]);
+setStrategySettings([{label:"Min buy quantity",value:0.1}]);
 
