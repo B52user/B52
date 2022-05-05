@@ -68,11 +68,11 @@ class B52Tv {
         var play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
         //try clicking if no try openning then clicking
         var alertMenu = "//div[@data-role='button' and @data-name='alerts']";
-        that.tv.waitForElement(alertMenu).then((a)=>{
+        that.waitForElement(alertMenu).then((a)=>{
             if(that.xpathItemCount(play)<1)
             {
                 var menu = that.tv.xpathGetFirstItem();
-                that.tv.triggerMouseEvent(a, "click");
+                that.triggerMouseEvent(a, "click");
             }
             that.waitForElement(play).then((e)=>{
                 that.triggerMouseEvent(e, "click");
