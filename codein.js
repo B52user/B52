@@ -10,7 +10,27 @@ tvObserver.AddAction(()=>{
 	}
 });
 
-var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
-var item = tv.xpathGetFirstItem(settings);
-tv.triggerMouseEvent(item, "mousedown");
-//div[./div[text()="Max Loss in $"]]/following-sibling::div[1]//input
+function setStrategySettings(sets)
+{
+	var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
+	var item = tv.xpathGetFirstItem(settings);
+	tv.triggerMouseEvent(item, "mousedown");
+	var that = this;
+	setTimeout(function () {
+		for(var i=0;i<sets.length;i++)
+		{
+			var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+			var inputNode = tv.xpathGetFirstItem(input);
+			inputNode.value = sets[i].value;
+			//tv.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
+                	//tv.triggerMouseEvent($("input[name='alert-name']")[0], "input");
+                	tv.triggerMouseEvent(inputNode, "change");
+                	//tv.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
+		}
+		var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
+		tv.triggerMouseEvent(ok, "click");
+	},150);
+}
+
+setStrategySettings([{label:"Min buy quantity",value:0.01}]);
+
