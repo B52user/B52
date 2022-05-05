@@ -52,10 +52,10 @@ class B52Tv {
         var arrow = this.xpathGetFirstItem("(//div[@data-name='show-favorite-indicators'])[1]");
         this.triggerMouseEvent(arrow, "click");
         var that = this;
-        setTimeout(function () {
-            var fav = that.xpathGetFirstItem("//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]");
-            that.triggerMouseEvent(fav, "click");
-        }, 200);
+        var fav = "//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]";
+        this.waitForElement(fav).then((e)=>{
+            that.triggerMouseEvent(e, "click");
+        });
     }
     runStopAlert(currency, name) {
         var play = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]");
@@ -75,56 +75,64 @@ class B52Tv {
     }
     grabAlertMessage(name) {
         var that = this;
-	return new Promise((s,f) => {
-        var existCondition = setInterval(function () {
-            if ($("div[data-qa-dialog-name='alert-fired']").length) {
-                clearInterval(existCondition);
-                //stop it now
-                that.runStopAlert(getCurrentCurrencyPair(), name);
-                var theMessage = that.getAlertMessage();
-                that.closeAlert();
-                s(theMessage);
-            }
-        }, 100);
-	});
+	    return new Promise((s,f) => {
+            var existCondition = setInterval(function () {
+                if ($("div[data-qa-dialog-name='alert-fired']").length) {
+                    clearInterval(existCondition);
+                    //stop it now
+                    that.runStopAlert(getCurrentCurrencyPair(), name);
+                    var theMessage = that.getAlertMessage();
+                    that.closeAlert();
+                    s(theMessage);
+                }
+            }, 100);
+	    });
     }
     createNewAlert(alertName) {
-	var that = this;
-	return new Promise((s,f) => 
-	{
-		var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
-		var item = this.xpathGetFirstItem(more);
-		that.triggerMouseEvent(item, "mousedown");
-		setTimeout(function () {
-		    var newAlert = that.xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
-		    that.triggerMouseEvent(newAlert, "click");
-		    setTimeout(() => {
-			$("input[name='alert-name']")[0].value = alertName;
-			that.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
-			that.triggerMouseEvent($("input[name='alert-name']")[0], "input");
-			that.triggerMouseEvent($("input[name='alert-name']")[0], "change");
-			that.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
-			setTimeout(() => {
-			    const ke = new KeyboardEvent('keydown', {
-				bubbles: true,
-				cancelable: true,
-				keyCode: 13
-			    });
-			    document.body.dispatchEvent(ke);
-			    s();
-			}, 50);
-		    }, 350);
-		}, 250);
-	});
+        var that = this;
+        return new Promise((s,f) => 
+        {
+            var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
+            var item = this.xpathGetFirstItem(more);
+            that.triggerMouseEvent(item, "mousedown");
+            var newAlert = "//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]";
+            that.waitForElement(newAlert).then((e1)=>{
+                that.triggerMouseEvent(e1, "click");
+                var inputVal = "//input[@name='alert-name']";
+                that.waitForElement(inputVal).then((e2)=>{
+                    e2.value = alertName;
+                    that.triggerMouseEvent(e2, "focus");
+                    that.triggerMouseEvent(e2, "input");
+                    that.triggerMouseEvent(e2, "change");
+                    that.triggerMouseEvent(e2, "blur");
+                    that.pressEnter().then(()=>{
+                        s();
+                    });
+                });
+            });
+        });
+    }
+    pressEnter() {
+        return new Promise((s,f)=>{
+            setTimeout(() => {
+                    const ke = new KeyboardEvent('keydown', {
+                    bubbles: true,
+                    cancelable: true,
+                    keyCode: 13
+                });
+                document.body.dispatchEvent(ke);
+                s();
+            }, 50);
+        });
     }
     deleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
         this.triggerMouseEvent(del, "click");
         var that = this;
-        setTimeout(function () {
-            var yesButton = that.xpathGetFirstItem("//button[starts-with(@class,'actionButton') and @name='yes']");
-            that.triggerMouseEvent(yesButton, "click");
-        }, 150);
+        var yesButton = "//button[starts-with(@class,'actionButton') and @name='yes']";
+        that.waitForElement(yesButton).then((e)=>{
+            that.triggerMouseEvent(e, "click");
+        });
     }
 	setStrategySettings(sets)
 	{
@@ -132,8 +140,9 @@ class B52Tv {
 		var item = tv.xpathGetFirstItem(settings);
 		tv.triggerMouseEvent(item, "mousedown");
 		var that = this;
-		setTimeout(function () {
-			for(var i=0;i<sets.length;i++)
+        var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+        this.waitForElement(input).then((e)=>{
+            for(var i=0;i<sets.length;i++)
 			{
 				var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
 				var inputNode = tv.xpathGetFirstItem(input);
@@ -147,8 +156,36 @@ class B52Tv {
 				var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
 				tv.triggerMouseEvent(ok, "click");
 			},5000);
-		},150);
+        });
 	}
+    waitForElement(xpath)
+    {
+        var that = this;
+        return new Promise((s,f) => {
+            var maxTimer = 300;
+            var existCondition = setInterval(() => {
+                var theElementFound = that.xpathItemCount(xpath)>0;
+                if (theElementFound) {
+                    //wait till ready and exit
+                    var theElement = that.xpathGetFirstItem(xpath);
+                    $(theElement).ready(()=>{
+                        s(theElement);
+                    });
+                    //exit
+                    clearInterval(existCondition);
+                }
+                else if(maxTimer<1)
+                {
+                    console.log("Didn't find element after 30 seconds: "+xpath);
+                    clearInterval(existCondition);
+                }
+                else
+                {
+                    maxTimer--;
+                }
+            }, 100);
+        });
+    }
 }
 
 class BinanceAdapter {
@@ -310,6 +347,23 @@ tvObserver.AddAction(()=>{
 		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit2),"click");
 	}
 });
+tvObserver.AddAction(()=>{
+	//shit window 3
+	var shit3 = "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']";
+	if(tv.xpathItemCount(shit3)>0)
+	{
+		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit3),"click");
+	}
+});
+tvObserver.AddAction(()=>{
+	//shit window 4
+	var shit4 = "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]";
+	if(tv.xpathItemCount(shit4)>0)
+	{
+		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit4),"click");
+	}
+});
+//
 tvObserver.Start();
 
 
