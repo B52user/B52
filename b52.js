@@ -67,13 +67,16 @@ class B52Tv {
         var that =this;
         var play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
         //try clicking if no try openning then clicking
-        if(that.xpathItemCount(play)<1)
-        {
-            var menu = that.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
-            that.tv.triggerMouseEvent(menu, "click");
-        }
-        that.waitForElement(play).then((e)=>{
-            that.triggerMouseEvent(e, "click");
+        var alertMenu = "//div[@data-role='button' and @data-name='alerts']";
+        that.tv.waitForElement(alertMenu).then((a)=>{
+            if(that.xpathItemCount(play)<1)
+            {
+                var menu = that.tv.xpathGetFirstItem();
+                that.tv.triggerMouseEvent(a, "click");
+            }
+            that.waitForElement(play).then((e)=>{
+                that.triggerMouseEvent(e, "click");
+            });
         });
     }
     getCurrentStrategyName() {
@@ -397,7 +400,15 @@ tvObserver.AddAction(()=>{
 		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit4),"click");
 	}
 });
-//
+tvObserver.AddAction(()=>{
+	//shit window 5
+	var shit5 = "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']";
+	if(tv.xpathItemCount(shit5)>0)
+	{
+		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit5),"click");
+	}
+});
+
 tvObserver.Start();
 
 
