@@ -149,7 +149,7 @@ class B52Tv {
 		var item = tv.xpathGetFirstItem(settings);
 		tv.triggerMouseEvent(item, "mousedown");
 		var that = this;
-        var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+        var input = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
         this.waitForElement(input).then((e)=>{
             for(var i=0;i<sets.length;i++)
 			{
