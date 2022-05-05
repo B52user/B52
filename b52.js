@@ -338,9 +338,6 @@ class B52Widget {
 
 class B52TvService
 {
-    constructor(B52Tv) {
-        this.tv = B52Tv;
-    }
 	AddAction(action)
 	{
 		this.arrayOfActions.push(action);
@@ -373,10 +370,11 @@ class B52TvService
 		clearInterval(this.service);
 	}
 
-	constructor(freq){
+	constructor(B52Tv,freq){
 		this.arrayOfActions = [];
 		this.service = null;
 		this.freq = freq;
+        this.tv = B52Tv;
 	}
 }
 
@@ -384,7 +382,7 @@ var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
 var page = new B52Widget(tv,b,"dark");
 page.Build();
-var tvShitObserver = new B52TvService(100);
+var tvShitObserver = new B52TvService(tv,100);
 tvShitObserver.AddCloseClickers(
     [
         "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
