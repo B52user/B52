@@ -342,6 +342,19 @@ class B52TvService
 	{
 		this.arrayOfActions.push(action);
 	}
+    AddCloseClickers(closers)
+    {
+        for(var i=0;i<closers.length;i++)
+        {
+            this.AddAction(()=>{
+                var shit = closers[i];
+                if(tv.xpathItemCount(shit)>0)
+                {
+                    tv.triggerMouseEvent(tv.xpathGetFirstItem(shit),"click");
+                }    
+            });
+        }
+    }
 	
 	Start() {
 		var that = this;
@@ -367,48 +380,16 @@ var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
 var page = new B52Widget(tv,b,"dark");
 page.Build();
-var tvObserver = new B52TvService(100);
-tvObserver.AddAction(()=>{
-	//shit window 1
-	var shit1 = "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]";
-	if(tv.xpathItemCount(shit1)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit1),"click");
-	}
-});
-tvObserver.AddAction(()=>{
-	//shit window 2
-	var shit2 = "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']";
-	if(tv.xpathItemCount(shit2)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit2),"click");
-	}
-});
-tvObserver.AddAction(()=>{
-	//shit window 3
-	var shit3 = "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']";
-	if(tv.xpathItemCount(shit3)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit3),"click");
-	}
-});
-tvObserver.AddAction(()=>{
-	//shit window 4
-	var shit4 = "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]";
-	if(tv.xpathItemCount(shit4)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit4),"click");
-	}
-});
-tvObserver.AddAction(()=>{
-	//shit window 5
-	var shit5 = "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']";
-	if(tv.xpathItemCount(shit5)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit5),"click");
-	}
-});
-
+var tvShitObserver = new B52TvService(100);
+tvShitObserver.AddCloseClickers(
+    [
+        "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
+        "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
+        "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']",
+        "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
+        "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']"
+    ]
+);
 tvObserver.Start();
 
 
