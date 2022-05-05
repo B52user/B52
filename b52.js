@@ -58,8 +58,17 @@ class B52Tv {
         });
     }
     runStopAlert(currency, name) {
-        var play = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]");
-        this.triggerMouseEvent(play, "click");
+        var that =this;
+        var play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
+        //try clicking if no try openning then clicking
+        if(that.xpathItemCount(play)<1)
+        {
+            var menu = that.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
+            that.tv.triggerMouseEvent(menu, "click");
+        }
+        that.waitForElement(play).them((e)=>{
+            this.triggerMouseEvent(play, "click");
+        });
     }
     getCurrentStrategyName() {
         var sign = this.xpathGetFirstItem("//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]");
@@ -256,8 +265,7 @@ class B52Widget {
         });
         $("#B52StartBinance").click(() => {
             var theUniqueName = "B52 " + Date.now().toString();
-            var menu = this.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
-            this.tv.triggerMouseEvent(menu, "click");
+            
             var that = this;
             this.tv.createNewAlert(theUniqueName).then(() => {
                 that.tv.grabAlertMessage(theUniqueName).then((res) => {
