@@ -10,7 +10,9 @@ class B52Tv {
     }
     getCurrentCurrencyPair() {
         var sign = this.xpathGetFirstItem("//div[@id='header-toolbar-symbol-search']/div");
-        return sign.innerText;
+	    var pairText = sign.innerText;
+	    if(pairText.substr(pairText.length - 4)=="PERP") pairText = pairText.slice(0,-4);
+        return pairText;
     }
     xpathItemCount(xpath) {
         return document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
@@ -100,21 +102,67 @@ class B52Tv {
             that.triggerMouseEvent(yesButton, "click");
         }, 150);
     }
+	setStrategySettings(sets)
+	{
+		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
+		var item = tv.xpathGetFirstItem(settings);
+		tv.triggerMouseEvent(item, "mousedown");
+		var that = this;
+		setTimeout(function () {
+			for(var i=0;i<sets.length;i++)
+			{
+				var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+				var inputNode = tv.xpathGetFirstItem(input);
+				inputNode.value = sets[i].value;
+				tv.triggerMouseEvent(inputNode, "focus");
+				tv.triggerMouseEvent(inputNode, "input");
+				tv.triggerMouseEvent(inputNode, "change");
+				tv.triggerMouseEvent(inputNode, "blur");
+			}
+			setTimeout(function(){
+				var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
+				tv.triggerMouseEvent(ok, "click");
+			},5000);
+		},150);
+	}
 }
 
 
 class BinanceAdapter {
     constructor(B52Tv) {
         this.tv = B52Tv;
+	this.ExchangeInfo = null;
     }
-    GetTickSize(resultFunc) {
-        var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
-	var that = this;
-        $.getJSON(url, function (tiketInfo) {
-            var theMinSize = parseFloat(tiketInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair())[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
-            resultFunc(theMinSize);
-        });
-    }
+	_getExchangeInfo(then)
+	{
+		var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+		var that = this;
+		$.getJSON(url, function (tiketInfo) {
+			that.ExchangeInfo = tiketInfo;
+			then();
+		    
+		});	
+	}
+	_getSize(then)
+	{
+			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==this.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+this.tv.getCurrentCurrencyPair());}
+			else
+			{
+				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+				then(theMinSize);
+			}
+	}
+    	GetTickSize(resultFunc) {
+		if(this.ExchangeInfo==null)
+		{
+			this._getExchangeInfo(()=>{this._getSize(resultFunc);});
+		}
+		else
+		{
+			this._getSize(resultFunc);
+		}
+    	}
 }
 
 const B52AreaHtml = `
