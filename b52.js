@@ -66,8 +66,8 @@ class B52Tv {
             var menu = that.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
             that.tv.triggerMouseEvent(menu, "click");
         }
-        that.waitForElement(play).them((e)=>{
-            this.triggerMouseEvent(play, "click");
+        that.waitForElement(play).then((e)=>{
+            this.triggerMouseEvent(e, "click");
         });
     }
     getCurrentStrategyName() {
