@@ -53,8 +53,14 @@ class B52Tv {
         this.triggerMouseEvent(arrow, "click");
         var that = this;
         var fav = "//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]";
-        this.waitForElement(fav).then((e)=>{
-            that.triggerMouseEvent(e, "click");
+        return new Promise((s,f)=>{
+            that.waitForElement(fav).then((e)=>{
+                that.triggerMouseEvent(e, "click");
+                var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
+                that.waitForElement(settings).then((e2)=>{
+                    s();
+                });
+            });
         });
     }
     runStopAlert(currency, name) {
@@ -67,7 +73,7 @@ class B52Tv {
             that.tv.triggerMouseEvent(menu, "click");
         }
         that.waitForElement(play).then((e)=>{
-            this.triggerMouseEvent(e, "click");
+            that.triggerMouseEvent(e, "click");
         });
     }
     getCurrentStrategyName() {
@@ -110,11 +116,6 @@ class B52Tv {
                 var inputVal = "//input[@name='alert-name']";
                 that.waitForElement(inputVal).then((e2)=>{
                         that.setReactValue(e2,alertName);
-                    /*e2.value = alertName;
-                    that.triggerMouseEvent(e2, "focus");
-                    that.triggerMouseEvent(e2, "input");
-                    that.triggerMouseEvent(e2, "change");
-                    that.triggerMouseEvent(e2, "blur");*/
                         that.pressEnter().then(()=>{
                             s();
                         });
@@ -151,15 +152,18 @@ class B52Tv {
 		this.triggerMouseEvent(item, "mousedown");
 		var that = this;
         var input = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
-        this.waitForElement(input).then((e)=>{
-            for(var i=0;i<sets.length;i++)
-			{
-				var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
-				var inputNode = that.xpathGetFirstItem(input);
-                that.setReactValue(inputNode,sets[i].value);
-			}
-            var ok = that.xpathGetFirstItem("//button[@data-name='submit-button']");
-			that.triggerMouseEvent(ok, "click");
+        return new Promise((s,f)=>{
+            this.waitForElement(input).then((e)=>{
+                for(var i=0;i<sets.length;i++)
+                {
+                    var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+                    var inputNode = that.xpathGetFirstItem(input);
+                    that.setReactValue(inputNode,sets[i].value);
+                }
+                var ok = that.xpathGetFirstItem("//button[@data-name='submit-button']");
+                that.triggerMouseEvent(ok, "click");
+                s();
+            });
         });
 	}
     waitForElement(xpath)
@@ -268,29 +272,16 @@ class B52Widget {
         $("#B52ClearChart").click(() => {
             this.tv.clearB52s();
         });
-        $("#B52Start100").click(() => {
-            this.tv.runFavIndicator($("#B52Start100").text());
-        });
-        $("#B52StartBinance").click(() => {
-            var theUniqueName = "B52 " + Date.now().toString();
-            
-            var that = this;
-            this.tv.createNewAlert(theUniqueName).then(() => {
-                that.tv.grabAlertMessage(theUniqueName).then((res) => {
-                    $("#B52Result").text(res);
-                    setTimeout(function () {
-                        that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
-                    }, 50);
-                });
-            });
-        });
+        $("#B52Start100").click(() => {startStrategy();});
+        $("#B52StartBinance").click(() => {makeADeal();});
+
         $("#B52ConnectBinance").click(() => {
             this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
         });
-        this.Stlye();
+        this.stlyeIt();
     }
 
-    Stlye() {
+    stlyeIt() {
         $("#B52Area.dark").css({
             "-webkit-user-drag": "element",
             "resize": "both",
@@ -312,6 +303,33 @@ class B52Widget {
             "border": "1px solid gray",
             "background-color": "#3f5721"
         });
+    }
+
+    startStrategy() {
+        var that = this;
+        this.tv.runFavIndicator($("#B52Start100").text()).then(()=>{
+            that.b.GetTickSize().then((s)=>{
+                var sets = [];
+                if(s!=1)
+                {
+                    sets.push({label:"Min buy quantity",value:s})
+                }
+                that.tv.setStrategySettings(sets);
+            });
+            
+        });
+    }
+    makeADeal() {
+        var theUniqueName = "B52 " + Date.now().toString();
+            var that = this;
+            this.tv.createNewAlert(theUniqueName).then(() => {
+                that.tv.grabAlertMessage(theUniqueName).then((res) => {
+                    $("#B52Result").text(res);
+                    setTimeout(function () {
+                        that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
+                    }, 50);
+                });
+            });
     }
 }
 
