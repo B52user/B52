@@ -1,4 +1,23 @@
 const secretWord = "B52";
+const B52AreaHtml = `
+<div>
+  <button id='B52ClearChart'>Clear chart</button>
+</div>
+<div>
+  <button id='B52Start100'>B52</button>
+</div>
+<div>
+  <button id='B52StartBinance'>START!</button>
+</div>
+<div>
+  Binance connection status: <span id="B52ConnectionStatus"></span>
+  <button id='B52ConnectBinance'>Connect</button>
+</div>
+<div>
+  Results:
+  <div id='B52Result'></div>
+</div>
+`;
 
 class B52Tv {
     constructor() {
@@ -54,8 +73,9 @@ class B52Tv {
         var close = this.xpathGetFirstItem("//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]");
         this.triggerMouseEvent(close, "click");
     }
-    grabAlertMessage(name, thenRun) {
+    grabAlertMessage(name) {
         var that = this;
+	return new Promise((s,f) => {
         var existCondition = setInterval(function () {
             if ($("div[data-qa-dialog-name='alert-fired']").length) {
                 clearInterval(existCondition);
@@ -63,35 +83,39 @@ class B52Tv {
                 that.runStopAlert(getCurrentCurrencyPair(), name);
                 var theMessage = that.getAlertMessage();
                 that.closeAlert();
-                thenRun(theMessage);
+                s(theMessage);
             }
         }, 100);
+	});
     }
-    createNewAlert(alertName, thenRun) {
-        var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
-        var item = this.xpathGetFirstItem(more);
-        this.triggerMouseEvent(item, "mousedown");
-        var that = this;
-        setTimeout(function () {
-            var newAlert = that.xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
-            that.triggerMouseEvent(newAlert, "click");
-            setTimeout(function () {
-                $("input[name='alert-name']")[0].value = alertName;
-                that.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
-                that.triggerMouseEvent($("input[name='alert-name']")[0], "input");
-                that.triggerMouseEvent($("input[name='alert-name']")[0], "change");
-                that.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
-                setTimeout(function () {
-                    const ke = new KeyboardEvent('keydown', {
-                        bubbles: true,
-                        cancelable: true,
-                        keyCode: 13
-                    });
-                    document.body.dispatchEvent(ke);
-                    thenRun();
-                }, 50);
-            }, 350);
-        }, 250);
+    createNewAlert(alertName) {
+	var that = this;
+	return new Promise((s,f) => 
+	{
+		var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
+		var item = this.xpathGetFirstItem(more);
+		that.triggerMouseEvent(item, "mousedown");
+		setTimeout(function () {
+		    var newAlert = that.xpathGetFirstItem("//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]");
+		    that.triggerMouseEvent(newAlert, "click");
+		    setTimeout(() => {
+			$("input[name='alert-name']")[0].value = alertName;
+			that.triggerMouseEvent($("input[name='alert-name']")[0], "focus");
+			that.triggerMouseEvent($("input[name='alert-name']")[0], "input");
+			that.triggerMouseEvent($("input[name='alert-name']")[0], "change");
+			that.triggerMouseEvent($("input[name='alert-name']")[0], "blur");
+			setTimeout(() => {
+			    const ke = new KeyboardEvent('keydown', {
+				bubbles: true,
+				cancelable: true,
+				keyCode: 13
+			    });
+			    document.body.dispatchEvent(ke);
+			    s();
+			}, 50);
+		    }, 350);
+		}, 250);
+	});
     }
     deleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
@@ -126,7 +150,6 @@ class B52Tv {
 		},150);
 	}
 }
-
 
 class BinanceAdapter {
     constructor(B52Tv) {
@@ -177,26 +200,6 @@ class BinanceAdapter {
     	}
 }
 
-const B52AreaHtml = `
-<div>
-  <button id='B52ClearChart'>Clear chart</button>
-</div>
-<div>
-  <button id='B52Start100'>B52</button>
-</div>
-<div>
-  <button id='B52StartBinance'>START!</button>
-</div>
-<div>
-  Binance connection status: <span id="B52ConnectionStatus"></span>
-  <button id='B52ConnectBinance'>Connect</button>
-</div>
-<div>
-  Results:
-  <div id='B52Result'></div>
-</div>
-`;
-
 class B52Widget {
     constructor(B52Tv, BinanceAdapter, theme) {
         this.tv = B52Tv;
@@ -219,8 +222,8 @@ class B52Widget {
             var menu = this.tv.xpathGetFirstItem("//div[@data-role='button' and @data-name='alerts']");
             this.tv.triggerMouseEvent(menu, "click");
             var that = this;
-            this.tv.createNewAlert(theUniqueName, () => {
-                that.tv.grabAlertMessage(theUniqueName, (res) => {
+            this.tv.createNewAlert(theUniqueName).then(() => {
+                that.tv.grabAlertMessage(theUniqueName).then((res) => {
                     $("#B52Result").text(res);
                     setTimeout(function () {
                         that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
@@ -229,7 +232,7 @@ class B52Widget {
             });
         });
         $("#B52ConnectBinance").click(() => {
-            this.b.GetTickSize((size) => { $("#B52ConnectionStatus").text(size.toString()); });
+            this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
         });
         this.Stlye();
     }
