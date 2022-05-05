@@ -75,21 +75,4 @@ var b = new BinanceAdapter(tv);
 b.GetTickSize((s)=>{console.log(s);});
 setStrategySettings([{label:"Min buy quantity",value:0.1}]);
 
-function waitForElement(xpath)
-{
-	var that = this;
-	return new Promise((s,f) => {
-		var maxTimer = 300;
-		var existCondition = setInterval(() => {
-			var theElement = that. !!!!!!!!!!!!!!!!!!!!!
-		    if ($("div[data-qa-dialog-name='alert-fired']").length) {
-			clearInterval(existCondition);
-			//stop it now
-			that.runStopAlert(getCurrentCurrencyPair(), name);
-			var theMessage = that.getAlertMessage();
-			that.closeAlert();
-			s(theMessage);
-		    }
-		}, 100);
-	}
-}
+
