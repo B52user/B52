@@ -109,14 +109,15 @@ class B52Tv {
                 that.triggerMouseEvent(e1, "click");
                 var inputVal = "//input[@name='alert-name']";
                 that.waitForElement(inputVal).then((e2)=>{
-                    e2.value = alertName;
+                        that.setReactValue(e2,alertName);
+                    /*e2.value = alertName;
                     that.triggerMouseEvent(e2, "focus");
                     that.triggerMouseEvent(e2, "input");
                     that.triggerMouseEvent(e2, "change");
-                    that.triggerMouseEvent(e2, "blur");
-                    that.pressEnter().then(()=>{
-                        s();
-                    });
+                    that.triggerMouseEvent(e2, "blur");*/
+                        that.pressEnter().then(()=>{
+                            s();
+                        });
                 });
             });
         });
@@ -147,24 +148,18 @@ class B52Tv {
 	{
 		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
 		var item = tv.xpathGetFirstItem(settings);
-		tv.triggerMouseEvent(item, "mousedown");
+		this.triggerMouseEvent(item, "mousedown");
 		var that = this;
         var input = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
         this.waitForElement(input).then((e)=>{
             for(var i=0;i<sets.length;i++)
 			{
 				var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
-				var inputNode = tv.xpathGetFirstItem(input);
-				inputNode.value = sets[i].value;
-				tv.triggerMouseEvent(inputNode, "focus");
-				tv.triggerMouseEvent(inputNode, "input");
-				tv.triggerMouseEvent(inputNode, "change");
-				tv.triggerMouseEvent(inputNode, "blur");
+				var inputNode = that.xpathGetFirstItem(input);
+                that.setReactValue(inputNode,sets[i].value);
 			}
-			setTimeout(function(){
-				var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
-				tv.triggerMouseEvent(ok, "click");
-			},5000);
+            var ok = that.xpathGetFirstItem("//button[@data-name='submit-button']");
+			that.triggerMouseEvent(ok, "click");
         });
 	}
     waitForElement(xpath)
@@ -194,6 +189,19 @@ class B52Tv {
                 }
             }, 100);
         });
+    }
+    setReactValue(element, value) {
+        let lastValue = element.value;
+        element.value = value;
+        let event = new Event("input", { target: element, bubbles: true });
+        // React 15
+        event.simulated = true;
+        // React 16
+        let tracker = element._valueTracker;
+        if (tracker) {
+            tracker.setValue(lastValue);
+        }
+        element.dispatchEvent(event);
     }
 }
 
