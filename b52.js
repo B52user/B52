@@ -265,6 +265,7 @@ class B52Widget {
         this.b = BinanceAdapter;
     }
     Build() {
+        var that = this;
         $('body').append('<div id="B52Area" draggable="true" class="' + this.theme + '"></div>');
         $('#B52Area').html(B52AreaHtml);
 
@@ -272,13 +273,13 @@ class B52Widget {
         $("#B52ClearChart").click(() => {
             this.tv.clearB52s();
         });
-        $("#B52Start100").click(() => {startStrategy();});
-        $("#B52StartBinance").click(() => {makeADeal();});
+        $("#B52Start100").click(() => {that.startStrategy();});
+        $("#B52StartBinance").click(() => {that.makeADeal();});
 
         $("#B52ConnectBinance").click(() => {
             this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
         });
-        this.stlyeIt();
+        that.stlyeIt();
     }
 
     stlyeIt() {
@@ -304,7 +305,6 @@ class B52Widget {
             "background-color": "#3f5721"
         });
     }
-
     startStrategy() {
         var that = this;
         this.tv.runFavIndicator($("#B52Start100").text()).then(()=>{
