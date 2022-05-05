@@ -9,3 +9,8 @@ tvObserver.AddAction(()=>{
 		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit3),"click");
 	}
 });
+
+var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
+var item = tv.xpathGetFirstItem(settings);
+tv.triggerMouseEvent(item, "mousedown");
+//div[./div[text()="Max Loss in $"]]/following-sibling::div[1]//input
