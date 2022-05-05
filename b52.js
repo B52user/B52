@@ -109,8 +109,9 @@ class BinanceAdapter {
     }
     GetTickSize(resultFunc) {
         var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+	var that = this;
         $.getJSON(url, function (tiketInfo) {
-            var theMinSize = parseFloat(tiketInfo.symbols.filter(a=>a.pair==this.tv.getCurrentCurrencyPair())[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+            var theMinSize = parseFloat(tiketInfo.symbols.filter(a=>a.pair==that.tv.getCurrentCurrencyPair())[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
             resultFunc(theMinSize);
         });
     }
