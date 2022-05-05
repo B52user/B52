@@ -34,5 +34,44 @@ function setStrategySettings(sets)
 	},150);
 }
 
+class BinanceAdapter {
+    constructor(B52Tv) {
+        this.tv = B52Tv;
+	this.ExchangeInfo = null;
+    }
+	_getExchangeInfo(then)
+	{
+		var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+		var that = this;
+		$.getJSON(url, function (tiketInfo) {
+			that.ExchangeInfo = tiketInfo;
+			then();
+		    
+		});	
+	}
+    	GetTickSize(resultFunc) {
+		var that = this;
+		var getSize = (then) => {
+			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
+			else
+			{
+				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+				then(theMinSize);
+			}
+		};
+		if(this.ExchangeInfo==null)
+		{
+			this._getExchangeInfo(getSize(resultFunc));
+		}
+		else
+		{
+			getSize(resultFunc);
+		}
+    	}
+}
+var tv = new B52Tv();
+var b = new BinanceAdapter(tv);
+b.GetTicketSize((size)=>{console.log(size);});
 setStrategySettings([{label:"Min buy quantity",value:0.1}]);
 
