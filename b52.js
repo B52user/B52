@@ -338,19 +338,23 @@ class B52Widget {
 
 class B52TvService
 {
+    constructor(B52Tv) {
+        this.tv = B52Tv;
+    }
 	AddAction(action)
 	{
 		this.arrayOfActions.push(action);
 	}
     AddCloseClickers(closers)
     {
+        var that = this;
         for(var i=0;i<closers.length;i++)
         {
-            this.AddAction(()=>{
-                var shit = closers[i];
-                if(tv.xpathItemCount(shit)>0)
+            var shit = closers[i];
+            that.AddAction(()=>{
+                if(that.tv.xpathItemCount(shit)>0)
                 {
-                    tv.triggerMouseEvent(tv.xpathGetFirstItem(shit),"click");
+                    that.tv.triggerMouseEvent(tv.xpathGetFirstItem(shit),"click");
                 }    
             });
         }
@@ -390,6 +394,6 @@ tvShitObserver.AddCloseClickers(
         "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']"
     ]
 );
-tvObserver.Start();
+tvShitObserver.Start();
 
 
