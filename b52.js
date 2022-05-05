@@ -80,7 +80,7 @@ class B52Tv {
                 if ($("div[data-qa-dialog-name='alert-fired']").length) {
                     clearInterval(existCondition);
                     //stop it now
-                    that.runStopAlert(getCurrentCurrencyPair(), name);
+                    that.runStopAlert(that.getCurrentCurrencyPair(), name);
                     var theMessage = that.getAlertMessage();
                     that.closeAlert();
                     s(theMessage);
