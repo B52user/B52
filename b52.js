@@ -351,13 +351,13 @@ class B52TvService
         var that = this;
         for(var i=0;i<closers.length;i++)
         {
-            that.AddAction(()=>{
-                var shit = closers[i];
-                if(that.tv.xpathItemCount(shit)>0)
+            var shit = closers[i];
+            that.AddAction(((s)=>{
+                if(that.tv.xpathItemCount(s)>0)
                 {
-                    that.tv.triggerMouseEvent(tv.xpathGetFirstItem(shit),"click");
+                    that.tv.triggerMouseEvent(that.tv.xpathGetFirstItem(s),"click");
                 }    
-            });
+            })(shit));
         }
     }
 	
