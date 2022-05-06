@@ -105,7 +105,6 @@ class B52Tv {
                     that.runStopAlert(that.getCurrentCurrencyPair(), name).then(()=>{
                         s(theMessage);
                     });
-                    
                 }
             }, 100);
 	    });
@@ -213,6 +212,23 @@ class B52Tv {
             tracker.setValue(lastValue);
         }
         element.dispatchEvent(event);
+    }
+    runNTimes(func,delay,times){
+        var maxTimer = times;
+            var existCondition = setInterval(() => {
+                func();
+
+                console.log(maxTimer);
+
+                if(maxTimer<1)
+                {
+                    clearInterval(existCondition);
+                }
+                else
+                {
+                    maxTimer--;
+                }
+            }, delay);
     }
 }
 
@@ -337,7 +353,15 @@ class B52Widget {
                     $("#B52Result").text(res);
                     setTimeout(function () {
                         that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
+                        that.tv.runNTimes(()=>{
+                            var theButtonClose = this.xpathGetFirstItem("//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]");
+                            if(that.tv.xpathItemCount(theButtonClose)>0)
+                            {
+                                that.tv.closeAlert();
+                            }
+                        },300,10);
                     }, 50);
+                    
                 });
             });
     }
