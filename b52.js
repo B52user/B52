@@ -349,16 +349,7 @@ class B52TvService
     AddCloseClickers(closers)
     {
         var that = this;
-        for(var i=0;i<closers.length;i++)
-        {
-            var shit = closers[i];
-            that.AddAction(((s)=>{
-                if(that.tv.xpathItemCount(s)>0)
-                {
-                    that.tv.triggerMouseEvent(that.tv.xpathGetFirstItem(s),"click");
-                }    
-            })(shit));
-        }
+        that.closers = closers;
     }
 	
 	Start() {
@@ -367,6 +358,15 @@ class B52TvService
 			for (var i = 0; i < that.arrayOfActions.length; i++) {
  			   that.arrayOfActions[i]();
 			}
+            for(var i=0;i<that.closers.length;i++)
+            {
+                var shit = closers[i];
+                if(that.tv.xpathItemCount(shit)>0)
+                {
+                    that.tv.triggerMouseEvent(that.tv.xpathGetFirstItem(shit),"click");
+                }    
+
+            }
 		}
         , this.freq);
 	}
@@ -379,6 +379,7 @@ class B52TvService
 		this.service = null;
 		this.freq = freq;
         this.tv = B52Tv;
+        this.closers = [];
 	}
 }
 
