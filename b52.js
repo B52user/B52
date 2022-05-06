@@ -321,7 +321,10 @@ class B52Widget {
                 {
                     sets.push({label:"Min buy quantity",value:s})
                 }
-                that.tv.setStrategySettings(sets);
+                if(sets.length)
+                {
+                    that.tv.setStrategySettings(sets);
+                }
             });
             
         });
