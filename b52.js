@@ -351,8 +351,8 @@ class B52TvService
         var that = this;
         for(var i=0;i<closers.length;i++)
         {
-            var shit = closers[i];
             that.AddAction(()=>{
+                var shit = closers[i];
                 if(that.tv.xpathItemCount(shit)>0)
                 {
                     that.tv.triggerMouseEvent(tv.xpathGetFirstItem(shit),"click");
