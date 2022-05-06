@@ -354,7 +354,7 @@ class B52Widget {
                     setTimeout(function () {
                         that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
                         that.tv.runNTimes(()=>{
-                            var theButtonClose = this.xpathGetFirstItem("//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]");
+                            var theButtonClose = "//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]";
                             if(that.tv.xpathItemCount(theButtonClose)>0)
                             {
                                 that.tv.closeAlert();
