@@ -360,7 +360,7 @@ class B52TvService
 			}
             for(var i=0;i<that.closers.length;i++)
             {
-                var shit = closers[i];
+                var shit = that.closers[i];
                 if(that.tv.xpathItemCount(shit)>0)
                 {
                     that.tv.triggerMouseEvent(that.tv.xpathGetFirstItem(shit),"click");
