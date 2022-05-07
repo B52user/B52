@@ -327,8 +327,9 @@ class BinanceAdapter {
 
         GetBalance()
         {
+            var that = this;
             return new Promise((s,f)=>{
-                signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
+                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
                     s(resp.filter(a=>a.asset=="USDT")[0].balance);
                 });
             });
