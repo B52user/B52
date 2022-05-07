@@ -1,78 +1,209 @@
-//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']
-//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]
-
-tvObserver.AddAction(()=>{
-	//shit window 3
-	var shit3 = "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]";
-	if(tv.xpathItemCount(shit3)>0)
-	{
-		tv.triggerMouseEvent(tv.xpathGetFirstItem(shit3),"click");
-	}
+let accessKey1 = "MEhBgQ7bJZ9u0kIlRHxdLSSyySwKAq83PckeEItzasgpE7EQArz4vzjfLWGlTrV0";
+let secretKey1 = "d5hxCPFCV05zmiE8JW2rUmruoFtksM9bRXFtYNlNfQaQtajQCTySiU5kWRqEw1OU";
+function signedGETRequest(url,accessKey,secretKey)
+    {
+		return new Promise((s,f)=>{
+			fetch("https://fapi.binance.com/fapi/v1/time")
+			.then(response => response.json())
+			.then(timer => {
+					var  timeCode = timer.serverTime;
+					var queryString = "timestamp=" + timeCode;
+					var hash = CryptoJS.HmacSHA256(queryString,secretKey);
+					var toAdd = queryString + "&signature=" + hash;
+					fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+						.then(response => response.json())
+						.then(resp => {
+							s(resp);
+						})
+						.catch(error => console.log(error));
+			})
+			.catch(error => console.log(error));
+		});
+    }
+function signedPOSTRequest(url,accessKey,secretKey,rBody)
+    {
+		return new Promise((s,f)=>{
+			fetch("https://fapi.binance.com/fapi/v1/time")
+			.then(response => response.json())
+			.then(timer => {
+					var  timeCode = timer.serverTime;
+					var queryString = "timestamp=" + timeCode;
+					var hash = CryptoJS.HmacSHA256(queryString,secretKey);
+					var toAdd = queryString + "&signature=" + hash;
+					fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
+						body:rBody})
+						.then(response => response.json())
+						.then(resp => {
+							s(resp);
+						})
+						.catch(error => console.log(error));
+			})
+			.catch(error => console.log(error));
+		});
+    }
+signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
+	console.log(resp.filter(a=>a.asset=="USDT")[0].balance);
 });
 
-function setStrategySettings(sets)
+
+var key1 = "";
+var key2 = "";
+function connect(key1,key2)
 {
-	var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
-	var item = tv.xpathGetFirstItem(settings);
-	tv.triggerMouseEvent(item, "mousedown");
-	var that = this;
-	setTimeout(function () {
-		for(var i=0;i<sets.length;i++)
-		{
-			var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
-			var inputNode = tv.xpathGetFirstItem(input);
-			inputNode.value = sets[i].value;
-			tv.triggerMouseEvent(inputNode, "focus");
-            		tv.triggerMouseEvent(inputNode, "input");
-            		tv.triggerMouseEvent(inputNode, "change");
-            		tv.triggerMouseEvent(inputNode, "blur");
-		}
-		setTimeout(function(){
-			var ok = tv.xpathGetFirstItem("//button[@data-name='submit-button']");
-			tv.triggerMouseEvent(ok, "click");
-		},5000);
-	},150);
-}
-
-class BinanceAdapter {
-    constructor(B52Tv) {
-        this.tv = B52Tv;
-	this.ExchangeInfo = null;
-    }
-	_getExchangeInfo(then)
-	{
-		var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
-		var that = this;
-		$.getJSON(url, function (tiketInfo) {
-			that.ExchangeInfo = tiketInfo;
-			then();
-		    
-		});	
-	}
-	_getSize(then)
-	{
-			var theSymb = this.ExchangeInfo.symbols.filter(a=>a.symbol==this.tv.getCurrentCurrencyPair());
-			if(!theSymb.length) {console.log("ERROR! Not found symbol "+this.tv.getCurrentCurrencyPair());}
-			else
-			{
-				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
-				then(theMinSize);
+	var timeTable = $.getJSON("https://fapi.binance.com/api/v3/time",(obj)=>{
+		console.log(obj);
+		var accRequest = "https://api.binance.com/api/v3/account?timestamp={{timestamp}}&signature={{signature}}";
+		debugger;
+		$.ajaxSetup({
+			headers:{
+				"X-MBX-APIKEY":"key"
 			}
-	}
-    	GetTickSize(resultFunc) {
-		if(this.ExchangeInfo==null)
-		{
-			this._getExchangeInfo(()=>{this._getSize(resultFunc);});
-		}
-		else
-		{
-			this._getSize(resultFunc);
-		}
-    	}
+		});
+	});
 }
-var tv = new B52Tv();
-var b = new BinanceAdapter(tv);
-b.GetTickSize((s)=>{console.log(s);});
-setStrategySettings([{label:"Min buy quantity",value:0.1}]);
 
 
+
+
+
+var a = "test";
+var s = "test";
+
+function signIt(apikey,secret)
+{
+	return new Promise((s,f)=>{
+		$.ajax({
+			beforeSend: function(req){
+				req.setRequestHeader("X-MBX-APIKEY", apikey);
+			},
+			dataType: "json",
+			url: "https://api.binance.com/api/v3/time",
+			success: (watch)=>
+			{
+				var queryString = "timestamp=" + watch.serverTime;
+				var hash = CryptoJS.HmacSHA256(queryString,secret);
+				s(queryString + "&signature=" + hash);
+			}
+		  })
+		 .done(function() {
+			console.log( "second success" );
+		  })
+		  .fail(function(err) {
+			console.log("Error1:");
+			console.log(err);
+		  })
+		  .always(function() {
+			console.log( "complete" );
+		  });
+	});
+}
+
+signIt(a,s).then((toadd)=>{
+	console.log(toadd);
+	var url = "https://api.binance.com/api/v3/account?"+toadd;
+	$.ajax({
+		beforeSend: function(req){
+			req.setRequestHeader("X-MBX-APIKEY", apikey);
+		},
+		dataType: "json",
+		url: url,
+		success: (resp)=>
+		{
+			console.log(resp);
+		}
+	})
+	.done(function() {
+		console.log( "second success" );
+	  })
+	  .fail(function(err) {
+		console.log("Error2:");
+		console.log(err);
+	  })
+	  .always(function() {
+		console.log( "complete" );
+	  });
+},(err)=>{
+	console.log("Error3:");
+	console.log(err);
+});
+
+var secret = 'mySecret';
+var queryString = 'timestamp=' + Date.now();
+var hash = CryptoJS.HmacSHA256(queryString,secret);
+var url = 'https://api.binance.com/api/v3/account?'+ queryString + '&signature=' +hash;
+
+$('.botonOrden').click(function(){
+    $.ajax({
+        beforeSend: function(req){
+            req.setRequestHeader("X-MBX-APIKEY", apiKey);
+        },
+        type: 'GET',
+        url: url
+    })
+    .done(function() {
+        console.log("success");
+    })
+    .fail(function() {
+        console.log("error");
+    })
+    .always(function() {
+        console.log("complete");
+    });
+});
+
+pm.sendRequest('https://api.binance.com/api/v3/time', function (err, res) {
+        console.log('Timestamp Response: '+res.json().serverTime);
+        pm.expect(err).to.not.be.ok;
+        var timestamp = res.json().serverTime;
+
+        postman.setEnvironmentVariable('timestamp',timestamp)  
+        postman.setGlobalVariable('timestamp',timestamp) 
+
+        let paramsObject = {};
+
+        const binance_api_secret = 'YOUR_API_SECRET';
+
+        const parameters = pm.request.url.query;
+
+        parameters.map((param) => {
+            if (param.key != 'signature' && 
+                param.key != 'timestamp' && 
+                !is_empty(param.value) &&
+                !is_disabled(param.disabled)) {
+                    paramsObject[param.key] = param.value;
+            }
+        })
+        
+        Object.assign(paramsObject, {'timestamp': timestamp});
+
+        if (binance_api_secret) {
+            const queryString = Object.keys(paramsObject).map((key) => {
+                return `${encodeURIComponent(key)}=${paramsObject[key]}`;
+            }).join('&');
+            console.log(queryString);
+            const signature = CryptoJS.HmacSHA256(queryString, binance_api_secret).toString();
+            pm.environment.set("signature", signature);
+        }
+
+        function is_disabled(str) {
+            return str == true;
+        }
+
+        function is_empty(str) {
+            if (typeof str == 'undefined' ||
+                !str || 
+                str.length === 0 || 
+                str === "" ||
+                !/[^\s]/.test(str) ||
+                /^\s*$/.test(str) ||
+                str.replace(/\s/g,"") === "")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+); 

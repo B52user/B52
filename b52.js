@@ -1,3 +1,5 @@
+const accessKey1 = "MEhBgQ7bJZ9u0kIlRHxdLSSyySwKAq83PckeEItzasgpE7EQArz4vzjfLWGlTrV0";
+const secretKey1 = "d5hxCPFCV05zmiE8JW2rUmruoFtksM9bRXFtYNlNfQaQtajQCTySiU5kWRqEw1OU";
 const secretWord = "B52";
 const B52AreaHtml = `
 <div>
@@ -247,7 +249,7 @@ class BinanceAdapter {
 				that.ExchangeInfo = tiketInfo;
 				s();
 			});	
-			});
+		});
 	}
 	
 	_getSize()
@@ -265,7 +267,7 @@ class BinanceAdapter {
 		});
 	}
 	
-    	GetTickSize() {
+    GetTickSize() {
 		var that = this;
 		return new Promise((s,f) =>
 		{
@@ -278,7 +280,60 @@ class BinanceAdapter {
 				this._getSize().then(s);
 			}
 		});
-    	}
+    }
+    
+    _signedGETRequest(url,accessKey,secretKey)
+        {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        var queryString = "timestamp=" + timeCode;
+                        var hash = CryptoJS.HmacSHA256(queryString,secretKey);
+                        var toAdd = queryString + "&signature=" + hash;
+                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+        }
+
+    _signedPOSTRequest(url,accessKey,secretKey,rBody)
+        {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        var queryString = "timestamp=" + timeCode;
+                        var hash = CryptoJS.HmacSHA256(queryString,secretKey);
+                        var toAdd = queryString + "&signature=" + hash;
+                        fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
+                            body:rBody})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+        }
+
+        GetBalance()
+        {
+            return new Promise((s,f)=>{
+                signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
+                    s(resp.filter(a=>a.asset=="USDT")[0].balance);
+                });
+            });
+            
+        }
 }
 
 class B52Widget {
@@ -300,7 +355,8 @@ class B52Widget {
         $("#B52StartBinance").click(() => {that.makeADeal();});
 
         $("#B52ConnectBinance").click(() => {
-            this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
+            //this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
+            this.b.GetBalance().then((bal)=>{$("#B52ConnectionStatus").text("$"+bal.toString());})
         });
         that.stlyeIt();
     }
