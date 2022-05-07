@@ -1,5 +1,28 @@
-let accessKey1 = "MEhBgQ7bJZ9u0kIlRHxdLSSyySwKAq83PckeEItzasgpE7EQArz4vzjfLWGlTrV0";
-let secretKey1 = "d5hxCPFCV05zmiE8JW2rUmruoFtksM9bRXFtYNlNfQaQtajQCTySiU5kWRqEw1OU";
+var dummyMakeSTopLimit = `
+{
+	"batchOrders":[
+		{
+			"side": "BUY",
+			"stopPrice": "35600",        
+			"symbol": "BTCUSDT",
+			"type": "STOP_MARKET"
+		},
+		{
+			"side": "BUY",
+			"stopPrice": "35610",        
+			"symbol": "BTCUSDT",
+			"type": "STOP_MARKET"
+		}
+	]
+}
+`;
+
+b._signedPOSTRequest("https://fapi.binance.com/fapi/v1/batchOrders?",accessKey1,secretKey1,dummyMakeSTopLimit).then((resp)=>{
+	console.log(resp);
+});
+
+const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
+const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
 function signedGETRequest(url,accessKey,secretKey)
     {
 		return new Promise((s,f)=>{

@@ -1,5 +1,5 @@
-const accessKey1 = "MEhBgQ7bJZ9u0kIlRHxdLSSyySwKAq83PckeEItzasgpE7EQArz4vzjfLWGlTrV0";
-const secretKey1 = "d5hxCPFCV05zmiE8JW2rUmruoFtksM9bRXFtYNlNfQaQtajQCTySiU5kWRqEw1OU";
+const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
+const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
 const secretWord = "B52";
 const B52AreaHtml = `
 <div>
