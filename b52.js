@@ -336,7 +336,7 @@ class BinanceAdapter {
                 var arr = JSON.parse(message);
                 var messageResponses = [];
                 arr.forEach(e=>{
-                    e["symbol"] = getCurrentCurrencyPair();
+                    e["symbol"] = that.tv.getCurrentCurrencyPair();
                     /*
                     that.signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,e).then((resp)=>{
                         s(messageResponses);
