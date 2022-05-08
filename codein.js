@@ -1,29 +1,37 @@
-var dummyMakeSTopLimit = `
-{
-	"batchOrders":[
-		{
-			"side": "BUY",
-			"stopPrice": "35600",        
-			"symbol": "BTCUSDT",
-			"type": "STOP_MARKET"
-		},
-		{
-			"side": "BUY",
-			"stopPrice": "35610",        
-			"symbol": "BTCUSDT",
-			"type": "STOP_MARKET"
-		}
-	]
-}
-`;
+const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
+const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
+params = null;
+var dummyMakeSTopLimit = `[{'side':'BUY','stopPrice':'32000','symbol':'BTCUSDT','type':'STOP_MARKET'},{'side':'BUY','stopPrice':'32500','symbol':'BTCUSDT','type':'STOP_MARKET'}]`;
 
-b._signedPOSTRequest("https://fapi.binance.com/fapi/v1/batchOrders?",accessKey1,secretKey1,dummyMakeSTopLimit).then((resp)=>{
+var theSingleOrder = `{"side":"BUY","stopPrice":"13.510","symbol":"WAVESUSDT","type":"STOP_MARKET","quantity":"0.5","timeInForce":"GTC"}`;
+
+function signedPOSTRequest_simple(url,accessKey,secretKey,params)
+{
+	return new Promise((s,f)=>{
+		fetch("https://fapi.binance.com/fapi/v1/time")
+		.then(response => response.json())
+		.then(timer => {
+				var  timeCode = timer.serverTime;
+				var queryString = "timestamp=" + timeCode;
+				params["timestamp"] = timeCode;
+				var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+				params["signature"] = hash.toString();
+				var toAdd = jQuery.param(params);
+				fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}/*,body:JSON.stringify(params)*/})
+					.then(response => response.json())
+					.then(resp => {
+						s(resp);
+					})
+					.catch(error => console.log(error));
+		})
+		.catch(error => console.log(error));
+	});
+}
+signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,JSON.parse(theSingleOrder)).then((resp)=>{
 	console.log(resp);
 });
 
-const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
-const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
-function signedGETRequest(url,accessKey,secretKey)
+function signedPOSTRequest(url,accessKey,secretKey,params)
     {
 		return new Promise((s,f)=>{
 			fetch("https://fapi.binance.com/fapi/v1/time")
@@ -31,6 +39,45 @@ function signedGETRequest(url,accessKey,secretKey)
 			.then(timer => {
 					var  timeCode = timer.serverTime;
 					var queryString = "timestamp=" + timeCode;
+					params["timestamp"] = timeCode;
+					console.log("Pure Params:");
+					console.log(params);
+					console.log("JQuery to Params:");
+					console.log(jQuery.param(params));
+					var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+					params["signature"] = hash.toString();
+					var toAdd = jQuery.param(params);
+					console.log("To Add:");
+					console.log(toAdd);
+					console.log("JSON stringlify:");
+					console.log(JSON.stringify(params));
+					fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
+						body:JSON.stringify(params)})
+						.then(response => response.json())
+						.then(resp => {
+							s(resp);
+						})
+						.catch(error => console.log(error));
+			})
+			.catch(error => console.log(error));
+		});
+    }
+signedPOSTRequest("https://fapi.binance.com/fapi/v1/batchOrders?",accessKey1,secretKey1,{
+		"batchOrders":dummyMakeSTopLimit
+	}).then((resp)=>{
+	console.log(resp);
+});
+
+
+function signedGETRequest(url,params,accessKey,secretKey)
+    {
+		return new Promise((s,f)=>{
+			fetch("https://fapi.binance.com/fapi/v1/time")
+			.then(response => response.json())
+			.then(timer => {
+					var  timeCode = timer.serverTime;
+					var queryString = params + "&timestamp=" + timeCode;
+					if(queryString.charAt(0)=='&') queryString = queryString.substring(1);
 					var hash = CryptoJS.HmacSHA256(queryString,secretKey);
 					var toAdd = queryString + "&signature=" + hash;
 					fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
@@ -43,29 +90,9 @@ function signedGETRequest(url,accessKey,secretKey)
 			.catch(error => console.log(error));
 		});
     }
-function signedPOSTRequest(url,accessKey,secretKey,rBody)
-    {
-		return new Promise((s,f)=>{
-			fetch("https://fapi.binance.com/fapi/v1/time")
-			.then(response => response.json())
-			.then(timer => {
-					var  timeCode = timer.serverTime;
-					var queryString = "timestamp=" + timeCode;
-					var hash = CryptoJS.HmacSHA256(queryString,secretKey);
-					var toAdd = queryString + "&signature=" + hash;
-					fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
-						body:rBody})
-						.then(response => response.json())
-						.then(resp => {
-							s(resp);
-						})
-						.catch(error => console.log(error));
-			})
-			.catch(error => console.log(error));
-		});
-    }
-signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
-	console.log(resp.filter(a=>a.asset=="USDT")[0].balance);
+
+signedGETRequest("https://fapi.binance.com/fapi/v1/batchOrders?","batchOrders=%5B%7B%22side%22%3A%20%22BUY%22%2C%22stopPrice%22%3A%20%2235600%22%2C%22symbol%22%3A%20%22BTCUSDT%22%2C%22type%22%3A%20%22STOP_MARKET%22%7D%2C%7B%22side%22%3A%20%22BUY%22%2C%22stopPrice%22%3A%20%2235610%22%2C%22symbol%22%3A%20%22BTCUSDT%22%2C%22type%22%3A%20%22STOP_MARKET%22%7D%5D",accessKey1,secretKey1).then((resp)=>{
+	console.log(resp);
 });
 
 
