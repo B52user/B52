@@ -251,7 +251,6 @@ class BinanceAdapter {
 			});	
 		});
 	}
-	
 	_getSize()
 	{
 		var that = this;
@@ -266,7 +265,6 @@ class BinanceAdapter {
 			}
 		});
 	}
-	
     GetTickSize() {
 		var that = this;
 		return new Promise((s,f) =>
@@ -281,9 +279,7 @@ class BinanceAdapter {
 			}
 		});
     }
-    
-    _signedGETRequest(url,accessKey,secretKey)
-        {
+    _signedGETRequest(url,accessKey,secretKey) {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
                 .then(response => response.json())
@@ -301,20 +297,19 @@ class BinanceAdapter {
                 })
                 .catch(error => console.log(error));
             });
-        }
-
-    _signedPOSTRequest(url,accessKey,secretKey,rBody)
+    }
+    _signedPOSTRequest_simple(url,accessKey,secretKey,params)
         {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
                 .then(response => response.json())
                 .then(timer => {
                         var  timeCode = timer.serverTime;
-                        var queryString = "timestamp=" + timeCode;
-                        var hash = CryptoJS.HmacSHA256(queryString,secretKey);
-                        var toAdd = queryString + "&signature=" + hash;
-                        fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
-                            body:rBody})
+                        params["timestamp"] = timeCode;
+                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                        params["signature"] = hash.toString();
+                        var toAdd = jQuery.param(params);
+                        fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
                             .then(response => response.json())
                             .then(resp => {
                                 s(resp);
@@ -324,7 +319,6 @@ class BinanceAdapter {
                 .catch(error => console.log(error));
             });
         }
-
         GetBalance()
         {
             var that = this;
@@ -334,6 +328,19 @@ class BinanceAdapter {
                 });
             });
             
+        }
+        ForEachOrderInMessage(message)
+        {
+            var that = this;
+            return new Promise((s,f)=>{
+                var arr = JSON.parse(message);
+                var messageResponses = [];
+                arr.forEach(e=>{
+                    that.signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,e).then((resp)=>{
+                        s(messageResponses);
+                    });
+                });
+            });
         }
 }
 
@@ -361,7 +368,6 @@ class B52Widget {
         });
         that.stlyeIt();
     }
-
     stlyeIt() {
         $("#B52Area.dark").css({
             "-webkit-user-drag": "element",
@@ -407,7 +413,13 @@ class B52Widget {
             var that = this;
             this.tv.createNewAlert(theUniqueName).then(() => {
                 that.tv.grabAlertMessage(theUniqueName).then((res) => {
+                    //process the message
                     $("#B52Result").text(res);
+                    /*
+                    b.ForEachOrderInMessage(res).then(r=>{
+                        
+                    });*/
+                    
                     setTimeout(function () {
                         that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
                         that.tv.runNTimes(()=>{
