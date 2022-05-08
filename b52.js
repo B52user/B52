@@ -336,9 +336,13 @@ class BinanceAdapter {
                 var arr = JSON.parse(message);
                 var messageResponses = [];
                 arr.forEach(e=>{
+                    e["symbol"] = getCurrentCurrencyPair();
+                    /*
                     that.signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,e).then((resp)=>{
                         s(messageResponses);
                     });
+                    */
+                   s(e);
                 });
             });
         }
@@ -415,10 +419,9 @@ class B52Widget {
                 that.tv.grabAlertMessage(theUniqueName).then((res) => {
                     //process the message
                     $("#B52Result").text(res);
-                    /*
                     b.ForEachOrderInMessage(res).then(r=>{
-                        
-                    });*/
+                        console.log(r);
+                    });
                     
                     setTimeout(function () {
                         that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
