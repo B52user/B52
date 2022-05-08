@@ -17,7 +17,7 @@ function signedPOSTRequest_simple(url,accessKey,secretKey,params)
 				var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
 				params["signature"] = hash.toString();
 				var toAdd = jQuery.param(params);
-				fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}/*,body:JSON.stringify(params)*/})
+				fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
 					.then(response => response.json())
 					.then(resp => {
 						s(resp);
