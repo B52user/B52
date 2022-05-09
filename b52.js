@@ -265,6 +265,20 @@ class BinanceAdapter {
 			}
 		});
 	}
+    _getPriceFormat()
+	{
+		var that = this;
+		return new Promise((s,f)=>
+		{
+			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
+			else
+			{
+				var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+				s(tickSize);
+			}
+		});
+	}
     GetTickSize() {
 		var that = this;
 		return new Promise((s,f) =>
@@ -276,6 +290,20 @@ class BinanceAdapter {
 			else
 			{
 				this._getSize().then(s);
+			}
+		});
+    }
+    GetPriceFormatting() {
+        var that = this;
+		return new Promise((s,f) =>
+		{
+			if(this.ExchangeInfo==null)
+			{
+				this._getExchangeInfo().then(()=>{this._getPriceFormat().then(s);});
+			}
+			else
+			{
+				this._getPriceFormat().then(s);
 			}
 		});
     }
@@ -397,15 +425,27 @@ class B52Widget {
         var that = this;
         this.tv.runFavIndicator($("#B52Start100").text()).then(()=>{
             that.b.GetTickSize().then((s)=>{
-                var sets = [];
-                if(s!=1)
-                {
-                    sets.push({label:"Min buy quantity",value:s})
-                }
-                if(sets.length)
-                {
-                    that.tv.setStrategySettings(sets);
-                }
+                that.b.GetPriceFormatting().then(f=>{
+                    var sets = [];
+                    if(s!=1)
+                    {
+                        sets.push({label:"Min buy quantity",value:s})
+                    }
+                    //get format
+                    var form = "#.";
+                    for(var i=0;i<f.length-2;i++)
+                    {
+                        form+="#";
+                    }
+                    if(form!="#.####") 
+                    {
+                        sets.push({label:"Price Formatting",value:form})
+                    }
+                    if(sets.length)
+                    {
+                        that.tv.setStrategySettings(sets);
+                    }
+                })
             });
             
         });
