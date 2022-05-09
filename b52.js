@@ -337,13 +337,11 @@ class BinanceAdapter {
                 var messageResponses = [];
                 arr.forEach(e=>{
                     e["symbol"] = that.tv.getCurrentCurrencyPair();
-                    /*
                     that.signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,e).then((resp)=>{
-                        s(messageResponses);
+                        messageResponses += resp.toString() + "\n";
                     });
-                    */
-                   s(e);
                 });
+                s(messageResponses);
             });
         }
 }
