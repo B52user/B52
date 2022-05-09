@@ -274,8 +274,8 @@ class BinanceAdapter {
 			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
 			else
 			{
-				var tickSize = theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize;
-				s(tickSize);
+				var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+				s(tickSize.toString());
 			}
 		});
 	}
