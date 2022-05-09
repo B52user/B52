@@ -274,7 +274,7 @@ class BinanceAdapter {
 			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
 			else
 			{
-				var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+				var tickSize = theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize;
 				s(tickSize);
 			}
 		});
@@ -432,11 +432,13 @@ class B52Widget {
                         sets.push({label:"Min buy quantity",value:s})
                     }
                     //get format
+                    console.log(f);
                     var form = "#.";
                     for(var i=0;i<f.length-2;i++)
                     {
                         form+="#";
                     }
+                    console.log(form);
                     if(form!="#.####") 
                     {
                         sets.push({label:"Price Formatting",value:form})
