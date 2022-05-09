@@ -432,13 +432,11 @@ class B52Widget {
                         sets.push({label:"Min buy quantity",value:s})
                     }
                     //get format
-                    console.log(f);
                     var form = "#.";
                     for(var i=0;i<f.length-2;i++)
                     {
                         form+="#";
                     }
-                    console.log(form);
                     if(form!="#.####") 
                     {
                         sets.push({label:"Price Formatting",value:form})
