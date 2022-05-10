@@ -37,11 +37,11 @@ var B52HTML =
 			width:74px;
 		}
 		button.B52BigButton {
-			margin:5px;
 			padding-top:5px;
 			padding-bottom:5px;
-			font-size:25px;
-			width:74px;
+			font-size:30px;
+			width:120px;
+			height: 100px;
 		}
 	</style>
 	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
@@ -55,6 +55,8 @@ var B52HTML =
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
 		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
+		</div>
+		<div id="52Comment" style="border:1px solid gray;height:100px">
 		</div>
 		<div>
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
