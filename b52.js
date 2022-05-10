@@ -25,8 +25,23 @@ var B52HTML =
 			z-index:1000;
 		}
 		div.B52dark button {
-			"border": "1px solid gray";
+			border: "1px solid gray";
 			margin:1px;
+			
+		}
+		button.B52StrategyButton {
+			margin:2px;
+			padding-top:5px;
+			padding-bottom:5px;
+			font-size:19px;
+			width:74px;
+		}
+		button.B52BigButton {
+			margin:5px;
+			padding-top:5px;
+			padding-bottom:5px;
+			font-size:25px;
+			width:74px;
 		}
 	</style>
 	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
@@ -42,10 +57,10 @@ var B52HTML =
 		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
 		</div>
 		<div>
-			<button id='B52StartBinance'>START!</button>
+			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
 		</div>
 		<div>
-			<button id='B52ClearChart'>Clear chart</button>
+			<button id='B52ClearChart' class="B52BigButton" style="background-color:green">CLEAR CHART</button>
 		</div>
 	</div>`
 }
@@ -482,12 +497,10 @@ class B52Widget {
 	{
 	    buttons.forEach(b=>
 			{
-		    		console.log(b.name);
-		    		console.log($("#B52StrategyButtons")[0]);
 		    		var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
-				var appended = $("#B52StrategyButtons").append("<button id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
+				var appended = $("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
 				$(appended).click(()=>{
 					startStrategy(stratName,loss);
 				});
