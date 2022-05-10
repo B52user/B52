@@ -421,36 +421,36 @@ class B52Widget {
     }
     
     startStrategy(strategyName, maxLoss) {
-	var that = this;
-	this.tv.runFavIndicator(strategyName).then(()=>{
-		that.b.GetTickSize().then((s)=>{
-			that.b.GetPriceFormatting().then(f=>{
-				var sets = [];
-				if(s!=1)
-				{
-					sets.push({label:"Min buy quantity",value:s})
-				}
-				//get format
-				var form = "#.";
-				for(var i=0;i<f.length-2;i++)
-				{
-					form+="#";
-				}
-				if(form!="#.####") 
-				{
-					sets.push({label:"Price Formatting",value:form})
-				}
-				//set maxLoss
-				sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
-				if(sets.length)
-				{
-					that.tv.setStrategySettings(sets);
-				}
-			})
+		var that = this;
+		this.tv.runFavIndicator(strategyName).then(()=>{
+			that.b.GetTickSize().then((s)=>{
+				that.b.GetPriceFormatting().then(f=>{
+					var sets = [];
+					if(s!=1)
+					{
+						sets.push({label:"Min buy quantity",value:s})
+					}
+					//get format
+					var form = "#.";
+					for(var i=0;i<f.length-2;i++)
+					{
+						form+="#";
+					}
+					if(form!="#.####") 
+					{
+						sets.push({label:"Price Formatting",value:form})
+					}
+					//set maxLoss
+					sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
+					if(sets.length)
+					{
+						that.tv.setStrategySettings(sets);
+					}
+				})
+			});
+
 		});
-		
-	});
-}
+	}
     makeADeal() {
         var theUniqueName = "B52 " + Date.now().toString();
             var that = this;
@@ -477,18 +477,18 @@ class B52Widget {
             });
     }
 	fillButtonsIn(buttons)
-{
-    buttons.forEach(b=>
-		{
-			var appended = $("#B52StrategyButtons").append("<button id='"+b.name+"' style='background-color:"+b.color+"'>"+b.name+"</button>");
-			$(appended).click(()=>{
-				var splitted = b.name.split('_');
+	{
+	    buttons.forEach(b=>
+			{
+		    		var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
-				startStrategy(stratName,loss);
+				var appended = $("#B52StrategyButtons").append("<button id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
+				$(appended).click(()=>{
+					startStrategy(stratName,loss);
+				});
 			});
-		})
-}
+	}
 }
 
 class B52TvService
