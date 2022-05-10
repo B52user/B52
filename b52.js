@@ -30,8 +30,10 @@ var B52HTML =
 		}
 	</style>
 	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
-		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/></svg>
+		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
+				<path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/>
+			</svg>
 		</div>
 		<div id="B52StrategyButtons">
 		</div>
@@ -480,6 +482,8 @@ class B52Widget {
 	{
 	    buttons.forEach(b=>
 			{
+		    		console.log(b.name);
+		    		console.log($("#B52StrategyButtons")[0]);
 		    		var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
