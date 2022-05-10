@@ -3,7 +3,7 @@ var B52Settings =
 	secretWord : "B52",
 	accessKey1 : "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o",
 	secretKey1 : "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg",
-	maxLossLabel : "",
+	maxLossLabel : "Max Loss in $",
 	sButtons : 
 	[
 		{name:"B52_ZONE_0.5",color:"#006600"},
@@ -497,14 +497,15 @@ class B52Widget {
     }
 	fillButtonsIn(buttons)
 	{
-	    buttons.forEach(b=>
+		var that = this;
+	    	buttons.forEach(b=>
 			{
 		    		var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
 				var appended = $("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
 				$(appended).click(()=>{
-					startStrategy(stratName,loss);
+					that.startStrategy(stratName,loss);
 				});
 			});
 	}
