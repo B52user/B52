@@ -1,259 +1,99 @@
-const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
-const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
-params = null;
-var dummyMakeSTopLimit = `[{'side':'BUY','stopPrice':'32000','symbol':'BTCUSDT','type':'STOP_MARKET'},{'side':'BUY','stopPrice':'32500','symbol':'BTCUSDT','type':'STOP_MARKET'}]`;
-
-var theSingleOrder = `{"side":"BUY","stopPrice":"13.510","symbol":"WAVESUSDT","type":"STOP_MARKET","quantity":"0.5","timeInForce":"GTC"}`;
-
-function signedPOSTRequest_simple(url,accessKey,secretKey,params)
+var B52Settings = 
 {
-	return new Promise((s,f)=>{
-		fetch("https://fapi.binance.com/fapi/v1/time")
-		.then(response => response.json())
-		.then(timer => {
-				var  timeCode = timer.serverTime;
-				var queryString = "timestamp=" + timeCode;
-				params["timestamp"] = timeCode;
-				var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
-				params["signature"] = hash.toString();
-				var toAdd = jQuery.param(params);
-				fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
-					.then(response => response.json())
-					.then(resp => {
-						s(resp);
-					})
-					.catch(error => console.log(error));
-		})
-		.catch(error => console.log(error));
-	});
-}
-signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,JSON.parse(theSingleOrder)).then((resp)=>{
-	console.log(resp);
-});
-
-function signedPOSTRequest(url,accessKey,secretKey,params)
-    {
-		return new Promise((s,f)=>{
-			fetch("https://fapi.binance.com/fapi/v1/time")
-			.then(response => response.json())
-			.then(timer => {
-					var  timeCode = timer.serverTime;
-					var queryString = "timestamp=" + timeCode;
-					params["timestamp"] = timeCode;
-					console.log("Pure Params:");
-					console.log(params);
-					console.log("JQuery to Params:");
-					console.log(jQuery.param(params));
-					var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
-					params["signature"] = hash.toString();
-					var toAdd = jQuery.param(params);
-					console.log("To Add:");
-					console.log(toAdd);
-					console.log("JSON stringlify:");
-					console.log(JSON.stringify(params));
-					fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey},
-						body:JSON.stringify(params)})
-						.then(response => response.json())
-						.then(resp => {
-							s(resp);
-						})
-						.catch(error => console.log(error));
-			})
-			.catch(error => console.log(error));
-		});
-    }
-signedPOSTRequest("https://fapi.binance.com/fapi/v1/batchOrders?",accessKey1,secretKey1,{
-		"batchOrders":dummyMakeSTopLimit
-	}).then((resp)=>{
-	console.log(resp);
-});
-
-
-function signedGETRequest(url,params,accessKey,secretKey)
-    {
-		return new Promise((s,f)=>{
-			fetch("https://fapi.binance.com/fapi/v1/time")
-			.then(response => response.json())
-			.then(timer => {
-					var  timeCode = timer.serverTime;
-					var queryString = params + "&timestamp=" + timeCode;
-					if(queryString.charAt(0)=='&') queryString = queryString.substring(1);
-					var hash = CryptoJS.HmacSHA256(queryString,secretKey);
-					var toAdd = queryString + "&signature=" + hash;
-					fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
-						.then(response => response.json())
-						.then(resp => {
-							s(resp);
-						})
-						.catch(error => console.log(error));
-			})
-			.catch(error => console.log(error));
-		});
-    }
-
-signedGETRequest("https://fapi.binance.com/fapi/v1/batchOrders?","batchOrders=%5B%7B%22side%22%3A%20%22BUY%22%2C%22stopPrice%22%3A%20%2235600%22%2C%22symbol%22%3A%20%22BTCUSDT%22%2C%22type%22%3A%20%22STOP_MARKET%22%7D%2C%7B%22side%22%3A%20%22BUY%22%2C%22stopPrice%22%3A%20%2235610%22%2C%22symbol%22%3A%20%22BTCUSDT%22%2C%22type%22%3A%20%22STOP_MARKET%22%7D%5D",accessKey1,secretKey1).then((resp)=>{
-	console.log(resp);
-});
-
-
-var key1 = "";
-var key2 = "";
-function connect(key1,key2)
-{
-	var timeTable = $.getJSON("https://fapi.binance.com/api/v3/time",(obj)=>{
-		console.log(obj);
-		var accRequest = "https://api.binance.com/api/v3/account?timestamp={{timestamp}}&signature={{signature}}";
-		debugger;
-		$.ajaxSetup({
-			headers:{
-				"X-MBX-APIKEY":"key"
-			}
-		});
-	});
+	accessKey1 : "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o",
+	secretKey1 : "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg",
+	maxLossLabel : "",
+	sButtons : 
+	[
+		{name:"B52_ZONE_0.5",color:"#006600"},
+		{name:"B52_ZONE_1.0",color:"#006600"},
+		{name:"B52_LINE_0.5",color:"#000099"},
+		{name:"B52_LINE_1.0",color:"#000099"},
+		{name:"B52_NOW_0.5",color:"#cc3300"},
+		{name:"B52_NOW_1.0",color:"#cc3300"}
+	]
 }
 
-
-
-
-
-var a = "test";
-var s = "test";
-
-function signIt(apikey,secret)
+var B52HTML = 
 {
-	return new Promise((s,f)=>{
-		$.ajax({
-			beforeSend: function(req){
-				req.setRequestHeader("X-MBX-APIKEY", apikey);
-			},
-			dataType: "json",
-			url: "https://api.binance.com/api/v3/time",
-			success: (watch)=>
-			{
-				var queryString = "timestamp=" + watch.serverTime;
-				var hash = CryptoJS.HmacSHA256(queryString,secret);
-				s(queryString + "&signature=" + hash);
-			}
-		  })
-		 .done(function() {
-			console.log( "second success" );
-		  })
-		  .fail(function(err) {
-			console.log("Error1:");
-			console.log(err);
-		  })
-		  .always(function() {
-			console.log( "complete" );
-		  });
-	});
-}
-
-signIt(a,s).then((toadd)=>{
-	console.log(toadd);
-	var url = "https://api.binance.com/api/v3/account?"+toadd;
-	$.ajax({
-		beforeSend: function(req){
-			req.setRequestHeader("X-MBX-APIKEY", apikey);
-		},
-		dataType: "json",
-		url: url,
-		success: (resp)=>
-		{
-			console.log(resp);
+	B52AreaHtml : `
+	<style>
+		div.B52dark {
+			position:absolute;
+			background-color:black;
+			padding:2px;
+			z-index:1000;
 		}
-	})
-	.done(function() {
-		console.log( "second success" );
-	  })
-	  .fail(function(err) {
-		console.log("Error2:");
-		console.log(err);
-	  })
-	  .always(function() {
-		console.log( "complete" );
-	  });
-},(err)=>{
-	console.log("Error3:");
-	console.log(err);
-});
+		div.B52dark button {
+			"border": "1px solid gray";
+			margin:1px;
+		}
+	</style>
+	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
+		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/></svg>
+		</div>
+		<div id="B52StrategyButtons">
+		</div>
+	</div>
+	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
+		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
+		</div>
+		<div>
+			<button id='B52StartBinance'>START!</button>
+		</div>
+		<div>
+			<button id='B52ClearChart'>Clear chart</button>
+		</div>
+	</div>`
+}
 
-var secret = 'mySecret';
-var queryString = 'timestamp=' + Date.now();
-var hash = CryptoJS.HmacSHA256(queryString,secret);
-var url = 'https://api.binance.com/api/v3/account?'+ queryString + '&signature=' +hash;
 
-$('.botonOrden').click(function(){
-    $.ajax({
-        beforeSend: function(req){
-            req.setRequestHeader("X-MBX-APIKEY", apiKey);
-        },
-        type: 'GET',
-        url: url
-    })
-    .done(function() {
-        console.log("success");
-    })
-    .fail(function() {
-        console.log("error");
-    })
-    .always(function() {
-        console.log("complete");
-    });
-});
+function fillButtonsIn(buttons)
+{
+    buttons.forEach(b=>
+		{
+			var appended = $("#B52StrategyButtons").append("<button id='"+b.name+"' style='background-color:"+b.color+"'>"+b.name+"</button>");
+			$(appended).click(()=>{
+				var splitted = b.name.split('_');
+				var stratName = splitted[0]+"_"+splitted[1];
+				var loss = parseFloat(splitted[2]);
+				startStrategy(stratName,loss);
+			});
+		})
+}
 
-pm.sendRequest('https://api.binance.com/api/v3/time', function (err, res) {
-        console.log('Timestamp Response: '+res.json().serverTime);
-        pm.expect(err).to.not.be.ok;
-        var timestamp = res.json().serverTime;
+function startStrategy(strategyName, maxLoss) {
+	var that = this;
+	this.tv.runFavIndicator(strategyName).then(()=>{
+		that.b.GetTickSize().then((s)=>{
+			that.b.GetPriceFormatting().then(f=>{
+				var sets = [];
+				if(s!=1)
+				{
+					sets.push({label:"Min buy quantity",value:s})
+				}
+				//get format
+				var form = "#.";
+				for(var i=0;i<f.length-2;i++)
+				{
+					form+="#";
+				}
+				if(form!="#.####") 
+				{
+					sets.push({label:"Price Formatting",value:form})
+				}
+				//set maxLoss
+				sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
+				if(sets.length)
+				{
+					that.tv.setStrategySettings(sets);
+				}
+			})
+		});
+		
+	});
+}
 
-        postman.setEnvironmentVariable('timestamp',timestamp)  
-        postman.setGlobalVariable('timestamp',timestamp) 
-
-        let paramsObject = {};
-
-        const binance_api_secret = 'YOUR_API_SECRET';
-
-        const parameters = pm.request.url.query;
-
-        parameters.map((param) => {
-            if (param.key != 'signature' && 
-                param.key != 'timestamp' && 
-                !is_empty(param.value) &&
-                !is_disabled(param.disabled)) {
-                    paramsObject[param.key] = param.value;
-            }
-        })
-        
-        Object.assign(paramsObject, {'timestamp': timestamp});
-
-        if (binance_api_secret) {
-            const queryString = Object.keys(paramsObject).map((key) => {
-                return `${encodeURIComponent(key)}=${paramsObject[key]}`;
-            }).join('&');
-            console.log(queryString);
-            const signature = CryptoJS.HmacSHA256(queryString, binance_api_secret).toString();
-            pm.environment.set("signature", signature);
-        }
-
-        function is_disabled(str) {
-            return str == true;
-        }
-
-        function is_empty(str) {
-            if (typeof str == 'undefined' ||
-                !str || 
-                str.length === 0 || 
-                str === "" ||
-                !/[^\s]/.test(str) ||
-                /^\s*$/.test(str) ||
-                str.replace(/\s/g,"") === "")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-); 
+$('body').append(B52HTML.B52AreaHtml);
+fillButtonsIn(B52Settings.sButtons);

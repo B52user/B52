@@ -1,25 +1,56 @@
 const accessKey1 = "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o";
 const secretKey1 = "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg";
 const secretWord = "B52";
-const B52AreaHtml = `
-<div>
-  <button id='B52ClearChart'>Clear chart</button>
-</div>
-<div>
-  <button id='B52Start100'>B52</button>
-</div>
-<div>
-  <button id='B52StartBinance'>START!</button>
-</div>
-<div>
-  Binance connection status: <span id="B52ConnectionStatus"></span>
-  <button id='B52ConnectBinance'>Connect</button>
-</div>
-<div>
-  Results:
-  <div id='B52Result'></div>
+const B52AreaHtml1 = `
+<div id="B52Area" class="dark">
+    <div>
+        <button id='B52ClearChart'>Clear chart</button>
+    </div>
+    <div>
+        <button id='B52Start100'>B52</button>
+    </div>
+    <div>
+        <button id='B52StartBinance'>START!</button>
+    </div>
+    <div>
+        Binance connection status: <span id="B52ConnectionStatus"></span>
+        <button id='B52ConnectBinance'>Connect</button>
+    </div>
+    <div>
+        Results:
+        <div id='B52Result'></div>
+    </div>
 </div>
 `;
+
+const sButtons = 
+[
+    {name:"B52_ZONE_0.5",color:"#006600"},
+    {name:"B52_ZONE_1.0",color:"#006600"},
+    {name:"B52_LINE_0.5",color:"#000099"},
+    {name:"B52_LINE_1.0",color:"#000099"},
+    {name:"B52_NOW_0.5",color:"#cc3300"},
+    {name:"B52_NOW_1.0",color:"#cc3300"}
+];
+
+const B52AreaHtml2 = `
+<div id="B52Area1" class="dark" style="position:absolute;right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;background-color:black;padding:2px;border-right:none;display:flex;z-index:1000">
+    <div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/></svg>
+    </div>
+    <div id="B52StrategyButtons">
+    </div>
+</div>
+<div id="B52Area2" class="dark" style="position:absolute;right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;background-color:black;padding:2px;z-index:1000">
+    <div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
+    </div>
+    <div>
+        <button id='B52StartBinance'>START!</button>
+    </div>
+    <div>
+        <button id='B52ClearChart'>Clear chart</button>
+    </div>
+</div>`;
 
 class B52Tv {
     constructor() {
@@ -382,8 +413,8 @@ class B52Widget {
     }
     Build() {
         var that = this;
-        $('body').append('<div id="B52Area" draggable="true" class="' + this.theme + '"></div>');
-        $('#B52Area').html(B52AreaHtml);
+        $('body').append(B52AreaHtml2);
+        //$('#B52Area').html(B52AreaHtml2);
 
         //events
         $("#B52ClearChart").click(() => {
@@ -396,20 +427,42 @@ class B52Widget {
             //this.b.GetTickSize().then((size) => { $("#B52ConnectionStatus").text(size.toString()); });
             this.b.GetBalance().then((bal)=>{$("#B52ConnectionStatus").text("$"+bal.toString());})
         });
-        that.stlyeIt();
+        that.stlyeIt2();
     }
-    stlyeIt() {
+    stlyeIt1() {
         $("#B52Area.dark").css({
             "-webkit-user-drag": "element",
             "resize": "both",
             "position": "absolute",
-            "right": "57px",
-            "bottom": "25px",
+            "right": "50px",
+            "bottom": "15px",
             "border": "1px solid gray",
-            "height": "350px",
-            "width": "240px",
+            "height": "150px",
+            "width": "300px",
             "background-color": "black",
-            "padding": "5px"
+            "padding": "2px"
+        });
+
+        $("#B52Area.dark").find("div").css({
+            "padding": "2px"
+        });
+
+        $("#B52Area.dark").find("button").css({
+            "border": "1px solid gray",
+            "background-color": "#3f5721"
+        });
+    }
+
+    stlyeIt2() {
+        $("#B52Area.dark").css({
+            "position": "absolute",
+            "right": "50px",
+            "bottom": "15px",
+            "border": "1px solid gray",
+            "height": "150px",
+            "width": "600px",
+            "background-color": "black",
+            "padding": "2px"
         });
 
         $("#B52Area.dark").find("div").css({
