@@ -46,12 +46,25 @@ var B52HTML =
 	</style>
 	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
 		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;">
-			<svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
-				<path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/>
+		<button id="B52CloseOpenButton" style="background-color: transparent;border: none;width: 30px;height: 120px;display: flex;margin: 0px;padding: 0px;">
+			<svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
+				<path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
+					c0.702-6.54-1.503-12.887-6.121-17.507c-8.12-8.11-22.271-8.11-30.408,0c-2.688,2.688-4.611,6.11-5.58,9.917
+					c-0.066,0.204-0.113,0.414-0.155,0.624c-0.469,2.127-0.603,4.326-0.404,6.552l-4.467,83.623
+					c-1.338,7.033,0.851,14.195,5.893,19.244c4.068,4.069,9.377,6.146,15.404,6.237c0.21,0.021,0.42,0.036,0.636,0.036
+					c0.097,0,0.194,0,0.289-0.005l85.046-4.552c2.114,0.199,4.257,0.078,6.282-0.341c0.473-0.053,0.93-0.174,1.36-0.348
+					c3.6-0.997,6.851-2.865,9.433-5.454c8.378-8.377,8.378-22.021,0-30.409c-4.565-4.566-10.985-6.781-17.49-6.116
+					c-0.127,0-0.258,0.011-0.39,0.021l-32.199,2.966l57.072-57.065C247.709,161.089,247.709,147.445,239.326,139.072z"/>
+				<path fill="white" d="M115.66,108.334c-0.011,0.131-0.021,0.26-0.021,0.389c-0.704,6.535,1.512,12.879,6.124,17.497
+					c4.063,4.058,9.459,6.293,15.208,6.293c5.745,0,11.142-2.236,15.198-6.293c2.705-2.698,4.625-6.111,5.581-9.891
+					c0.062-0.209,0.116-0.419,0.163-0.635c0.473-2.123,0.603-4.32,0.404-6.556l4.473-83.621c1.343-7.031-0.836-14.197-5.89-19.239
+					c-4.085-4.089-9.629-6.535-15.444-6.247c-0.288-0.031-0.6-0.036-0.883-0.026L55.526,4.553c-2.1-0.184-4.212-0.076-6.229,0.339
+					c-0.501,0.052-0.984,0.176-1.441,0.36c-3.596,1-6.837,2.871-9.406,5.44c-8.381,8.386-8.381,22.027,0,30.402
+					c4.569,4.569,10.965,6.795,17.443,6.124c0.145,0,0.289-0.011,0.436-0.023l32.208-2.966l-57.074,57.066
+					c-4.065,4.053-6.302,9.449-6.302,15.195c0,5.747,2.237,11.149,6.297,15.208c4.063,4.063,9.459,6.299,15.205,6.299
+					c5.743,0,11.14-2.236,15.203-6.294l56.887-56.893L115.66,108.334z"/>
 			</svg>
-			<svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
-				<path fill="white" d="M14.19 16.005l7.869 7.868-2.129 2.129-9.996-9.997L19.937 6.002l2.127 2.129z"/>
-			</svg>
+		</button>
 		</div>
 		<div id="B52StrategyButtons">
 		</div>
@@ -439,23 +452,19 @@ class B52Widget {
             that.tv.clearB52s();
         });
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
-	$("B52CloseOpen").mouseup(() => {
+	$("B52CloseOpenButton").mouseup(() => {
 		console.log("1");
-		var closed = $("B52CloseOpen").attr("closed")=="true";
+		var closed = $("B52CloseOpenButton").attr("closed")=="true";
 		if (closed)
 		{
 			//open
-			$("B52CloseOpen").find("svg").first().hide();
-			$("B52CloseOpen").find("svg").last().show();
-			$("B52CloseOpen").attr("closed","true");
+			$("B52CloseOpenButton").attr("closed","true");
 			console.log("2");
 		}
 		else
 		{
 			//close
-			$("B52CloseOpen").find("svg").first().show();
-			$("B52CloseOpen").find("svg").last().hide();
-			$("B52CloseOpen").attr("closed","false");
+			$("B52CloseOpenButton").attr("closed","false");
 			console.log("3");
 		}
 	});
