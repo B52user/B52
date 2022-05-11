@@ -79,7 +79,7 @@ var B52HTML =
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
 		</div>
 		<div>
-			<button id='B52ClearChart' class="B52BigButton" style="background-color:#cc3300">CLEAR CHART</button>
+			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR CHART</button>
 		</div>
 	</div>`
 }
