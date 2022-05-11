@@ -447,25 +447,25 @@ class B52Widget {
         //events
         $("#B52ClearChart").mouseup(() => {that.tv.clearB52s();});
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
-	    $("B52CloseOpenButton").mouseup(() => {that.closeOpen();});
+	    $("#B52CloseOpenButton").mouseup(() => {that.closeOpen();});
 
     }
     closeOpen()
     {
         alert('1');
-        /*var closed = $("B52CloseOpenButton").attr("closed")=="true";
+        var closed = $("#B52CloseOpenButton").attr("closed")=="true";
         if (closed)
         {
             //open
-            $("B52CloseOpenButton").attr("closed","true");
+            $("#B52CloseOpenButton").attr("closed","true");
             alert('2');
         }
         else
         {
             //close
-            $("B52CloseOpenButton").attr("closed","false");
+            $("#B52CloseOpenButton").attr("closed","false");
             alert('3');
-        }*/
+        }
     }
 
     startStrategy(strategyName, maxLoss) {
