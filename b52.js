@@ -460,7 +460,7 @@ class B52Widget {
             $("#B52CloseOpen").css("right","600px");
             $("#B52CloseOpen").css("bottom","10px");
             $("#B52Area1").show();
-            $("#B52Area1").show();
+            $("#B52Area2").show();
         }
         else
         {
