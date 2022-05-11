@@ -41,7 +41,7 @@ var B52HTML =
 			padding-bottom:5px;
 			font-size:30px;
 			width:120px;
-			height:120px;
+			height:115px;
 		}
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:600px;bottom:10px;">
