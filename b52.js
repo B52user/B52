@@ -445,32 +445,32 @@ class B52Widget {
     Build() {
         var that = this;
         $('body').append(B52HTML.B52AreaHtml);
-	that.fillButtonsIn(B52Settings.sButtons);
+	    that.fillButtonsIn(B52Settings.sButtons);
 
         //events
-        $("#B52ClearChart").mouseup(() => {
-            that.tv.clearB52s();
-        });
+        $("#B52ClearChart").mouseup(() => {that.tv.clearB52s();});
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
-	$("B52CloseOpenButton").mouseup(() => {
-		console.log("1");
-		var closed = $("B52CloseOpenButton").attr("closed")=="true";
-		if (closed)
-		{
-			//open
-			$("B52CloseOpenButton").attr("closed","true");
-			console.log("2");
-		}
-		else
-		{
-			//close
-			$("B52CloseOpenButton").attr("closed","false");
-			console.log("3");
-		}
-	});
+	    $("B52CloseOpenButton").mouseup(() => {that.closeOpen();});
 
     }
-    
+    closeOpen()
+    {
+        alert('1');
+        var closed = $("B52CloseOpenButton").attr("closed")=="true";
+        if (closed)
+        {
+            //open
+            $("B52CloseOpenButton").attr("closed","true");
+            alert('2');
+        }
+        else
+        {
+            //close
+            $("B52CloseOpenButton").attr("closed","false");
+            alert('3');
+        }
+    }
+
     startStrategy(strategyName, maxLoss) {
 		var that = this;
 		this.tv.runFavIndicator(strategyName).then(()=>{
@@ -502,6 +502,7 @@ class B52Widget {
 
 		});
 	}
+
     makeADeal() {
         var theUniqueName = "B52 " + Date.now().toString();
             var that = this;
@@ -527,6 +528,7 @@ class B52Widget {
                 });
             });
     }
+
 	fillButtonsIn(buttons)
 	{
 		var that = this;
@@ -539,6 +541,7 @@ class B52Widget {
 			});
 		$("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.strategyButtonClick(e);})
 	}
+    
 	strategyButtonClick(b)
 	{
 		var that = this;
