@@ -281,9 +281,6 @@ class B52Tv {
         var maxTimer = times;
             var existCondition = setInterval(() => {
                 func();
-
-                console.log(maxTimer);
-
                 if(maxTimer<1)
                 {
                     clearInterval(existCondition);
