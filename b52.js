@@ -457,11 +457,19 @@ class B52Widget {
         {
             //open
             $("#B52CloseOpenButton").attr("closed","false");
+            $("#B52CloseOpen").css("right","600px");
+            $("#B52CloseOpen").css("bottom","10px");
+            $("#B52Area1").show();
+            $("#B52Area1").show();
         }
         else
         {
             //close
             $("#B52CloseOpenButton").attr("closed","true");
+            $("#B52CloseOpen").css("right","10px");
+            $("#B52CloseOpen").css("bottom","10px");
+            $("#B52Area1").hide();
+            $("#B52Area2").hide();
         }
     }
 
@@ -528,7 +536,7 @@ class B52Widget {
 		var that = this;
 	    	buttons.forEach(b=>
 			{
-		    		var splitted = b.name.split('_');
+		    	var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
 				$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
