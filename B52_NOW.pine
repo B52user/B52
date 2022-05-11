@@ -1,0 +1,123 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © nelubian
+
+//@version=5
+//input start
+indicator("B52_NOW",overlay=true,format=format.inherit)
+stoploss = input.price(0,title="<< STOP LOSS >>",confirm=true)
+gain = input.price(0,title="<< POTENTIAL GAIN? >>",confirm=true)
+maxLoss = input.float(1.0,title="Max Loss in $")
+minQuantity = input.float(1.0,title="Min buy quantity")
+priceFormat = input.string("#.####",title="Price Formatting")
+numberOfTakes = input.int(5,title="Number of takes")
+minnotal = input.float(5.0,title="Minnotal $")
+buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
+//input end
+
+
+
+//calc start
+//long or short?
+float level = close
+bool ls = stoploss < level
+float calcLevel = level
+float stopLossP = 100*math.abs(calcLevel - stoploss)/math.min(calcLevel,stoploss)
+float iWantCotlet = (maxLoss*100)/(2*buysellfee+stopLossP)
+float minTake = level*minQuantity
+
+float realMinTake = if minTake<minnotal
+    math.ceil(minnotal/minTake)*minTake
+else
+    minTake
+
+float iWantTakes = if (iWantCotlet/realMinTake)<1
+    0
+else
+    math.floor(iWantCotlet/realMinTake)
+
+float realTakesNumber = if iWantTakes>numberOfTakes
+    numberOfTakes
+else
+    iWantTakes
+    
+float coinsPerTake = (math.floor((iWantCotlet/realTakesNumber)/minTake))*minQuantity
+
+float takeDollars = coinsPerTake*level
+
+float catletDollars = realTakesNumber * takeDollars
+
+float maxPotentialGain = ((math.abs(gain-calcLevel)/calcLevel)-((2*buysellfee)/100))*catletDollars
+//calc end
+
+//draw start
+var line line1 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.green,style = line.style_solid,width = 2)
+line.set_xy1(line1, time, level)
+line.set_xy2(line1, time + 1, level)
+line1Label = label.new(x=bar_index, y=level, color=color.olive, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line1Label, text=str.tostring(level,priceFormat))
+label.set_xy(line1Label,bar_index,level)
+label.delete(line1Label[1])
+
+var line line2 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.red,style = line.style_solid,width = 2)
+line.set_xy1(line2, time, stoploss)
+line.set_xy2(line2, time + 1, stoploss)
+line2Label = label.new(x=bar_index, y=stoploss, color=color.maroon, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line2Label, text=str.tostring(stoploss,priceFormat))
+label.set_xy(line2Label,bar_index+10,stoploss)
+label.delete(line2Label[1])
+
+var line line4 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.orange,style = line.style_dotted,width = 2)
+line.set_xy1(line4, time, gain)
+line.set_xy2(line4, time + 1, gain)
+line4Label = label.new(x=bar_index, y=gain, color=color.orange, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line4Label, text=str.tostring(gain,priceFormat))
+label.set_xy(line4Label,bar_index+10,gain)
+label.delete(line4Label[1])
+
+var table panel = table.new(position.top_right, 2, 15)
+table.cell(panel, 0, 0, "Params", bgcolor=color.black, text_color=color.gray,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 0, 1, "Max loss:", bgcolor=color.maroon, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 1, 1, str.tostring(maxLoss,"#.##")+"$", bgcolor=color.maroon, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 0, 2, "Max gain:", bgcolor=color.olive, text_color=color.white,text_size = size.normal,text_halign=text.align_left)
+table.cell(panel, 1, 2, str.tostring(maxPotentialGain,"#.##")+"$", bgcolor=color.olive, text_color=color.white,text_size = size.normal,text_halign=text.align_left)
+table.cell(panel, 0, 3, "Entering Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.normal,text_halign=text.align_left)
+table.cell(panel, 1, 3, str.tostring(catletDollars,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.normal,text_halign=text.align_left)
+table.cell(panel, 0, 4, "Number of Takes ", bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 1, 4, str.tostring(realTakesNumber), bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 0, 5, "Contracts per take ", bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 1, 5, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 0, 6, "Take size", bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 1, 6, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.normal, text_halign=text.align_left)
+table.cell(panel, 0, 7, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+table.cell(panel, 1, 7, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+
+//draw end
+
+string gettingTakes = if ls
+    "BUY"
+else
+    "SELL"
+string gettingLoss = if ls
+    "SELL"
+else
+    "BUY"
+string packet = "["
+float currPrice = level
+string part1 = na
+string part2 = na
+
+for i = 1 to realTakesNumber
+    part1 := "{\"side\":\"" + gettingTakes
+    part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake) + "\",\"type\":\"MARKET\"},"
+    packet := packet + part1 + part2
+
+part1 := "{\"side\":\"" + gettingLoss + "\",\"stopPrice\":\"" + str.tostring(stoploss,priceFormat)
+part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake*realTakesNumber)+"\",\"type\":\"STOP_MARKET\",\"timeInForce\":\"GTC\"}]"
+packet := packet + part1 + part2
+//end combine packet
+
+alert(str.tostring(packet),alert.freq_all) 
+
+
+
+
