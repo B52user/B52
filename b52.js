@@ -177,7 +177,7 @@ class B52Tv {
         var that = this;
         return new Promise((s,f) => 
         {
-            var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']";
+            var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
             var item = this.xpathGetFirstItem(more);
             that.triggerMouseEvent(item, "mousedown");
             var newAlert = "//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]";
