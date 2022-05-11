@@ -413,7 +413,7 @@ class BinanceAdapter {
         {
             var that = this;
             return new Promise((s,f)=>{
-                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",accessKey1,secretKey1).then((resp)=>{
+                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",B52Settings.accessKey1,B52Settings.secretKey1).then((resp)=>{
                     s(resp.filter(a=>a.asset=="USDT")[0].balance);
                 });
             });
@@ -427,7 +427,7 @@ class BinanceAdapter {
                 var messageResponses = [];
                 arr.forEach(e=>{
                     e["symbol"] = that.tv.getCurrentCurrencyPair();
-                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",accessKey1,secretKey1,e).then((resp)=>{
+                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",B52Settings.accessKey1,B52Settings.secretKey1,e).then((resp)=>{
                         messageResponses += resp.toString() + "\n";
                     });
                 });
