@@ -456,7 +456,7 @@ class B52Widget {
     closeOpen()
     {
         alert('1');
-        var closed = $("B52CloseOpenButton").attr("closed")=="true";
+        /*var closed = $("B52CloseOpenButton").attr("closed")=="true";
         if (closed)
         {
             //open
@@ -468,7 +468,7 @@ class B52Widget {
             //close
             $("B52CloseOpenButton").attr("closed","false");
             alert('3');
-        }
+        }*/
     }
 
     startStrategy(strategyName, maxLoss) {
@@ -541,7 +541,7 @@ class B52Widget {
 			});
 		$("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.strategyButtonClick(e);})
 	}
-    
+
 	strategyButtonClick(b)
 	{
 		var that = this;
