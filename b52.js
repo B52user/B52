@@ -44,7 +44,7 @@ var B52HTML =
 			height:65px;
 		}
 	</style>
-    <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:600px;bottom:10px;">
+    <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:370px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
                 <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
                     <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
@@ -65,7 +65,7 @@ var B52HTML =
                 </svg>
             </button>
 	</div>
-	<div id="B52Area1" class="B52dark" style="right:130px;bottom:2px;border:1px solid gray;height:120px;width:470px;border-right:none;display:flex;">
+	<div id="B52Area1" class="B52dark" style="right:72px;bottom:2px;border:1px solid gray;height:120px;width:300px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons">
 		</div>
 	</div>
