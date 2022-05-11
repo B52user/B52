@@ -33,15 +33,15 @@ var B52HTML =
 			margin:2px;
 			padding-top:5px;
 			padding-bottom:5px;
-			font-size:19px;
-			width:74px;
+			font-size:15px;
+			width:50px;
 		}
 		button.B52BigButton {
 			padding-top:5px;
 			padding-bottom:5px;
-			font-size:30px;
-			width:120px;
-			height:115px;
+			font-size:20px;
+			width:70px;
+			height:65px;
 		}
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:600px;bottom:10px;">
@@ -65,11 +65,11 @@ var B52HTML =
                 </svg>
             </button>
 	</div>
-	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:470px;border-right:none;display:flex;">
+	<div id="B52Area1" class="B52dark" style="right:130px;bottom:2px;border:1px solid gray;height:120px;width:470px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons">
 		</div>
 	</div>
-	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
+	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:220px;width:70px;">
 		<!--<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
 		</div>-->
 		<div>
