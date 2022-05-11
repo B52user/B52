@@ -201,7 +201,7 @@ class B52Tv {
     }
 	setStrategySettings(sets)
 	{
-		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']";
+		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
 		var item = tv.xpathGetFirstItem(settings);
 		this.triggerMouseEvent(item, "mousedown");
 		var that = this;
@@ -503,14 +503,17 @@ class B52Widget {
 		    		var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
-				$("#B52StrategyButtons")
-						.append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>")
-						.on("mouseup", "#"+b.name, function (e) {
-							console.log("!!!");
-							console.log(e);
-							that.startStrategy(stratName,loss);
-						});
+				$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
 			});
+		$("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.strategyButtonClick(e);})
+	}
+	strategyButtonClick(b)
+	{
+		var that = this;
+		var splitted = b.srcElement.id.split('_');
+		var stratName = splitted[0]+"_"+splitted[1];
+		var loss = parseFloat(splitted[2]);
+		that.startStrategy(stratName,loss);
 	}
 }
 
