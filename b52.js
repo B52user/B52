@@ -72,13 +72,14 @@ var B52HTML =
 	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
 		<!--<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
 		</div>-->
-		<div id="52Comment" class="B52BigButton">
+		<div>
+            <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX $30.21</button>
 		</div>
 		<div>
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
 		</div>
 		<div>
-			<button id='B52ClearChart' class="B52BigButton" style="background-color:green">CLEAR CHART</button>
+			<button id='B52ClearChart' class="B52BigButton" style="background-color:#cc3300">CLEAR CHART</button>
 		</div>
 	</div>`
 }
