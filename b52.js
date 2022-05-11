@@ -46,8 +46,11 @@ var B52HTML =
 	</style>
 	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
 		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040;display:flex;">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
+			<svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
 				<path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/>
+			</svg>
+			<svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto">
+				<path fill="white" d="M14.19 16.005l7.869 7.868-2.129 2.129-9.996-9.997L19.937 6.002l2.127 2.129z"/>
 			</svg>
 		</div>
 		<div id="B52StrategyButtons">
@@ -56,7 +59,7 @@ var B52HTML =
 	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
 		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
 		</div>
-		<div id="52Comment" style="border:1px solid gray;height:100px">
+		<div id="52Comment" style="border:1px solid gray;height:80px">
 		</div>
 		<div>
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
@@ -436,6 +439,26 @@ class B52Widget {
             that.tv.clearB52s();
         });
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
+	$("B52CloseOpen").mouseup(() => {
+		console.log("1");
+		var closed = $("B52CloseOpen").attr("closed")=="true";
+		if (closed)
+		{
+			//open
+			$("B52CloseOpen").find("svg").first().hide();
+			$("B52CloseOpen").find("svg").last().show();
+			$("B52CloseOpen").attr("closed","true");
+			console.log("2");
+		}
+		else
+		{
+			//close
+			$("B52CloseOpen").find("svg").first().show();
+			$("B52CloseOpen").find("svg").last().hide();
+			$("B52CloseOpen").attr("closed","false");
+			console.log("3");
+		}
+	});
 
     }
     
