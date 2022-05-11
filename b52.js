@@ -609,7 +609,8 @@ tvShitObserver.AddCloseClickers(
         "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
         "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']",
         "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
-        "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']"
+        "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
+	"//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
     ]
 );
 tvShitObserver.Start();
