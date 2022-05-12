@@ -34,14 +34,14 @@ var B52HTML =
 			padding-top:5px;
 			padding-bottom:5px;
 			font-size:15px;
-			width:55px;
+			width:50px;
 		}
 		button.B52BigButton {
 			padding-top:5px;
 			padding-bottom:5px;
-			font-size:20px;
+			font-size:17px;
 			width:70px;
-			height:65px;
+			height:50px;
 		}
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:360px;bottom:2px;">
@@ -66,12 +66,12 @@ var B52HTML =
             </button>
 	</div>
 	<div id="B52Area1" class="B52dark" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:290px;border-right:none;display:flex;">
-		<div id="B52StrategyButtons">
+		<div id="B52StrategyButtons" style="overflow-y: auto;">
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:200px;width:70px;">
-		<!--<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
-		</div>-->
+		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
+		</div>
 		<div>
             <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX $30.21</button>
 		</div>
