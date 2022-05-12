@@ -181,8 +181,8 @@ class B52Tv {
             var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
             var item = this.xpathGetFirstItem(more);
             that.triggerMouseEvent(item, "mousedown");
-            var newAlert = "//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]";
-            that.waitForElement(newAlert).then((e1)=>{
+            var newAlert = ["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"];
+            that.waitForElementOr(newAlert).then((e1)=>{
                 that.triggerMouseEvent(e1, "click");
                 var inputVal = "//input[@name='alert-name']";
                 that.waitForElement(inputVal).then((e2)=>{
@@ -257,6 +257,37 @@ class B52Tv {
                 {
                     console.log("Didn't find element after 30 seconds: "+xpath);
                     clearInterval(existCondition);
+                }
+                else
+                {
+                    maxTimer--;
+                }
+            }, 100);
+        });
+    }
+    waitForElementOr(xpaths)
+    {
+        var that = this;
+        return new Promise((s,f) => {
+            var maxTimer = 300;
+            var existCondition = setInterval(() => {
+                var theElementFound = false;
+                var theFoundXpath = "";
+                xpaths.forEach(x=>{if(that.xpathItemCount(x)>0)theElementFound = true;theFoundXpath=x;});
+                if (theElementFound) {
+                    //wait till ready and exit
+                    var theElement = that.xpathGetFirstItem(theFoundXpath);
+                    $(theElement).ready(()=>{
+                        s(theElement);
+                    });
+                    //exit
+                    clearInterval(existCondition);
+                }
+                else if(maxTimer<1)
+                {
+                    console.log("Didn't find element after 30 seconds: "+xpath);
+                    clearInterval(existCondition);
+                    f();
                 }
                 else
                 {
