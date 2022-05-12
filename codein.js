@@ -43,7 +43,16 @@ class BinanceAdapter {
 	}
 	GetOrders()
 	{
-		
+		var that = this;
+		return new Promise((s,f)=>{
+			that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
+							 B52Settings.accessKey1,
+							 B52Settings.secretKey1,
+							 {"symbol",that.tv.getCurrentCurrencyPair()}
+				  ).then((resp)=>{
+			    s(resp.filter(a=>a.asset=="USDT")[0].balance);
+			});
+		});
 	}
 	_getExchangeInfo() {
 		var that = this;
@@ -122,6 +131,26 @@ class BinanceAdapter {
                         var queryString = "timestamp=" + timeCode;
                         var hash = CryptoJS.HmacSHA256(queryString,secretKey);
                         var toAdd = queryString + "&signature=" + hash;
+                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+    }
+	_signedGETWithParamsRequest(url,accessKey,secretKey,params) {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        params["timestamp"] = timeCode;
+                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                        params["signature"] = hash.toString();
+                        var toAdd = jQuery.param(params);
                         fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
                             .then(response => response.json())
                             .then(resp => {
