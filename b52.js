@@ -44,7 +44,7 @@ var B52HTML =
 			height:50px;
 		}
 	</style>
-    <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:360px;bottom:2px;">
+    <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
                 <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
                     <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
@@ -65,12 +65,12 @@ var B52HTML =
                 </svg>
             </button>
 	</div>
-	<div id="B52Area1" class="B52dark" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:290px;border-right:none;display:flex;">
+	<div id="B52Area1" class="B52dark" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:285px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons" style="overflow-y: auto;">
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:200px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:50px;width:70px;background-color:black">
+		<div id="B52ExpandButton" style="margin:1px;height:47px;width:70px;background-color:black">
 		</div>
 		<div>
             <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX $30.21</button>
@@ -503,7 +503,7 @@ class B52Widget {
         {
             //open
             $("#B52CloseOpenButton").attr("closed","false");
-            $("#B52CloseOpen").css("right","360px");
+            $("#B52CloseOpen").css("right","355px");
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
