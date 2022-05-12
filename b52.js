@@ -69,7 +69,7 @@ var B52HTML =
 		<div id="B52StrategyButtons">
 		</div>
 	</div>
-	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:220px;width:70px;">
+	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:200px;width:70px;">
 		<!--<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
 		</div>-->
 		<div>
