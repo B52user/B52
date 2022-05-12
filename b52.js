@@ -146,6 +146,21 @@ class B52Tv {
             });
         });
     }
+    instantAlertDelete(name)
+    {
+        var that =this;
+        return new Promise((s,f)=>{
+            var alertEditButton = "//div[starts-with(@class,'dialog') and .//div[text()='"+name+"']]//button[1]";
+            that.triggerMouseEvent(that.xpathGetFirstItem(alertEditButton), "click");
+            that.waitForElement("//div[@data-name='delete']").then(e=>{
+                that.triggerMouseEvent(e,"click");
+                that.waitForElement("//button[@name='yes']").then(b=>{
+                    that.triggerMouseEvent(b,"click");
+                    s();
+                });
+            });
+        });
+    }
     getCurrentStrategyName() {
         var sign = this.xpathGetFirstItem("//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]");
         return sign.innerText;
@@ -166,8 +181,7 @@ class B52Tv {
                     clearInterval(existCondition);
                     //stop it now
                     var theMessage = that.getAlertMessage();
-                    that.closeAlert();
-                    that.runStopAlert(that.getCurrentCurrencyPair(), name).then(()=>{
+                    that.instantAlertDelete(name).then(()=>{
                         s(theMessage);
                     });
                 }
@@ -457,7 +471,7 @@ class BinanceAdapter {
                 arr.forEach(e=>{
                     e["symbol"] = that.tv.getCurrentCurrencyPair();
                     that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",B52Settings.accessKey1,B52Settings.secretKey1,e).then((resp)=>{
-                        messageResponses += resp.toString() + "\n";
+                        messageResponses.push(resp);
                     });
                 });
                 s(messageResponses);
@@ -543,13 +557,12 @@ class B52Widget {
             this.tv.createNewAlert(theUniqueName).then(() => {
                 that.tv.grabAlertMessage(theUniqueName).then((res) => {
                     //process the message
-                    $("#B52Result").text(res);
+                    console.log(res);
                     b.ForEachOrderInMessage(res).then(r=>{
                         console.log(r);
                     });
                     
                     setTimeout(function () {
-                        that.tv.deleteAlert(that.tv.getCurrentCurrencyPair(), theUniqueName);
                         that.tv.runNTimes(()=>{
                             var theButtonClose = "//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]";
                             if(that.tv.xpathItemCount(theButtonClose)>0)
