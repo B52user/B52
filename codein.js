@@ -14,86 +14,168 @@ var B52Settings =
 	]
 }
 
-var B52HTML = 
-{
-	B52AreaHtml : `
-	<style>
-		div.B52dark {
-			position:absolute;
-			background-color:black;
-			padding:2px;
-			z-index:1000;
-		}
-		div.B52dark button {
-			"border": "1px solid gray";
-			margin:1px;
-		}
-	</style>
-	<div id="B52Area1" class="B52dark" style="right:130px;bottom:10px;border:1px solid gray;height:120px;width:500px;border-right:none;display:flex;">
-		<div id="B52CloseOpen" style="margin:-2px;height:124px;width:30px;background-color:#404040">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"/></svg>
-		</div>
-		<div id="B52StrategyButtons">
-		</div>
-	</div>
-	<div id="B52Area2" class="B52dark" style="right:10px;bottom:10px;border:1px solid gray;height:350px;width:120px;">
-		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
-		</div>
-		<div>
-			<button id='B52StartBinance'>START!</button>
-		</div>
-		<div>
-			<button id='B52ClearChart'>Clear chart</button>
-		</div>
-	</div>`
-}
-
-
-function fillButtonsIn(buttons)
-{
-    buttons.forEach(b=>
+class BinanceAdapter {
+    constructor(B52Tv) {
+        this.tv = B52Tv;
+	this.ExchangeInfo = null;
+	this.accessKey = "";
+	this.secretKey = "";
+    }
+	SetAccessKey(key)
+	{
+		this.accessKey = key;
+	}
+	SetSecretKey(key)
+	{
+		this.secretKey = key;
+	}
+	GetPrice()
+	{
+		var that = this;
+	    	return new Promise((s,f)=>
 		{
-			var appended = $("#B52StrategyButtons").append("<button id='"+b.name+"' style='background-color:"+b.color+"'>"+b.name+"</button>");
-			$(appended).click(()=>{
-				var splitted = b.name.split('_');
-				var stratName = splitted[0]+"_"+splitted[1];
-				var loss = parseFloat(splitted[2]);
-				startStrategy(stratName,loss);
-			});
-		})
-}
-
-function startStrategy(strategyName, maxLoss) {
-	var that = this;
-	this.tv.runFavIndicator(strategyName).then(()=>{
-		that.b.GetTickSize().then((s)=>{
-			that.b.GetPriceFormatting().then(f=>{
-				var sets = [];
-				if(s!=1)
-				{
-					sets.push({label:"Min buy quantity",value:s})
-				}
-				//get format
-				var form = "#.";
-				for(var i=0;i<f.length-2;i++)
-				{
-					form+="#";
-				}
-				if(form!="#.####") 
-				{
-					sets.push({label:"Price Formatting",value:form})
-				}
-				//set maxLoss
-				sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
-				if(sets.length)
-				{
-					that.tv.setStrategySettings(sets);
-				}
-			})
+			var url = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="+that.tv.getCurrentCurrencyPair();
+			
+			$.getJSON(url, (priceInfo) => {
+				s(parseFloat(priceInfo.lastPrice));
+			});	
 		});
+	}
+	GetOrders()
+	{
 		
-	});
+	}
+	_getExchangeInfo() {
+		var that = this;
+	    	return new Promise((s,f)=>
+		{
+			var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+			
+			$.getJSON(url, (tiketInfo) => {
+				that.ExchangeInfo = tiketInfo;
+				s();
+			});	
+		});
+	}
+	_getSize()
+	{
+		var that = this;
+		return new Promise((s,f)=>
+		{
+			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
+			else
+			{
+				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+				s(theMinSize);
+			}
+		});
+	}
+    _getPriceFormat()
+	{
+		var that = this;
+		return new Promise((s,f)=>
+		{
+			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
+			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
+			else
+			{
+				var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+				s(tickSize.toString());
+			}
+		});
+	}
+    GetTickSize() {
+		var that = this;
+		return new Promise((s,f) =>
+		{
+			if(this.ExchangeInfo==null)
+			{
+				this._getExchangeInfo().then(()=>{this._getSize().then(s);});
+			}
+			else
+			{
+				this._getSize().then(s);
+			}
+		});
+    }
+    GetPriceFormatting() {
+        var that = this;
+		return new Promise((s,f) =>
+		{
+			if(this.ExchangeInfo==null)
+			{
+				this._getExchangeInfo().then(()=>{this._getPriceFormat().then(s);});
+			}
+			else
+			{
+				this._getPriceFormat().then(s);
+			}
+		});
+    }
+    _signedGETRequest(url,accessKey,secretKey) {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        var queryString = "timestamp=" + timeCode;
+                        var hash = CryptoJS.HmacSHA256(queryString,secretKey);
+                        var toAdd = queryString + "&signature=" + hash;
+                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+    }
+    _signedPOSTRequest_simple(url,accessKey,secretKey,params)
+        {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        params["timestamp"] = timeCode;
+                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                        params["signature"] = hash.toString();
+                        var toAdd = jQuery.param(params);
+                        fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+        }
+        GetBalance()
+        {
+            var that = this;
+            return new Promise((s,f)=>{
+                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",B52Settings.accessKey1,B52Settings.secretKey1).then((resp)=>{
+                    s(resp.filter(a=>a.asset=="USDT")[0].balance);
+                });
+            });
+            
+        }
+        ForEachOrderInMessage(message)
+        {
+            var that = this;
+            return new Promise((s,f)=>{
+                var arr = JSON.parse(message);
+                var messageResponses = [];
+                arr.forEach(e=>{
+                    e["symbol"] = that.tv.getCurrentCurrencyPair();
+                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",B52Settings.accessKey1,B52Settings.secretKey1,e).then((resp)=>{
+                        messageResponses += resp.toString() + "\n";
+                    });
+                });
+                s(messageResponses);
+            });
+        }
 }
-
-$('body').append(B52HTML.B52AreaHtml);
-fillButtonsIn(B52Settings.sButtons);
