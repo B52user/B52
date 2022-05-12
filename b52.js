@@ -458,7 +458,7 @@ class B52Widget {
         {
             //open
             $("#B52CloseOpenButton").attr("closed","false");
-            $("#B52CloseOpen").css("right","370px");
+            $("#B52CloseOpen").css("right","360px");
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
