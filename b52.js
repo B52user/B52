@@ -195,7 +195,8 @@ class B52Tv {
             var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
             var item = this.xpathGetFirstItem(more);
             that.triggerMouseEvent(item, "mousedown");
-            var newAlert = ["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"];
+            var newAlert = ["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]"
+            ,"//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"];
             that.waitForElementOr(newAlert).then((e1)=>{
                 that.triggerMouseEvent(e1, "click");
                 var inputVal = "//input[@name='alert-name']";
@@ -287,7 +288,7 @@ class B52Tv {
             var existCondition = setInterval(() => {
                 var theElementFound = false;
                 var theFoundXpath = "";
-                xpaths.forEach(x=>{if(that.xpathItemCount(x)>0)theElementFound = true;theFoundXpath=x;});
+                xpaths.forEach(x=>{if(that.xpathItemCount(x)>0){theElementFound = true;theFoundXpath=x;}});
                 if (theElementFound) {
                     //wait till ready and exit
                     var theElement = that.xpathGetFirstItem(theFoundXpath);
@@ -299,7 +300,7 @@ class B52Tv {
                 }
                 else if(maxTimer<1)
                 {
-                    console.log("Didn't find element after 30 seconds: "+xpath);
+                    xpaths.forEach(x=>console.log("Didn't find element after 30 seconds: "+ x));
                     clearInterval(existCondition);
                     f();
                 }
