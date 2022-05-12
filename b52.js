@@ -23,6 +23,7 @@ var B52HTML =
 			background-color:black;
 			padding:2px;
 			z-index:1000;
+            color-scheme: dark;
 		}
 		div.B52dark button {
 			border: "1px solid gray";
