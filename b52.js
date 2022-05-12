@@ -34,7 +34,7 @@ var B52HTML =
 			padding-top:5px;
 			padding-bottom:5px;
 			font-size:15px;
-			width:52px;
+			width:51px;
 		}
 		button.B52BigButton {
 			padding-top:5px;
