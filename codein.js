@@ -48,7 +48,7 @@ class BinanceAdapter {
 			that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
 							 B52Settings.accessKey1,
 							 B52Settings.secretKey1,
-							 {"symbol",that.tv.getCurrentCurrencyPair()}
+							 {"symbol":that.tv.getCurrentCurrencyPair()}
 				  ).then((resp)=>{
 			    s(resp.filter(a=>a.asset=="USDT")[0].balance);
 			});

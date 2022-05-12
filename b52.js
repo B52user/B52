@@ -343,8 +343,42 @@ class B52Tv {
 class BinanceAdapter {
     constructor(B52Tv) {
         this.tv = B52Tv;
-	this.ExchangeInfo = null;
-    }
+	    this.ExchangeInfo = null;
+        this.accessKey = "";
+        this.secretKey = "";
+        }
+        SetAccessKey(key)
+        {
+            this.accessKey = key;
+        }
+        SetSecretKey(key)
+        {
+            this.secretKey = key;
+        }
+        GetPrice()
+        {
+            var that = this;
+            return new Promise((s,f)=>
+            {
+                var url = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="+that.tv.getCurrentCurrencyPair();
+                $.getJSON(url, (priceInfo) => {
+                    s(parseFloat(priceInfo.lastPrice));
+                });	
+            });
+        }
+        GetOrders()
+        {
+            var that = this;
+            return new Promise((s,f)=>{
+                that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
+                                 that.accessKey,
+                                 that.secretKey,
+                                 {"symbol":that.tv.getCurrentCurrencyPair()}
+                      ).then((resp)=>{
+                          console.log(resp);
+                });
+            });
+        }
 	_getExchangeInfo() {
 		var that = this;
 	    	return new Promise((s,f)=>
@@ -453,11 +487,31 @@ class BinanceAdapter {
                 .catch(error => console.log(error));
             });
         }
+    _signedGETWithParamsRequest(url,accessKey,secretKey,params) {
+            return new Promise((s,f)=>{
+                fetch("https://fapi.binance.com/fapi/v1/time")
+                .then(response => response.json())
+                .then(timer => {
+                        var  timeCode = timer.serverTime;
+                        params["timestamp"] = timeCode;
+                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                        params["signature"] = hash.toString();
+                        var toAdd = jQuery.param(params);
+                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                            .then(response => response.json())
+                            .then(resp => {
+                                s(resp);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
+            });
+    }
         GetBalance()
         {
             var that = this;
             return new Promise((s,f)=>{
-                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",B52Settings.accessKey1,B52Settings.secretKey1).then((resp)=>{
+                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",B52Settings.that.accessKey,that.secretKey).then((resp)=>{
                     s(resp.filter(a=>a.asset=="USDT")[0].balance);
                 });
             });
@@ -471,7 +525,7 @@ class BinanceAdapter {
                 var messageResponses = [];
                 arr.forEach(e=>{
                     e["symbol"] = that.tv.getCurrentCurrencyPair();
-                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",B52Settings.accessKey1,B52Settings.secretKey1,e).then((resp)=>{
+                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,e).then((resp)=>{
                         messageResponses.push(resp);
                     });
                 });
@@ -645,6 +699,8 @@ class B52TvService
 
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
+b.SetAccessKey(B52Settings.accessKey1);
+b.SetSecretKey(B52Settings.secretKey1);
 var page = new B52Widget(tv,b,"dark");
 page.Build();
 var tvShitObserver = new B52TvService(tv,100);
@@ -655,7 +711,7 @@ tvShitObserver.AddCloseClickers(
         "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']",
         "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
         "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
-	"//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
+	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
     ]
 );
 tvShitObserver.Start();
