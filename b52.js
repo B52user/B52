@@ -34,7 +34,7 @@ var B52HTML =
 			padding-top:5px;
 			padding-bottom:5px;
 			font-size:15px;
-			width:50px;
+			width:52px;
 		}
 		button.B52BigButton {
 			padding-top:5px;
@@ -70,7 +70,7 @@ var B52HTML =
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:200px;width:70px;">
-		<div id="B52ExpandButton" style="margin:-2px;height:30px;width:124px;background-color:#404040">
+		<div id="B52ExpandButton" style="margin:1px;height:50px;width:70px;background-color:black">
 		</div>
 		<div>
             <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX $30.21</button>
