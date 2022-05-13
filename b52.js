@@ -795,7 +795,7 @@ tvShitObserver.AddCloseClickers(B52Settings.shitClickers);
 tvShitObserver.AddAction(()=>{
     //check gray buttons
     var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
-    if(tv.xpathItemCount(anyStratOnline)>0)
+    if(tv.xpathItemCount(anyStratOnline)<1)
     {
         $(".B52StrategyButton").each(e=>{$(e).css("background-color",$(e).attr("origcolor"));});
         $(".B52StrategyButton").css("color","white");
