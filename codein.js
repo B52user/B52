@@ -1,8 +1,8 @@
-GetOrders()
+b.GetOrders = function()
 {
 			var that = this;
             return new Promise((s,f)=>{
-                that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
+                that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/openOrders?",
                                  that.accessKey,
                                  that.secretKey,
                                  {"symbol":that.tv.getCurrentCurrencyPair()}
@@ -11,7 +11,8 @@ GetOrders()
                 });
             });
 }
-GetOpenedOrders()
+b.GetOrders().then(r=>console.log());
+function GetOpenedOrders()
 {
 			var that = this;
             return new Promise((s,f)=>{
@@ -22,7 +23,7 @@ GetOpenedOrders()
             });
 }
 
-GetPositions()
+function GetPositions()
 {
 			var that = this;
             return new Promise((s,f)=>{

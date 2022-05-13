@@ -70,11 +70,17 @@ var B52HTML =
 		<div id="B52StrategyButtons" style="overflow-y: auto;">
 		</div>
 	</div>
-	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:200px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:47px;width:70px;background-color:black">
+	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:250px;width:70px;">
+		<!--<div id="B52ExpandButton" style="margin:1px;height:47px;width:70px;background-color:black">
+		</div>-->
+        <div>
+            <button id='B52NLStop' class="B52BigButton" style="background-color:green" disabled>NO L STOP</button>
+		</div>
+        <div>
+            <button id='B52COrders' class="B52BigButton" style="background-color:#000099" disabled>CANCEL ORDERS</button>
 		</div>
 		<div>
-            <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX $30.21</button>
+            <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX/button>
 		</div>
 		<div>
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
