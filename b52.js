@@ -800,12 +800,21 @@ tvShitObserver.AddAction(()=>{
         console.log($(e).attr("origcolor"));
         $(".B52StrategyButton").each(e=>{$(e).css("background-color",$(e).attr("origcolor"));});
         $(".B52StrategyButton").css("color","white");
+        $("#B52StartBinance").css("background-color","#262626");
+        $("#B52StartBinance").css("color","#636363");
+        $("#B52ClearChart").css("background-color","#262626");
+        $("#B52ClearChart").css("color","#636363");
     }
     else
     {
         //gray
         $(".B52StrategyButton").css("background-color","#262626");
         $(".B52StrategyButton").css("color","#636363");
+        $("#B52StartBinance").css("background-color","maroon");
+        $("#B52StartBinance").css("color","white");
+        $("#B52ClearChart").css("background-color","#000099");
+        $("#B52ClearChart").css("color","white");
+        
     }
 });
 tvShitObserver.Start();
