@@ -391,8 +391,8 @@ GetOpenedOrders()
             });
 }
 
-GetPositions()
-{
+        GetPositions()
+        {
 			var that = this;
             return new Promise((s,f)=>{
                 that._signedGETRequest("https://fapi.binance.com/fapi/v1/allOrders?",
@@ -402,6 +402,7 @@ GetPositions()
                           s(resp);
                 });
             });
+        }
 	_getExchangeInfo() {
 		var that = this;
 	    	return new Promise((s,f)=>
