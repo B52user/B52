@@ -802,10 +802,14 @@ b._eventOpenPositionsChanged.push(()=>{
     {
         var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*amount;
         $("#B52SellAll").text("FIX "+ (profit-charge).toFixed(2));
+        $("#B52SellAll").css("background-color","green");
+        $("#B52SellAll").css("color","white");
     }
     else
     {
         $("#B52SellAll").text("FIX");
+        $("#B52SellAll").css("background-color","#262626");
+        $("#B52SellAll").css("color","#636363");
     }
 });
 b._runPositionsService();
