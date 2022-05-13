@@ -12,7 +12,17 @@ var B52Settings =
 		{name:"B52_LINE_1.0",color:"#000099"},
 		{name:"B52_NOW_0.5",color:"#cc3300"},
 		{name:"B52_NOW_1.0",color:"#cc3300"}
-	]
+	],
+    positionsServiceIntervalMS : 1000,
+    ordersSerciceIntervalMS : 1000,
+    shitClickers:[
+        "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
+        "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
+        "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']",
+        "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
+        "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
+	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
+    ]
 }
 var B52HTML = 
 {
@@ -74,10 +84,10 @@ var B52HTML =
 		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black">
 		</div>
         <div>
-            <button id='B52NLStop' class="B52BigButton" style="background-color:green" disabled>NO LOS STOP</button>
+            <button id='B52NLStop' class="B52BigButton" style="background-color:green">STOP NO L.</button>
 		</div>
         <div>
-            <button id='B52COrders' class="B52BigButton" style="background-color:#000099" disabled>CANCEL ORDERS</button>
+            <button id='B52COrders' class="B52BigButton" style="background-color:#000099">C.ORDS</button>
 		</div>
 		<div>
             <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX</button>
@@ -86,7 +96,7 @@ var B52HTML =
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
 		</div>
 		<div>
-			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR CHART</button>
+			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR</button>
 		</div>
 	</div>`
 }
@@ -353,74 +363,116 @@ class BinanceAdapter {
 	    this.ExchangeInfo = null;
         this.accessKey = "";
         this.secretKey = "";
-        }
-        SetAccessKey(key)
-        {
-            this.accessKey = key;
-        }
-        SetSecretKey(key)
-        {
-            this.secretKey = key;
-        }
-        GetPrice()
-        {
-            var that = this;
-            return new Promise((s,f)=>
-            {
-                var url = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="+that.tv.getCurrentCurrencyPair();
-                $.getJSON(url, (priceInfo) => {
-                    s(parseFloat(priceInfo.lastPrice));
-                });	
-            });
-        }
-        GetOrders()
-{
-			var that = this;
-            return new Promise((s,f)=>{
-                that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
-                                 that.accessKey,
-                                 that.secretKey,
-                                 {"symbol":that.tv.getCurrentCurrencyPair()}
-                      ).then((resp)=>{
-                          s(resp);
-                });
-            });
-}
-GetOpenedOrders()
-{
-			var that = this;
-            return new Promise((s,f)=>{
-                that.GetOrders.then(r=>{
-					s(r.filter(a=>a.status=="NEW"));
-				});
-                
-            });
-}
+        this.openedPositions = null;
+        this.openedPositions_lock = false;
+        this.openedOrders = null;
+        this.openedOrders_lock = false;
+        this.posService = null;
+        this.ordService = null;
+        this._eventOpenPositionsChanged = [];
+        this._eventOpenOrdersChanged = [];
+    }
 
-        GetPositions()
+    _runPositionsService() {
+        that = this;
+        that.posService = setInterval(()=>{
+                if(!that.openedPositions_lock)
+                {
+                    that.openedPositions_lock = true;
+                    that.GetPositions().then(pos=>{
+                        that.openedPositions = pos;
+                        that.openedPositions_lock = false;
+                        //run event
+                        that._eventOpenPositionsChanged.forEach(a=>a());
+                    });
+                }
+            },
+            B52Settings.positionsServiceIntervalMS
+        );
+    }
+
+    _stopPositionsService() {
+        that = this;
+        clearInterval(that.posService);
+    }
+
+    _runOrdersService() {
+        that = this;
+        that.ordService = setInterval(()=>{
+                if(!that.openedOrders_lock)
+                {
+                    that.openedOrders_lock = true;
+                    that.GetPositions().then(pos=>{
+                        that.openedOrders = pos;
+                        that.openedOrders_lock = false;
+                        //run event
+                        that._eventOpenOrdersChanged.forEach(a=>a());
+                    });
+                }
+            },
+            B52Settings.ordersSerciceIntervalMS
+        );
+    }
+
+    _stopOrdersService() {
+        that = this;
+        clearInterval(that.ordService);
+    }
+
+    SetAccessKey(key) {
+        this.accessKey = key;
+    }
+
+    SetSecretKey(key) {
+            this.secretKey = key;
+    }
+    
+    GetPrice() {
+        var that = this;
+        return new Promise((s,f)=>
         {
-			var that = this;
-            return new Promise((s,f)=>{
-                that._signedGETRequest("https://fapi.binance.com/fapi/v1/allOrders?",
-                                 that.accessKey,
-                                 that.secretKey
-                      ).then((resp)=>{
-                          s(resp);
+            var url = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="+that.tv.getCurrentCurrencyPair();
+            $.getJSON(url, (priceInfo) => {
+                s(parseFloat(priceInfo.lastPrice));
+            });	
+        });
+    }
+    
+    GetOpenOrders() {
+		var that = this;
+        return new Promise((s,f)=>{
+            that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/openOrders?",
+                that.accessKey,
+                that.secretKey,
+                {"symbol":that.tv.getCurrentCurrencyPair()}).then((resp)=>{
+                    s(resp);
                 });
             });
-        }
+    }
+
+    GetPositions() {
+		var that = this;
+        return new Promise((s,f)=>{
+            that._signedGETRequest("https://fapi.binance.com/fapi/v1/positionRisk?",
+                that.accessKey,
+                that.secretKey).then((resp)=>{
+                    s(resp);
+                });
+            });
+    }
+
 	_getExchangeInfo() {
 		var that = this;
-	    	return new Promise((s,f)=>
+	    return new Promise((s,f)=>
 		{
 			var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
-			
 			$.getJSON(url, (tiketInfo) => {
 				that.ExchangeInfo = tiketInfo;
 				s();
 			});	
 		});
 	}
+
 	_getSize()
 	{
 		var that = this;
@@ -435,6 +487,7 @@ GetOpenedOrders()
 			}
 		});
 	}
+
     _getPriceFormat()
 	{
 		var that = this;
@@ -449,6 +502,7 @@ GetOpenedOrders()
 			}
 		});
 	}
+
     GetTickSize() {
 		var that = this;
 		return new Promise((s,f) =>
@@ -463,6 +517,7 @@ GetOpenedOrders()
 			}
 		});
     }
+
     GetPriceFormatting() {
         var that = this;
 		return new Promise((s,f) =>
@@ -477,6 +532,7 @@ GetOpenedOrders()
 			}
 		});
     }
+
     _signedGETRequest(url,accessKey,secretKey) {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
@@ -496,8 +552,8 @@ GetOpenedOrders()
                 .catch(error => console.log(error));
             });
     }
-    _signedPOSTRequest_simple(url,accessKey,secretKey,params)
-        {
+
+    _signedPOSTRequest_simple(url,accessKey,secretKey,params) {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
                 .then(response => response.json())
@@ -516,7 +572,8 @@ GetOpenedOrders()
                 })
                 .catch(error => console.log(error));
             });
-        }
+    }
+
     _signedGETWithParamsRequest(url,accessKey,secretKey,params) {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
@@ -537,18 +594,17 @@ GetOpenedOrders()
                 .catch(error => console.log(error));
             });
     }
-        GetBalance()
-        {
+        
+    GetBalance() {
             var that = this;
             return new Promise((s,f)=>{
                 that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",that.accessKey,that.secretKey).then((resp)=>{
                     s(resp.filter(a=>a.asset=="USDT")[0].balance);
                 });
             });
-            
-        }
-        ForEachOrderInMessage(message)
-        {
+    }
+
+    ForEachOrderInMessage(message) {
             var that = this;
             return new Promise((s,f)=>{
                 var arr = JSON.parse(message);
@@ -734,17 +790,14 @@ b.SetSecretKey(B52Settings.secretKey1);
 var page = new B52Widget(tv,b,"dark");
 page.Build();
 var tvShitObserver = new B52TvService(tv,100);
-tvShitObserver.AddCloseClickers(
-    [
-        "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
-        "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
-        "//div[starts-with(@class,'modal') and .//div[text()='More indicators, more trading possibilities']]//button[@aria-label='Close']",
-        "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
-        "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
-	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
-    ]
-);
+tvShitObserver.AddCloseClickers(B52Settings.shitClickers);
 tvShitObserver.Start();
+b._eventOpenPositionsChanged.push(()=>{
+    console.log(b.openedPositions);
+});
+b._runPositionsService();
+//b._runOrdersService();
+
 
 //libs afterall
 var CryptoJS=CryptoJS||function(h,s){var f={},g=f.lib={},q=function(){},m=g.Base={extend:function(a){q.prototype=this;var c=new q;a&&c.mixIn(a);c.hasOwnProperty("init")||(c.init=function(){c.$super.init.apply(this,arguments)});c.init.prototype=c;c.$super=this;return c},create:function(){var a=this.extend();a.init.apply(a,arguments);return a},init:function(){},mixIn:function(a){for(var c in a)a.hasOwnProperty(c)&&(this[c]=a[c]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},
