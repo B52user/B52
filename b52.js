@@ -798,8 +798,6 @@ tvShitObserver.AddAction(()=>{
     if(tv.xpathItemCount(anyStratOnline)<1)
     {
         $(".B52StrategyButton").each((i,e)=>{
-            console.log(e);
-            console.log($(e).attr("origcolor"));
             $(e).css("background-color",$(e).attr("origcolor"));
         });
         $(".B52StrategyButton").css("color","white");
