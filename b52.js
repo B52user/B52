@@ -368,18 +368,40 @@ class BinanceAdapter {
             });
         }
         GetOrders()
-        {
-            var that = this;
+{
+			var that = this;
             return new Promise((s,f)=>{
                 that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/allOrders?",
                                  that.accessKey,
                                  that.secretKey,
                                  {"symbol":that.tv.getCurrentCurrencyPair()}
                       ).then((resp)=>{
-                          console.log(resp);
+                          s(resp);
                 });
             });
-        }
+}
+GetOpenedOrders()
+{
+			var that = this;
+            return new Promise((s,f)=>{
+                that.GetOrders.then(r=>{
+					s(r.filter(a=>a.status=="NEW"));
+				});
+                
+            });
+}
+
+GetPositions()
+{
+			var that = this;
+            return new Promise((s,f)=>{
+                that._signedGETRequest("https://fapi.binance.com/fapi/v1/allOrders?",
+                                 that.accessKey,
+                                 that.secretKey
+                      ).then((resp)=>{
+                          s(resp);
+                });
+            });
 	_getExchangeInfo() {
 		var that = this;
 	    	return new Promise((s,f)=>
