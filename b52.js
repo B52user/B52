@@ -374,7 +374,7 @@ class BinanceAdapter {
     }
 
     _runPositionsService() {
-        that = this;
+        var that = this;
         that.posService = setInterval(()=>{
                 if(!that.openedPositions_lock)
                 {
@@ -392,12 +392,12 @@ class BinanceAdapter {
     }
 
     _stopPositionsService() {
-        that = this;
+        var that = this;
         clearInterval(that.posService);
     }
 
     _runOrdersService() {
-        that = this;
+        var that = this;
         that.ordService = setInterval(()=>{
                 if(!that.openedOrders_lock)
                 {
@@ -415,7 +415,7 @@ class BinanceAdapter {
     }
 
     _stopOrdersService() {
-        that = this;
+        var that = this;
         clearInterval(that.ordService);
     }
 
