@@ -22,7 +22,8 @@ var B52Settings =
         "//article[starts-with(@class,'toast')]//button[starts-with(@class,'close-button')]",
         "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
 	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
-    ]
+    ],
+    marketOrderPrice : 0.08
 }
 var B52HTML = 
 {
@@ -793,7 +794,19 @@ var tvShitObserver = new B52TvService(tv,100);
 tvShitObserver.AddCloseClickers(B52Settings.shitClickers);
 tvShitObserver.Start();
 b._eventOpenPositionsChanged.push(()=>{
-    console.log(b.openedPositions);
+    var currentRisk = b.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
+    var entryPrice = parseFloat(currentRisk.entryPrice);
+    var amount = parseFloat(currentRisk.positionAmt);
+    var profit = parseFloat(currentRisk.unRealizedProfit);
+    if(profit!=0)
+    {
+        var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*amount;
+        $("#B52SellAll").text("FIX "+ (profit-charge).toFixed(2));
+    }
+    else
+    {
+        $("#B52SellAll").text("FIX");
+    }
 });
 b._runPositionsService();
 //b._runOrdersService();
