@@ -797,8 +797,10 @@ tvShitObserver.AddAction(()=>{
     var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
     if(tv.xpathItemCount(anyStratOnline)<1)
     {
-        console.log($(e).attr("origcolor"));
-        $(".B52StrategyButton").each(e=>{$(e).css("background-color",$(e).attr("origcolor"));});
+        $(".B52StrategyButton").each(e=>{
+            console.log($(e).attr("origcolor"));
+            $(e).css("background-color",$(e).attr("origcolor"));
+        });
         $(".B52StrategyButton").css("color","white");
         $("#B52StartBinance").css("background-color","#262626");
         $("#B52StartBinance").css("color","#636363");
