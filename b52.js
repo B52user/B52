@@ -799,8 +799,8 @@ tvShitObserver.AddAction(()=>{
     {
         $(".B52StrategyButton").each(e=>{
             console.log(e);
-            console.log($(e).attr("origcolor"));
-            $(e).css("background-color",$(e).attr("origcolor"));
+            console.log($(".B52StrategyButton")[e].origcolor);
+            $($(".B52StrategyButton")[e]).css("background-color",$(".B52StrategyButton")[e].origcolor);
         });
         $(".B52StrategyButton").css("color","white");
         $("#B52StartBinance").css("background-color","#262626");
