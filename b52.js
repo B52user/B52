@@ -832,12 +832,16 @@ b._eventOpenPositionsChanged.push(()=>{
         $("#B52SellAll").text("FIX "+ (profit-charge).toFixed(2));
         $("#B52SellAll").css("background-color","green");
         $("#B52SellAll").css("color","white");
+        $("#B52BigButton").css("background-color","green");
+        $("#B52BigButton").css("color","white");
     }
     else
     {
         $("#B52SellAll").text("FIX");
         $("#B52SellAll").css("background-color","#262626");
         $("#B52SellAll").css("color","#636363");
+        $("#B52BigButton").css("background-color","#262626");
+        $("#B52BigButton").css("color","#636363");
     }
 });
 b._runPositionsService();
