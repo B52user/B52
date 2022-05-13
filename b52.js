@@ -726,7 +726,7 @@ class B52Widget {
 		    	var splitted = b.name.split('_');
 				var stratName = splitted[0]+"_"+splitted[1];
 				var loss = parseFloat(splitted[2]);
-				$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
+				$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"' origcolor='"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
 			});
 		$("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.strategyButtonClick(e);})
 	}
@@ -792,6 +792,21 @@ var page = new B52Widget(tv,b,"dark");
 page.Build();
 var tvShitObserver = new B52TvService(tv,100);
 tvShitObserver.AddCloseClickers(B52Settings.shitClickers);
+tvShitObserver.AddAction(()=>{
+    //check gray buttons
+    var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
+    if(tv.xpathItemCount(anyStratOnline)>0)
+    {
+        $(".B52StrategyButton").each(e=>{$(e).css("background-color",$(e).attr("origcolor"));});
+        $(".B52StrategyButton").css("color","white");
+    }
+    else
+    {
+        //gray
+        $(".B52StrategyButton").css("background-color","#262626");
+        $(".B52StrategyButton").css("color","#636363");
+    }
+});
 tvShitObserver.Start();
 b._eventOpenPositionsChanged.push(()=>{
     var currentRisk = b.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
@@ -800,7 +815,7 @@ b._eventOpenPositionsChanged.push(()=>{
     var profit = parseFloat(currentRisk.unRealizedProfit);
     if(profit!=0)
     {
-        var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*amount;
+        var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
         $("#B52SellAll").text("FIX "+ (profit-charge).toFixed(2));
         $("#B52SellAll").css("background-color","green");
         $("#B52SellAll").css("color","white");
