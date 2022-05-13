@@ -798,9 +798,9 @@ tvShitObserver.AddAction(()=>{
     if(tv.xpathItemCount(anyStratOnline)<1)
     {
         $(".B52StrategyButton").each(e=>{
-            console.log(e);
-            console.log($(".B52StrategyButton")[e].origcolor);
-            $($(".B52StrategyButton")[e]).css("background-color",$(".B52StrategyButton")[e].origcolor);
+            console.log(this);
+            console.log($(this).attr("origcolor"));
+            $(this).css("background-color",$(this).attr("origcolor"));
         });
         $(".B52StrategyButton").css("color","white");
         $("#B52StartBinance").css("background-color","#262626");
