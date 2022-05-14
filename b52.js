@@ -842,8 +842,12 @@ b._eventOpenPositionsChanged.push(()=>{
         $("#B52NLStop").css("color","#636363");
     }
 });
+b._eventOpenOrdersChanged.push(()=>{
+    var ordersOpened = b.openedOrders;
+    console.log(ordersOpened);
+});
 b._runPositionsService();
-//b._runOrdersService();
+b._runOrdersService();
 
 
 //libs afterall
