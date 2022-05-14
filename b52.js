@@ -374,6 +374,35 @@ class BinanceAdapter {
         this._eventOpenOrdersChanged = [];
     }
 
+    FixPosition() {
+        var that = this;
+        var currentRisk = that.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
+        var position = parseFloat(currentRisk.positionAmt);
+        if(position==0) return;
+        var direction = position>0?"SELL":"BUY";
+        var closeParams = {
+            side:direction,
+            quantity:Math.abs(position),
+            type:"MARKET",
+            symbol:that.tv.getCurrentCurrencyPair()
+        };
+        that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
+            console.log(resp);
+        });
+    }
+
+    ChancelOrders() {
+        var that = this;
+        var orders = that.openedOrders;
+        if(orders.length==0) return;
+        closeParams = {
+            symbol:that.tv.getCurrentCurrencyPair()
+        };
+        that._signedDELRequest("https://fapi.binance.com/fapi/v1/allOpenOrders?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
+            console.log(resp);
+        });
+    }
+
     _runPositionsService() {
         var that = this;
         that.posService = setInterval(()=>{
@@ -534,6 +563,27 @@ class BinanceAdapter {
 		});
     }
 
+    _signedDELRequest(url,accessKey,secretKey,params) {
+        return new Promise((s,f)=>{
+            fetch("https://fapi.binance.com/fapi/v1/time")
+            .then(response => response.json())
+            .then(timer => {
+                    var  timeCode = timer.serverTime;
+                    params["timestamp"] = timeCode;
+                    var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                    params["signature"] = hash.toString();
+                    var toAdd = jQuery.param(params);
+                    fetch(url+toAdd,{method:"DELETE",headers:{"X-MBX-APIKEY":accessKey}})
+                        .then(response => response.json())
+                        .then(resp => {
+                            s(resp);
+                        })
+                        .catch(error => console.log(error));
+            })
+            .catch(error => console.log(error));
+        });
+}
+
     _signedGETRequest(url,accessKey,secretKey) {
             return new Promise((s,f)=>{
                 fetch("https://fapi.binance.com/fapi/v1/time")
@@ -636,7 +686,8 @@ class B52Widget {
         $("#B52ClearChart").mouseup(() => {that.tv.clearB52s();});
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
 	    $("#B52CloseOpenButton").mouseup(() => {that.closeOpen();});
-
+        $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
+        $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
     }
     closeOpen()
     {
