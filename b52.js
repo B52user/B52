@@ -384,7 +384,8 @@ class BinanceAdapter {
             side:direction,
             quantity:Math.abs(position),
             type:"MARKET",
-            symbol:that.tv.getCurrentCurrencyPair()
+            symbol:that.tv.getCurrentCurrencyPair(),
+            reduceOnly: true
         };
         that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
             console.log(resp);
