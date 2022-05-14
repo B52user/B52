@@ -396,7 +396,7 @@ class BinanceAdapter {
         var that = this;
         var orders = that.openedOrders;
         if(orders.length==0) return;
-        closeParams = {
+        var closeParams = {
             symbol:that.tv.getCurrentCurrencyPair()
         };
         that._signedDELRequest("https://fapi.binance.com/fapi/v1/allOpenOrders?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
