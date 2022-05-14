@@ -403,8 +403,8 @@ class BinanceAdapter {
                 if(!that.openedOrders_lock)
                 {
                     that.openedOrders_lock = true;
-                    that.GetPositions().then(pos=>{
-                        that.openedOrders = pos;
+                    that.GetOpenOrders().then(ords=>{
+                        that.openedOrders = ords;
                         that.openedOrders_lock = false;
                         //run event
                         that._eventOpenOrdersChanged.forEach(a=>a());
