@@ -827,7 +827,7 @@ b._eventOpenPositionsChanged.push(()=>{
     if(profit!=0)
     {
         var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
-        $("#B52SellAll").text("FIX "+ (profit-charge).toFixed(2));
+        $("#B52SellAll").text("FIX ("+ (profit-charge).toFixed(2)) + ")";
         $("#B52SellAll").css("background-color","green");
         $("#B52SellAll").css("color","white");
         $("#B52NLStop").css("background-color","green");
@@ -844,7 +844,18 @@ b._eventOpenPositionsChanged.push(()=>{
 });
 b._eventOpenOrdersChanged.push(()=>{
     var ordersOpened = b.openedOrders;
-    console.log(ordersOpened);
+    if(ordersOpened.length)
+    {
+        $("#B52COrders").text("C.ORDS ("+ ordersOpened.length + ")";
+        $("#B52COrders").css("background-color","#000099");
+        $("#B52COrders").css("color","white");
+    }
+    else
+    {
+        $("#B52COrders").text("C.ORDS");
+        $("#B52COrders").css("background-color","#262626");
+        $("#B52COrders").css("color","#636363");
+    }
 });
 b._runPositionsService();
 b._runOrdersService();
