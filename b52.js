@@ -933,10 +933,15 @@ b._eventOpenPositionsChanged.push(()=>{
 b._eventOpenPositionsChanged.push(()=>{
     b.GetBalance().then(bal=>{
         var prevBalance = parseFloat($("#B52Balance").text().split('$').join(''));
-        var currBalance = parseFloat(bal);
-        $("#B52Balance").text("$"+currBalance.toFixed(2));
-        $("#B52BalanceChange").text("$"+(currBalance-prevBalance).toFixed(2));
-        if((currBalance-prevBalance)<0.01) $("#B52BalanceChange").text("");
+        var currBalance = parseFloat(bal.toFixed(2));
+        if(currBalance!=prevBalance)
+        {
+            $("#B52Balance").text("$"+currBalance.toFixed(2));
+            if(Math.abs(currBalance-prevBalance)>=0.01)
+            {
+                $("#B52BalanceChange").text("$"+(currBalance-prevBalance).toFixed(2));
+            }
+        }
     });
 });
 b._eventOpenOrdersChanged.push(()=>{
