@@ -25,9 +25,9 @@ var B52Settings =
     ],
     marketOrderPrice : 0.08,
     redToGreen:[
-        {dir:"green",perc:0,col:"#495c4e"},
+        {dir:"green",perc:0,col:"#54785c"},
         {dir:"green",perc:0.005,col:"#00a12a"},
-        {dir:"red",perc:0,col:"#524141"},
+        {dir:"red",perc:0,col:"#855151"},
         {dir:"red",perc:0.005,col:"#960000"}
     ]
 }
