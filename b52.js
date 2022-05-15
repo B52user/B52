@@ -388,16 +388,18 @@ class BinanceAdapter {
         if(position==0) return;
         var direction = position>0?"SELL":"BUY";
         var priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
-        var closeParams = {
-            side:direction,
-            quantity:Math.abs(position),
-            stopPrice:priceToToStop,
-            type:"STOP_MARKET",
-            symbol:that.tv.getCurrentCurrencyPair(),
-            timeInForce:"GTC"
-        };
-        that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
-            console.log(resp);
+        that.b.GetPriceFormatting().then(f=>{
+            var closeParams = {
+                side:direction,
+                quantity:Math.abs(position),
+                stopPrice:priceToToStop.toFixed(f.length-2),
+                type:"STOP_MARKET",
+                symbol:that.tv.getCurrentCurrencyPair(),
+                timeInForce:"GTC"
+            };
+            that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
+                console.log(resp);
+            });
         });
     }
 
