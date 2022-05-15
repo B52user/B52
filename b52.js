@@ -388,8 +388,6 @@ class BinanceAdapter {
         if(position==0) return;
         var direction = position>0?"SELL":"BUY";
         var priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
-        
-        var priceToToStop = 0;
         var closeParams = {
             side:direction,
             quantity:Math.abs(position),
