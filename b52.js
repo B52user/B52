@@ -88,7 +88,11 @@ var B52HTML =
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black">
+		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black;display:flex;">
+            <div style="height:14px" id="B52Balance">
+            </div>
+            <div style="height:14px" id="B52BalanceChange">
+            </div>
 		</div>
         <div>
             <button id='B52NLStop' class="B52BigButton" style="background-color:green">STOP NO L.</button>
@@ -897,7 +901,6 @@ tvShitObserver.AddAction(()=>{
         $("#B52StartBinance").css("color","white");
         $("#B52ClearChart").css("background-color","#000099");
         $("#B52ClearChart").css("color","white");
-        
     }
 });
 tvShitObserver.Start();
@@ -926,6 +929,14 @@ b._eventOpenPositionsChanged.push(()=>{
         $("#B52NLStop").css("background-color","#262626");
         $("#B52NLStop").css("color","#636363");
     }
+});
+b._eventOpenPositionsChanged.push(()=>{
+    b.GetBalance().then(bal=>{
+        var prevBalance = parseFloat($("#B52Balance").text().split('$').join(''));
+        var currBalance = parseFloat(bal);
+        $("#B52Balance").text("$"+currBalance.toFixed(2));
+        $("#B52BalanceChange").text("$"+(currBalance-prevBalance).toFixed(2));
+    });
 });
 b._eventOpenOrdersChanged.push(()=>{
     var ordersOpened = b.openedOrders;
