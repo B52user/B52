@@ -25,10 +25,10 @@ var B52Settings =
     ],
     marketOrderPrice : 0.08,
     redToGreen:[
-        {dir:"green",perc:0.005,col:"#495c4e"},
-        {dir:"green",perc:0.01,col:"#00a12a"},
-        {dir:"red",perc:0.005,col:"#524141"},
-        {dir:"red",perc:0.01,col:"#960000"}
+        {dir:"green",perc:0,col:"#495c4e"},
+        {dir:"green",perc:0.005,col:"#00a12a"},
+        {dir:"red",perc:0,col:"#524141"},
+        {dir:"red",perc:0.005,col:"#960000"}
     ]
 }
 var B52HTML = 
@@ -911,12 +911,9 @@ b._eventOpenPositionsChanged.push(()=>{
         var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
         $("#B52SellAll").text("FIX ("+ (profit-charge).toFixed(2) + ")");
         var colorFilter = (profit-charge)>0?"green":"red";
-        console.log(colorFilter);
-        var colorProp = (profit-charge)/entryPrice*Math.abs(amount);
-        console.log(colorProp);
-        var pickAcolorForIt = B52Settings.redToGreen.filter(a=>a.dir==colorFilter&&a.perc>colorProp).sort((a,b)=>a.perc>b.perc?1:-1)[0].col;
-        console.log(pickAcolorForIt);
-        $("#B52SellAll").css("background-color","green");
+        var colorProp = Math.abs((profit-charge)/entryPrice*Math.abs(amount));
+        var pickAcolorForIt = B52Settings.redToGreen.filter(a=>a.dir==colorFilter&&colorProp>=a.perc).sort((a,b)=>a.perc>b.perc?1:-1)[0].col;
+        $("#B52SellAll").css("background-color",pickAcolorForIt);
         $("#B52SellAll").css("color","white");
         $("#B52NLStop").css("background-color","green");
         $("#B52NLStop").css("color","white");
