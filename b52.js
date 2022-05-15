@@ -88,10 +88,10 @@ var B52HTML =
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black;display:flex;">
-            <div style="height:14px" id="B52Balance">
+		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black;">
+            <div style="height:15px" id="B52Balance">
             </div>
-            <div style="height:14px" id="B52BalanceChange">
+            <div style="height:15px" id="B52BalanceChange">
             </div>
 		</div>
         <div>
@@ -936,6 +936,7 @@ b._eventOpenPositionsChanged.push(()=>{
         var currBalance = parseFloat(bal);
         $("#B52Balance").text("$"+currBalance.toFixed(2));
         $("#B52BalanceChange").text("$"+(currBalance-prevBalance).toFixed(2));
+        if((currBalance-prevBalance)<0.01) $("#B52BalanceChange").text("");
     });
 });
 b._eventOpenOrdersChanged.push(()=>{
