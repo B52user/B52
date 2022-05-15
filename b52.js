@@ -23,7 +23,13 @@ var B52Settings =
         "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
 	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
     ],
-    marketOrderPrice : 0.08
+    marketOrderPrice : 0.08,
+    redToGreen:[
+        {dir:"green",perc:0.005,col:"#495c4e"},
+        {dir:"green",perc:0.01,col:"#00a12a"},
+        {dir:"red",perc:0.005,col:"#524141"},
+        {dir:"red",perc:0.01,col:"#960000"}
+    ]
 }
 var B52HTML = 
 {
@@ -374,6 +380,29 @@ class BinanceAdapter {
         this._eventOpenOrdersChanged = [];
     }
 
+    SetNoLoss(){
+        var that = this;
+        var currentRisk = that.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
+        var position = parseFloat(currentRisk.positionAmt);
+        var entryPrice = parseFloat(currentRisk.entryPrice);
+        if(position==0) return;
+        var direction = position>0?"SELL":"BUY";
+        var priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
+        
+        var priceToToStop = 0;
+        var closeParams = {
+            side:direction,
+            quantity:Math.abs(position),
+            stopPrice:priceToToStop,
+            type:"STOP_MARKET",
+            symbol:that.tv.getCurrentCurrencyPair(),
+            timeInForce:"GTC"
+        };
+        that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
+            console.log(resp);
+        });
+    }
+
     FixPosition() {
         var that = this;
         var currentRisk = that.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
@@ -669,7 +698,7 @@ class BinanceAdapter {
                 });
                 s(messageResponses);
             });
-        }
+    }
 }
 
 class B52Widget {
@@ -689,6 +718,7 @@ class B52Widget {
 	    $("#B52CloseOpenButton").mouseup(() => {that.closeOpen();});
         $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
+        $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
     }
     closeOpen()
     {
@@ -880,6 +910,12 @@ b._eventOpenPositionsChanged.push(()=>{
     {
         var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
         $("#B52SellAll").text("FIX ("+ (profit-charge).toFixed(2) + ")");
+        var colorFilter = (profit-charge)>0?"green":"red";
+        console.log(colorFilter);
+        var colorProp = (profit-charge)/entryPrice*Math.abs(amount);
+        console.log(colorProp);
+        var pickAcolorForIt = B52Settings.redToGreen.filter(a=>a.dir==colorFilter&&a.perc>colorProp).sort((a,b)=>a.perc>b.perc?1:-1)[0].col;
+        console.log(pickAcolorForIt);
         $("#B52SellAll").css("background-color","green");
         $("#B52SellAll").css("color","white");
         $("#B52NLStop").css("background-color","green");
