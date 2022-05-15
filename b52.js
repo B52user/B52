@@ -933,7 +933,7 @@ b._eventOpenPositionsChanged.push(()=>{
 b._eventOpenPositionsChanged.push(()=>{
     b.GetBalance().then(bal=>{
         var prevBalance = parseFloat($("#B52Balance").text().split('$').join(''));
-        var currBalance = parseFloat(bal.toFixed(2));
+        var currBalance = parseFloat(parseFloat(bal).toFixed(2));
         if(currBalance!=prevBalance)
         {
             $("#B52Balance").text("$"+currBalance.toFixed(2));
