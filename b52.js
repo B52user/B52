@@ -752,7 +752,7 @@ class B52Widget {
         $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
-        $("B52Window2Open").mouseup(()=>{that.closeOpen2();});
+        $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
         $("#B52Tabs").hide();
     }
     closeOpen()
