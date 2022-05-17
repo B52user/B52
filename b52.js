@@ -136,8 +136,13 @@ var B52HTML =
 		</div>
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
-        <div style="display:flex;height:30px;width:100%""></div>
-        <div style="height:170px;width:100%;border:1px solid gray;"></div>
+        <div style="display:flex;height:25px;width:100%"">
+            <div style="border:1px solid gray;width:20px;height:25px;">Menu1</div>
+            <div style="border:1px solid gray;width:20px;height:25px;">Menu2</div>
+            <div style="border:1px solid gray;width:20px;height:25px;">Menu3</div>
+            <div style="border:1px solid gray;width:20px;height:25px;">Menu4</div>
+        </div>
+        <div style="height:175px;width:100%;border:1px solid gray;"></div>
     </div>
     `
 }
