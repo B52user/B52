@@ -5,7 +5,6 @@
 //input start
 indicator("B52_NOW",overlay=true,format=format.inherit)
 stoploss = input.price(0,title="<< STOP LOSS >>",confirm=true)
-gain = input.price(0,title="<< POTENTIAL GAIN? >>",confirm=true)
 maxLoss = input.float(1.0,title="Max Loss in $")
 minQuantity = input.float(1.0,title="Min buy quantity")
 priceFormat = input.string("#.####",title="Price Formatting")
@@ -46,7 +45,6 @@ float takeDollars = coinsPerTake*level
 
 float catletDollars = realTakesNumber * takeDollars
 
-float maxPotentialGain = ((math.abs(gain-calcLevel)/calcLevel)-((2*buysellfee)/100))*catletDollars
 //calc end
 
 //draw start
@@ -66,30 +64,20 @@ label.set_text(id=line2Label, text=str.tostring(stoploss,priceFormat))
 label.set_xy(line2Label,bar_index+10,stoploss)
 label.delete(line2Label[1])
 
-var line line4 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.orange,style = line.style_dotted,width = 2)
-line.set_xy1(line4, time, gain)
-line.set_xy2(line4, time + 1, gain)
-line4Label = label.new(x=bar_index, y=gain, color=color.orange, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
-label.set_text(id=line4Label, text=str.tostring(gain,priceFormat))
-label.set_xy(line4Label,bar_index+10,gain)
-label.delete(line4Label[1])
-
 var table panel = table.new(position.top_right, 2, 15)
 table.cell(panel, 0, 0, "Params", bgcolor=color.black, text_color=color.gray,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 1, "Max loss:", bgcolor=color.maroon, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 1, 1, str.tostring(maxLoss,"#.##")+"$", bgcolor=color.maroon, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 0, 2, "Max gain:", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 1, 2, str.tostring(maxPotentialGain,"#.##")+"$", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 0, 3, "Entering Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 1, 3, str.tostring(catletDollars,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 0, 4, "Number of Takes ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 4, str.tostring(realTakesNumber), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 0, 5, "Contracts per take ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 5, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 0, 6, "Take size", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 6, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 0, 7, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
-table.cell(panel, 1, 7, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+table.cell(panel, 0, 2, "Entering Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 2, str.tostring(catletDollars,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 0, 3, "Number of Takes ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 3, str.tostring(realTakesNumber), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 4, "Contracts per take ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 4, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 5, "Take size", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 5, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 6, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+table.cell(panel, 1, 6, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
 
 //draw end
 

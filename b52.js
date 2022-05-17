@@ -8,10 +8,9 @@ var B52Settings =
 	[
 		{name:"B52_ZONE_0.5",color:"#006600"},
 		{name:"B52_ZONE_1.0",color:"#006600"},
-		{name:"B52_LINE_0.5",color:"#000099"},
-		{name:"B52_LINE_1.0",color:"#000099"},
 		{name:"B52_NOW_0.5",color:"#cc3300"},
-		{name:"B52_NOW_1.0",color:"#cc3300"}
+		{name:"B52_NOW_1.0",color:"#cc3300"},
+        {name:"B52_TAKE",color:"#000099"}
 	],
     positionsServiceIntervalMS : 1000,
     ordersSerciceIntervalMS : 1000,
