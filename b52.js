@@ -780,10 +780,7 @@ class B52Widget {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").hide();
             $("#B52Area2").hide();
-            if(closed2)
-            {
-                $("#B52Tabs").hide();
-            }
+            $("#B52Tabs").hide();
         }
     }
     closeOpen2()
