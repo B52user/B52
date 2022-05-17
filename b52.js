@@ -70,6 +70,11 @@ var B52HTML =
             margin: 1px;
             text-align: center;
         }
+        div.B52Tab
+        {
+            height:100%;
+            width:100%;
+        }
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
@@ -145,12 +150,17 @@ var B52HTML =
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:25px;width:100%"">
-            <button class="B52TabButton" style="background:rgba(0, 162, 11, .2)">Menu2</button>
-            <button class="B52TabButton" style="background:rgba(202, 86, 0, .2)">Menu3</button>
-            <button class="B52TabButton" style="background:rgba(0, 3, 202, .2)">Menu4</button>
-            <button class="B52TabButton" style="background:rgba(0, 0, 0, .2)">Menu1</button>
+            <button class="B52TabButton" style="background:rgba(0, 162, 11, .4)" id="B52TabButton1">Ords</button>
+            <button class="B52TabButton" style="background:rgba(202, 86, 0, .4)" id="B52TabButton2">Poss</button>
+            <button class="B52TabButton" style="background:rgba(0, 3, 202, .4)" id="B52TabButton3">Free</button>
+            <button class="B52TabButton" style="background:rgba(0, 0, 0, .4)" id="B52TabButton4">State</button>
         </div>
-        <div style="height:175px;width:100%;border:1px solid gray;"></div>
+        <div style="height:175px;width:100%;border:1px solid gray;">
+            <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
+            <div class="B52Tab" id="B52Tab2">Some 2222 interesting text</div>
+            <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
+            <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
+        </div>
     </div>
     `
 }
@@ -768,6 +778,10 @@ class B52Widget {
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
         $("#B52Tabs").hide();
+        for(var i=1;i<5;i++)
+        {
+            $("B52TabButton"+i).mouseup(()=>{that.tabClick(i);});
+        }
     }
     closeOpen()
     {
@@ -810,6 +824,11 @@ class B52Widget {
             $("#B52Tabs").attr("hid","false");
             $("#B52Tabs").show();
         }
+    }
+
+    tabClick(num) {
+        $(".B52Tab").hide();
+        $("B52Tab"+num).show();
     }
 
     startStrategy(strategyName, maxLoss) {
