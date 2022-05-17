@@ -62,7 +62,7 @@ var B52HTML =
 			width:70px;
 			height:50px;
 		}
-        div.B52TabButton
+        button.B52TabButton
         {
             border:1px solid gray;
             width: 50px;
@@ -145,10 +145,10 @@ var B52HTML =
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:25px;width:100%"">
-            <div class="B52TabButton">Menu1</div>
-            <div class="B52TabButton">Menu2</div>
-            <div class="B52TabButton">Menu3</div>
-            <div class="B52TabButton">Menu4</div>
+            <button class="B52TabButton" style="background:rgba(0, 162, 11, .2)">Menu2</button>
+            <button class="B52TabButton" style="background:rgba(202, 86, 0, .2)">Menu3</button>
+            <button class="B52TabButton" style="background:rgba(0, 3, 202, .2)">Menu4</button>
+            <button class="B52TabButton" style="background:rgba(0, 0, 0, .2)">Menu1</button>
         </div>
         <div style="height:175px;width:100%;border:1px solid gray;"></div>
     </div>
