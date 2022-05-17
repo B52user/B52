@@ -90,7 +90,7 @@ var B52HTML =
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
 		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black;display:flex">
             <div>
-                <button style="width:67px;display:flex">
+                <button style="width:67px;display:flex" id="B52Window2Open">
                     <div style="height:30px;width:30px">
                         <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
                             <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
@@ -134,7 +134,7 @@ var B52HTML =
 			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR</button>
 		</div>
 	</div>
-    <div id="#B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;">
+    <div id="#B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:30px;width:100%""></div>
         <div style="height:170px;width:100%;border:1px solid gray;"></div>
     </div>
@@ -752,10 +752,12 @@ class B52Widget {
         $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
+        $("B52Window2Open").mouseup(()=>{that.closeOpen2();});
     }
     closeOpen()
     {
         var closed = $("#B52CloseOpenButton").attr("closed")=="true";
+        var closed2 = $("#B52Tabs").attr("hid")=="true";
         if (closed)
         {
             //open
@@ -764,6 +766,10 @@ class B52Widget {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
+            if(!closed2)
+            {
+                $("#B52Tabs").show();
+            }
         }
         else
         {
@@ -773,6 +779,24 @@ class B52Widget {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").hide();
             $("#B52Area2").hide();
+            if(closed2)
+            {
+                $("#B52Tabs").hide();
+            }
+        }
+    }
+    closeOpen2()
+    {
+        var closed = $("#B52Tabs").attr("hid")=="true";
+        if(closed)
+        {
+            $("#B52Tabs").attr("hid")=="false"
+            $("#B52Tabs").show();
+        }
+        else
+        {
+            $("#B52Tabs").attr("hid")=="true"
+            $("#B52Tabs").hide();
         }
     }
 
