@@ -62,6 +62,14 @@ var B52HTML =
 			width:70px;
 			height:50px;
 		}
+        div.B52TabButton
+        {
+            border:1px solid gray;
+            width: 50px;
+            height:25px;
+            margin: 1px;
+            text-align: center;
+        }
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
@@ -137,10 +145,10 @@ var B52HTML =
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:25px;width:100%"">
-            <div style="border:1px solid gray;width:20px;height:25px;">Menu1</div>
-            <div style="border:1px solid gray;width:20px;height:25px;">Menu2</div>
-            <div style="border:1px solid gray;width:20px;height:25px;">Menu3</div>
-            <div style="border:1px solid gray;width:20px;height:25px;">Menu4</div>
+            <div class="B52TabButton">Menu1</div>
+            <div class="B52TabButton">Menu2</div>
+            <div class="B52TabButton">Menu3</div>
+            <div class="B52TabButton">Menu4</div>
         </div>
         <div style="height:175px;width:100%;border:1px solid gray;"></div>
     </div>
