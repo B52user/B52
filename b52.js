@@ -753,7 +753,9 @@ class B52Widget {
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
+        console.log("2");
         $("#B52Tabs").hide();
+        console.log("3");
     }
     closeOpen()
     {
@@ -767,7 +769,8 @@ class B52Widget {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
-            if(!closed2)
+            console.log(closed2);
+            if(closed2)
             {
                 $("#B52Tabs").show();
             }
@@ -781,11 +784,14 @@ class B52Widget {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();
+            console.log("1");
         }
     }
     closeOpen2()
     {
+        console.log("4");
         var closed = $("#B52Tabs").attr("hid")=="true";
+        console.log(closed);
         if(closed)
         {
             $("#B52Tabs").attr("hid")=="false"
