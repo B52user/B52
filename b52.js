@@ -789,12 +789,12 @@ class B52Widget {
         if(!closed)
         {
             $("#B52Tabs").attr("hid","true");
-            $("#B52Tabs").show();
+            $("#B52Tabs").hide();
         }
         else
         {
             $("#B52Tabs").attr("hid","false");
-            $("#B52Tabs").hide();
+            $("#B52Tabs").show();
         }
     }
 
