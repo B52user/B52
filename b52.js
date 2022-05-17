@@ -134,7 +134,7 @@ var B52HTML =
 			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR</button>
 		</div>
 	</div>
-    <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="false">
+    <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:30px;width:100%""></div>
         <div style="height:170px;width:100%;border:1px solid gray;"></div>
     </div>
@@ -753,9 +753,7 @@ class B52Widget {
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
-        console.log("2");
         $("#B52Tabs").hide();
-        console.log("3");
     }
     closeOpen()
     {
@@ -769,8 +767,7 @@ class B52Widget {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
-            console.log(closed2);
-            if(closed2)
+            if(!closed2)
             {
                 $("#B52Tabs").show();
             }
@@ -784,22 +781,19 @@ class B52Widget {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();
-            console.log("1");
         }
     }
     closeOpen2()
     {
-        console.log("4");
         var closed = $("#B52Tabs").attr("hid")=="true";
-        console.log(closed);
-        if(closed)
+        if(!closed)
         {
-            $("#B52Tabs").attr("hid","false");
+            $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").show();
         }
         else
         {
-            $("#B52Tabs").attr("hid","true");
+            $("#B52Tabs").attr("hid","false");
             $("#B52Tabs").hide();
         }
     }
