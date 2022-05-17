@@ -1,0 +1,87 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © nelubian
+
+//@version=5
+//input start
+indicator("B52_TAKE",overlay=true,format=format.inherit)
+takeFrom = input.price(0,title="<< TAKE FROM >>",confirm=true)
+takeTo = input.price(0,title="<< TAKE TO >>",confirm=true)
+currentSum = input.float(1.0,title="Current position in $")
+minQuantity = input.float(1.0,title="Min buy quantity")
+priceFormat = input.string("#.####",title="Price Formatting")
+numberOfTakes = input.int(5,title="Number of takes")
+minnotal = input.float(5.0,title="Minnotal $")
+buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
+//input end
+
+
+
+//calc start
+//long or short?
+bool ls = takeTo > close
+
+//float potentialGain = ((math.abs(gain-calcLevel)/calcLevel)-((2*buysellfee)/100))*catletDollars
+//calc end
+
+//draw start
+var line line1 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.green,style = line.style_solid,width = 2)
+line.set_xy1(line1, time, takeFrom)
+line.set_xy2(line1, time + 1, takeFrom)
+line1Label = label.new(x=bar_index, y=takeFrom, color=color.olive, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line1Label, text=str.tostring(takeFrom,priceFormat))
+label.set_xy(line1Label,bar_index,takeFrom)
+label.delete(line1Label[1])
+
+var line line2 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.aqua,style = line.style_solid,width = 2)
+line.set_xy1(line2, time, takeTo)
+line.set_xy2(line2, time + 1, takeTo)
+line2Label = label.new(x=bar_index, y=takeTo, color=color.navy, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line2Label, text=str.tostring(takeTo,priceFormat))
+label.set_xy(line2Label,bar_index+10,takeTo)
+label.delete(line2Label[1])
+
+var table panel = table.new(position.top_right, 2, 15)
+table.cell(panel, 0, 0, "Params", bgcolor=color.black, text_color=color.gray,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 1, "Expected Gain:", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 1, str.tostring(potentialGain,"#.##")+"$", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 0, 2, "Current Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 2, str.tostring(currentSum,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 0, 3, "Number of Takes ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 3, str.tostring(realTakesNumber), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 4, "Contracts per take ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 4, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 5, "Take size (approx)", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 5, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 6, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+table.cell(panel, 1, 6, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+
+//draw end
+
+string gettingTakes = if ls
+    "BUY"
+else
+    "SELL"
+string gettingLoss = if ls
+    "SELL"
+else
+    "BUY"
+string packet = "["
+float currPrice = level
+string part1 = na
+string part2 = na
+
+for i = 1 to realTakesNumber
+    part1 := "{\"side\":\"" + gettingTakes + "\",\"price\":\"" + str.tostring(currPrice,priceFormat)
+    part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake) + "\",\"type\":\"LIMIT\",\"timeInForce\":\"GTC\"},"
+    packet := packet + part1 + part2
+
+part1 := "{\"side\":\"" + gettingLoss + "\",\"stopPrice\":\"" + str.tostring(stoploss,priceFormat)
+part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake*realTakesNumber)+"\",\"type\":\"STOP_MARKET\",\"timeInForce\":\"GTC\"}]"
+packet := packet + part1 + part2
+//end combine packet
+
+alert(str.tostring(packet),alert.freq_all) 
+
+
+
+
