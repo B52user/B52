@@ -753,6 +753,7 @@ class B52Widget {
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("B52Window2Open").mouseup(()=>{that.closeOpen2();});
+        $("#B52Tabs").hide();
     }
     closeOpen()
     {
