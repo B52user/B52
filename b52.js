@@ -104,6 +104,29 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
+        div.B52RiskPosItem
+        {
+            height:24px;
+            width:170px;
+            margin:2px;
+            padding:2px;
+            font-size:14px;
+            display:flex;
+        }
+        div.B52RiskPosItem div
+        {
+            margin-right:8px;
+        }
+        div.B52RiskPosItem button
+        {
+            height:23px;
+            width:23px;
+            text-align: center;
+            font-size:17px;
+            background:black;
+            padding-top:0px;
+        }
+        
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
@@ -1096,18 +1119,19 @@ b._eventOpenPositionsChanged.push(()=>{
     var riskOpened = b.openedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
     $("#B52PosOpenedList").html("Positions:");
     riskOpened.forEach((p)=>{
-        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit>0)?"BUY":"SELL"))[0].col;
+        console.log("LIMIT"+(parseFloat(p.unRealizedProfit)>0)?"BUY":"SELL");
+        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0)?"BUY":"SELL")[0].col;
         let control = `
-        <div class="B52OrderItem" style="background:${col}">
+        <div class="B52RiskPosItem" style="background:${col}">
             <div style="width:25px;">
-                <button id="B52${p.symbol}">x</button>
+                <button id="B52${p.symbol}POS">x</button>
             </div>
-            <div style="margin-top:5px;width:80px">
-                $${parseFloat(p.unRealizedProfit).toFixed(2)}
+            <div style="margin-top:5px;width:120px">
+                ${p.symbol} $${parseFloat(p.unRealizedProfit).toFixed(2)}
             </div>
         <div>`;
-        $("#B52Tab1").append(control);
-        $("#B52"+p.symbol).mouseup(()=>b.FixPositionSimbol(p.symbol));
+        $("#B52PosOpenedList").append(control);
+        $("#B52"+p.symbol+"POS").mouseup(()=>b.FixPositionSimbol(p.symbol));
     });
 });
 b._eventOpenOrdersChanged.push(()=>{
