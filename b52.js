@@ -780,7 +780,7 @@ class B52Widget {
         $("#B52Tabs").hide();
         for(let i=1;i<5;i++)
         {
-            $("#B52TabButton"+i.toString()).mouseup((()=>that.tabClick(i));
+            $("#B52TabButton"+i.toString()).mouseup(()=>that.tabClick(i));
         }
     }
     closeOpen()
