@@ -62,9 +62,9 @@ var B52HTML =
 			width:51px;
 		}
 		button.B52BigButton {
-			padding-top:2px;
-			padding-bottom:2px;
-			font-size:16px;
+			padding-top:0px;
+			padding-bottom:0px;
+			font-size:15px;
 			width:70px;
 			height:42px;
 		}
