@@ -33,9 +33,9 @@ var B52Settings =
     ],
     orderColors:[
         {name:"STOP_MARKETBUY",col:"blue"},
-        {name:"STOP_MARKETSELL",col:"orange"},
-        {name:"LIMITBUY",col:"green"},
-        {name:"LIMITSELL",col:"red"}
+        {name:"STOP_MARKETSELL",col:"#cc3300"},
+        {name:"LIMITBUY",col:"#00a12a"},
+        {name:"LIMITSELL",col:"#960000"}
     ]
 }
 var B52HTML = 
@@ -85,11 +85,13 @@ var B52HTML =
         {
             height:25px;
             width:50px;
+            margin:2px;
+            font-size:12px;
         }
         div.B52OrderItem button
         {
-            height:10px;
-            width:10px;
+            height:20px;
+            width:20px;
         }
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
