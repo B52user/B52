@@ -798,6 +798,7 @@ class B52Widget {
             if(!closed2)
             {
                 $("#B52Tabs").show();
+                $("#B52TabButton1").mouseup();
             }
         }
         else
@@ -823,6 +824,7 @@ class B52Widget {
         {
             $("#B52Tabs").attr("hid","false");
             $("#B52Tabs").show();
+            $("#B52TabButton1").mouseup();
         }
     }
 
