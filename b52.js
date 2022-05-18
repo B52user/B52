@@ -75,6 +75,7 @@ var B52HTML =
             height:100%;
             width:100%;
         }
+        
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
