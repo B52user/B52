@@ -1005,6 +1005,18 @@ class B52TvService
 	}
 }
 
+class B52Log {
+    constructor() {
+        this._log = [];    
+    }
+    Info(message){
+        this._log.push({type:"info",mess:message});
+    }
+    GetLog(){
+        return this._log;
+    }
+}
+
 var tv = new B52Tv();
 var b = new BinanceAdapter(tv);
 b.SetAccessKey(B52Settings.accessKey1);
@@ -1097,7 +1109,6 @@ b._eventOpenPositionsChanged.push(()=>{
         $("#B52Tab1").append(control);
         $("#B52"+p.symbol).mouseup(()=>b.FixPositionSimbol(p.symbol));
     });
-    //B52PosOpenedList
 });
 b._eventOpenOrdersChanged.push(()=>{
     var ordersOpened = b.openedOrders;
