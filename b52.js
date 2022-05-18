@@ -186,7 +186,7 @@ var B52HTML =
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
-            <div class="B52Tab" id="B52Tab2">
+            <div class="B52Tab" id="B52Tab2" style="display:flex">
                 <div style="width:50%;" id="B52PosOpenedList">
                 Positions:
                 </div>
