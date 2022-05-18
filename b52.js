@@ -66,7 +66,7 @@ var B52HTML =
 			padding-bottom:5px;
 			font-size:17px;
 			width:70px;
-			height:50px;
+			height:45px;
 		}
         button.B52TabButton
         {
@@ -190,8 +190,11 @@ var B52HTML =
         <div>
             <button id='B52COrders' class="B52BigButton" style="background-color:#000099">C.ORDS</button>
 		</div>
+        <div>
+            <button id='B52SellPart' class="B52BigButton" style="background-color:green">FIX</button>
+		</div>
 		<div>
-            <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIX</button>
+            <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIXALL</button>
 		</div>
 		<div>
 			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
@@ -846,6 +849,7 @@ class B52Widget {
         $("#B52StartBinance").mouseup(() => {that.makeADeal();});
 	    $("#B52CloseOpenButton").mouseup(() => {that.closeOpen();});
         $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
+        $("#B52SellPart").mouseup(()=>{that.b.FixPosition();})
         $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
@@ -1082,20 +1086,27 @@ b._eventOpenPositionsChanged.push(()=>{
     if(profit!=0)
     {
         var charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
-        $("#B52SellAll").text("FIX ("+ (profit-charge).toFixed(2) + ")");
+        $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
+        $("#B52SellPart").text("FIX ("+ (profit-charge).toFixed(2) + ")");
+        
         var colorFilter = (profit-charge)>0?"green":"red";
         var colorProp = Math.abs((profit-charge)/entryPrice*Math.abs(amount));
         var pickAcolorForIt = B52Settings.redToGreen.filter(a=>a.dir==colorFilter&&colorProp>=a.perc).sort((a,b)=>a.perc>b.perc?1:-1)[0].col;
         $("#B52SellAll").css("background-color",pickAcolorForIt);
         $("#B52SellAll").css("color","white");
+        $("#B52SellPart").css("background-color",pickAcolorForIt);
+        $("#B52SellPart").css("color","white");
         $("#B52NLStop").css("background-color","green");
         $("#B52NLStop").css("color","white");
     }
     else
     {
-        $("#B52SellAll").text("FIX");
+        $("#B52SellAll").text("FIXALL");
         $("#B52SellAll").css("background-color","#262626");
         $("#B52SellAll").css("color","#636363");
+        $("#B52SellPart").text("FIX");
+        $("#B52SellPart").css("background-color","#262626");
+        $("#B52SellPart").css("color","#636363");
         $("#B52NLStop").css("background-color","#262626");
         $("#B52NLStop").css("color","#636363");
     }
