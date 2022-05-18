@@ -62,11 +62,11 @@ var B52HTML =
 			width:51px;
 		}
 		button.B52BigButton {
-			padding-top:5px;
-			padding-bottom:5px;
-			font-size:17px;
+			padding-top:2px;
+			padding-bottom:2px;
+			font-size:16px;
 			width:70px;
-			height:45px;
+			height:42px;
 		}
         button.B52TabButton
         {
@@ -154,10 +154,10 @@ var B52HTML =
 		</div>
 	</div>
 	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:38px;width:70px;background-color:black;display:flex">
+		<div id="B52ExpandButton" style="margin:1px;height:35px;width:70px;background-color:black;display:flex">
             <div>
                 <button style="width:67px;display:flex" id="B52Window2Open">
-                    <div style="height:30px;width:30px">
+                    <div style="height:28px;width:28px">
                         <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
                             <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
                                 c0.702-6.54-1.503-12.887-6.121-17.507c-8.12-8.11-22.271-8.11-30.408,0c-2.688,2.688-4.611,6.11-5.58,9.917
@@ -177,9 +177,9 @@ var B52HTML =
                         </svg>
                     </div>
                     <div>
-                    <div style="height:15px" id="B52Balance">
+                    <div style="height:14px" id="B52Balance">
                     </div>
-                    <div style="height:15px" id="B52BalanceChange">
+                    <div style="height:14px" id="B52BalanceChange">
                     </div>
                 </button>
             </div>
