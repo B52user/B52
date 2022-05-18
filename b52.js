@@ -179,10 +179,10 @@ var B52HTML =
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:30px;width:100%"">
-            <button class="B52TabButton" style="background:rgba(0, 162, 11, .4)" id="B52TabButton1">Ords</button>
-            <button class="B52TabButton" style="background:rgba(202, 86, 0, .4)" id="B52TabButton2">Poss</button>
-            <button class="B52TabButton" style="background:rgba(0, 3, 202, .4)" id="B52TabButton3">Free</button>
-            <button class="B52TabButton" style="background:rgba(0, 0, 0, .4)" id="B52TabButton4">State</button>
+            <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
+            <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Poss</button>
+            <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">State</button>
+            <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
@@ -1075,7 +1075,7 @@ b._eventOpenOrdersChanged.push(()=>{
     }
 });
 b._eventOpenOrdersChanged.push(()=>{
-    var ordersOpened = b.openedOrders;
+    var ordersOpened = b.openedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
     $("#B52Tab1").empty();
     ordersOpened.forEach((o)=>{
         let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
