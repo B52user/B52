@@ -30,6 +30,12 @@ var B52Settings =
         {dir:"green",perc:0.005,col:"#00a12a"},
         {dir:"red",perc:0,col:"#855151"},
         {dir:"red",perc:0.005,col:"#960000"}
+    ],
+    orderColors:[
+        {name:"STOP_MARKETBUY",col:"blue"},
+        {name:"STOP_MARKETSELL",col:"orange"},
+        {name:"LIMITBUY",col:"green"},
+        {name:"LIMITSELL",col:"red"}
     ]
 }
 var B52HTML = 
@@ -75,7 +81,6 @@ var B52HTML =
             height:100%;
             width:100%;
         }
-        
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
@@ -157,7 +162,7 @@ var B52HTML =
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .4)" id="B52TabButton4">State</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
-            <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
+            <div class="B52Tab" id="B52Tab1" style="display:flex">Some 1111 interesting text</div>
             <div class="B52Tab" id="B52Tab2">Some 2222 interesting text</div>
             <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
@@ -1046,6 +1051,15 @@ b._eventOpenOrdersChanged.push(()=>{
         $("#B52COrders").css("background-color","#262626");
         $("#B52COrders").css("color","#636363");
     }
+});
+b._eventOpenOrdersChanged.push(()=>{
+    var ordersOpened = b.openedOrders;
+    $("#B52Tab1").empty();
+    ordersOpened.forEach((o)=>{
+        let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
+        $("#B52Tab1").append("<div class='B52OrderItem' style='background:"+col+"'>"+o.price=="0"?o.stopPrice:o.price+" "+origQty+" <button id='B52"+o.clientOrderId+"'>x</button><div>");
+        $("#B52"+o.clientOrderId).mouseup(()=>alert(o.clientOrderId));
+    });
 });
 b._runPositionsService();
 b._runOrdersService();
