@@ -32,7 +32,7 @@ var B52Settings =
         {dir:"red",perc:0.005,col:"#960000"}
     ],
     orderColors:[
-        {name:"STOP_MARKETBUY",col:"blue"},
+        {name:"STOP_MARKETBUY",col:"darkseagreen"},
         {name:"STOP_MARKETSELL",col:"#cc3300"},
         {name:"LIMITBUY",col:"#00a12a"},
         {name:"LIMITSELL",col:"#960000"}
@@ -80,19 +80,29 @@ var B52HTML =
         {
             height:100%;
             width:100%;
+            style="overflow-y: auto;
         }
         div.B52OrderItem
         {
-            height:25px;
-            width:70px;
+            height:28px;
+            width:170px;
             margin:2px;
             padding:2px;
             font-size:14px;
+            display:flex;
+        }
+        div.B52OrderItem div
+        {
+            margin-right:8px;
         }
         div.B52OrderItem button
         {
-            height:20px;
-            width:20px;
+            height:25px;
+            width:25px;
+            text-align: center;
+            font-size:20px;
+            background:black;
+            padding-top:0px;
         }
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
@@ -175,7 +185,7 @@ var B52HTML =
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .4)" id="B52TabButton4">State</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
-            <div class="B52Tab" id="B52Tab1" style="display:flex">Some 1111 interesting text</div>
+            <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
             <div class="B52Tab" id="B52Tab2">Some 2222 interesting text</div>
             <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
@@ -1071,10 +1081,14 @@ b._eventOpenOrdersChanged.push(()=>{
         let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
         let control = `
         <div class="B52OrderItem" style="background:${col}">
-            <button id="B52${o.clientOrderId}">x</button>
-            ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
+            <div style="width:25px;">
+                <button id="B52${o.clientOrderId}">x</button>
+            </div>
+            <div style="margin-top:5px;">
+                ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
+            </div>
         <div>`;
-        $("#B52Tab1").append(control);
+        $("#B52Tab1").prepend(control);
         $("#B52"+o.clientOrderId).mouseup(()=>alert(o.clientOrderId));
     });
 });
