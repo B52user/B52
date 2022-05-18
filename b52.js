@@ -66,7 +66,7 @@ var B52HTML =
         {
             border:1px solid gray;
             width: 50px;
-            height:25px;
+            height:30px;
             margin: 1px;
             text-align: center;
         }
@@ -149,13 +149,13 @@ var B52HTML =
 		</div>
 	</div>
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
-        <div style="display:flex;height:25px;width:100%"">
+        <div style="display:flex;height:30px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .4)" id="B52TabButton1">Ords</button>
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .4)" id="B52TabButton2">Poss</button>
             <button class="B52TabButton" style="background:rgba(0, 3, 202, .4)" id="B52TabButton3">Free</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .4)" id="B52TabButton4">State</button>
         </div>
-        <div style="height:175px;width:100%;border:1px solid gray;">
+        <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
             <div class="B52Tab" id="B52Tab2">Some 2222 interesting text</div>
             <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
