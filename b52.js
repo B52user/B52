@@ -780,7 +780,7 @@ class B52Widget {
         $("#B52Tabs").hide();
         for(var i=1;i<5;i++)
         {
-            $("#B52TabButton"+i).mouseup(()=>{that.tabClick(i);});
+            $("#B52TabButton"+i.toString()).mouseup(()=>{that.tabClick(i);});
         }
     }
     closeOpen()
@@ -829,6 +829,7 @@ class B52Widget {
     }
 
     tabClick(num) {
+        console.log("X"+num);
         $(".B52Tab").hide();
         $("#B52Tab"+num).show();
     }
