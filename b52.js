@@ -1119,8 +1119,7 @@ b._eventOpenPositionsChanged.push(()=>{
     var riskOpened = b.openedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
     $("#B52PosOpenedList").html("Positions:");
     riskOpened.forEach((p)=>{
-        console.log("LIMIT"+(parseFloat(p.unRealizedProfit)>0)?"BUY":"SELL");
-        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0)?"BUY":"SELL")[0].col;
+        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
         let control = `
         <div class="B52RiskPosItem" style="background:${col}">
             <div style="width:25px;">
