@@ -7,13 +7,15 @@ indicator("B52_ZONE",overlay=true,format=format.inherit)
 level = input.price(0,title="<< LEVEL >>",confirm=true)
 takefromLevel = input.price(0,title="<< TAKES FROM >>",confirm=true)
 stoploss = input.price(0,title="<< STOP LOSS >>",confirm=true)
-gain = input.price(0,title="<< POTENTIAL GAIN? >>",confirm=true)
+gain1 = input.price(0,title="<< POTENTIAL TAKE FROM >>",confirm=true)
+gain2 = input.price(0,title="<< POTENTIAL TAKE TO >>",confirm=true)
 maxLoss = input.float(1.0,title="Max Loss in $")
 minQuantity = input.float(1.0,title="Min buy quantity")
 priceFormat = input.string("#.####",title="Price Formatting")
 numberOfTakes = input.int(5,title="Number of takes")
 minnotal = input.float(5.0,title="Minnotal $")
 buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
+float gain = (gain1+gain2)/2
 //input end
 
 
@@ -102,8 +104,6 @@ table.cell(panel, 0, 5, "Contracts per take ", bgcolor=color.black, text_color=c
 table.cell(panel, 1, 5, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 6, "Take size", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 1, 6, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 0, 7, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
-table.cell(panel, 1, 7, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
 
 //draw end
 
