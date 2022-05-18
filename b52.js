@@ -778,9 +778,9 @@ class B52Widget {
         $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
         $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
         $("#B52Tabs").hide();
-        for(var i=1;i<5;i++)
+        for(let i=1;i<5;i++)
         {
-            $("#B52TabButton"+i.toString()).mouseup(((_i)=>that.tabClick(_i))(i));
+            $("#B52TabButton"+i.toString()).mouseup((()=>that.tabClick(i));
         }
     }
     closeOpen()
