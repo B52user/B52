@@ -81,6 +81,16 @@ var B52HTML =
             height:100%;
             width:100%;
         }
+        div.B52OrderItem
+        {
+            height:25px;
+            width:50px;
+        }
+        div.B52OrderItem button
+        {
+            height:10px;
+            width:10px;
+        }
 	</style>
     <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
@@ -835,7 +845,6 @@ class B52Widget {
     }
 
     tabClick(num) {
-        console.log("X"+num);
         $(".B52Tab").hide();
         $("#B52Tab"+num).show();
     }
@@ -1057,7 +1066,12 @@ b._eventOpenOrdersChanged.push(()=>{
     $("#B52Tab1").empty();
     ordersOpened.forEach((o)=>{
         let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
-        $("#B52Tab1").append("<div class='B52OrderItem' style='background:"+col+"'>"+o.price=="0"?o.stopPrice:o.price+" "+origQty+" <button id='B52"+o.clientOrderId+"'>x</button><div>");
+        let control = `
+        <div class="B52OrderItem" style="background:${col}">
+            ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
+            <button id="B52${o.clientOrderId}">x</button>
+        <div>`;
+        $("#B52Tab1").append(control);
         $("#B52"+o.clientOrderId).mouseup(()=>alert(o.clientOrderId));
     });
 });
