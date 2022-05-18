@@ -180,13 +180,20 @@ var B52HTML =
     <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:30px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
-            <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Poss</button>
+            <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
             <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">State</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
-            <div class="B52Tab" id="B52Tab2">Some 2222 interesting text</div>
+            <div class="B52Tab" id="B52Tab2">
+                <div style="width:50%;" id="B52PosOpenedList">
+                Positions:
+                </div>
+                <div style="width:50%;" id="B52OrdersOpenedList">
+                Orders:
+                </div>
+            </div>
             <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
@@ -1072,6 +1079,26 @@ b._eventOpenPositionsChanged.push(()=>{
         }
     });
 });
+b._eventOpenPositionsChanged.push(()=>{
+    
+    var riskOpened = b.openedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
+    $("#B52PosOpenedList").html("Positions:");
+    riskOpened.forEach((p)=>{
+        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit>0)?"BUY":"SELL"))[0].col;
+        let control = `
+        <div class="B52OrderItem" style="background:${col}">
+            <div style="width:25px;">
+                <button id="B52${p.symbol}">x</button>
+            </div>
+            <div style="margin-top:5px;width:80px">
+                $${parseFloat(p.unRealizedProfit).toFixed(2)}
+            </div>
+        <div>`;
+        $("#B52Tab1").append(control);
+        $("#B52"+p.symbol).mouseup(()=>b.FixPositionSimbol(p.symbol));
+    });
+    //B52PosOpenedList
+});
 b._eventOpenOrdersChanged.push(()=>{
     var ordersOpened = b.openedOrders;
     if(ordersOpened.length)
@@ -1107,6 +1134,7 @@ b._eventOpenOrdersChanged.push(()=>{
         $("#B52Tab1").append(control);
         let ordid = o.orderId;
         $("#B52"+o.clientOrderId).mouseup(()=>b.ChancelOneOrder(ordid));
+        $("#B52"+o.clientOrderId+"Line").mouseup(()=>tv.DrawLine(o));
     });
 });
 b._runPositionsService();
