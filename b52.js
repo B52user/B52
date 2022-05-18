@@ -32,10 +32,10 @@ var B52Settings =
         {dir:"red",perc:0.005,col:"#960000"}
     ],
     orderColors:[
-        {name:"STOP_MARKETBUY",col:"olive"},
-        {name:"STOP_MARKETSELL",col:"#cc3300"},
-        {name:"LIMITBUY",col:"#00a12a"},
-        {name:"LIMITSELL",col:"#960000"}
+        {name:"STOP_MARKETBUY",col:"rgba(85, 107, 47, .4)"},
+        {name:"STOP_MARKETSELL",col:"rgba(204, 85, 0, .4)"},
+        {name:"LIMITBUY",col:"rgba(0, 107, 60, .4)"},
+        {name:"LIMITSELL",col:"rgba(165, 42, 42, .4)"}
     ]
 }
 var B52HTML = 
