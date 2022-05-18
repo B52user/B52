@@ -84,9 +84,10 @@ var B52HTML =
         div.B52OrderItem
         {
             height:25px;
-            width:50px;
+            width:70px;
             margin:2px;
-            font-size:12px;
+            padding:2px;
+            font-size:14px;
         }
         div.B52OrderItem button
         {
@@ -1070,8 +1071,8 @@ b._eventOpenOrdersChanged.push(()=>{
         let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
         let control = `
         <div class="B52OrderItem" style="background:${col}">
-            ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
             <button id="B52${o.clientOrderId}">x</button>
+            ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
         <div>`;
         $("#B52Tab1").append(control);
         $("#B52"+o.clientOrderId).mouseup(()=>alert(o.clientOrderId));
