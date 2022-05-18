@@ -32,7 +32,7 @@ var B52Settings =
         {dir:"red",perc:0.005,col:"#960000"}
     ],
     orderColors:[
-        {name:"STOP_MARKETBUY",col:"darkseagreen"},
+        {name:"STOP_MARKETBUY",col:"olive"},
         {name:"STOP_MARKETSELL",col:"#cc3300"},
         {name:"LIMITBUY",col:"#00a12a"},
         {name:"LIMITSELL",col:"#960000"}
@@ -80,7 +80,7 @@ var B52HTML =
         {
             height:100%;
             width:100%;
-            style="overflow-y: auto;
+            overflow-y: auto;
         }
         div.B52OrderItem
         {
