@@ -84,8 +84,8 @@ var B52HTML =
         }
         div.B52OrderItem
         {
-            height:28px;
-            width:170px;
+            height:24px;
+            width:270px;
             margin:2px;
             padding:2px;
             font-size:14px;
@@ -97,10 +97,10 @@ var B52HTML =
         }
         div.B52OrderItem button
         {
-            height:25px;
-            width:25px;
+            height:23px;
+            width:23px;
             text-align: center;
-            font-size:20px;
+            font-size:17px;
             background:black;
             padding-top:0px;
         }
@@ -785,6 +785,19 @@ class BinanceAdapter {
                 s(messageResponses);
             });
     }
+
+    ChancelOneOrder(orderid){
+        var that = this;
+        var orders = that.openedOrders;
+        if(orders.length==0) return;
+        var closeParams = {
+            orderId:orderid,
+            symbol:that.tv.getCurrentCurrencyPair()
+        };
+        that._signedDELRequest("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
+            console.log(resp);
+        });
+    }
 }
 
 class B52Widget {
@@ -1084,12 +1097,16 @@ b._eventOpenOrdersChanged.push(()=>{
             <div style="width:25px;">
                 <button id="B52${o.clientOrderId}">x</button>
             </div>
-            <div style="margin-top:5px;">
+            <div style="margin-top:5px;width:200px">
                 ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
             </div>
+            <div>
+                <button id="B52${o.clientOrderId}Line">*</button>
+            </div>
         <div>`;
-        $("#B52Tab1").prepend(control);
-        $("#B52"+o.clientOrderId).mouseup(()=>alert(o.clientOrderId));
+        $("#B52Tab1").append(control);
+        let ordid = o.orderId;
+        $("#B52"+o.clientOrderId).mouseup(()=>b.ChancelOneOrder(ordid));
     });
 });
 b._runPositionsService();
