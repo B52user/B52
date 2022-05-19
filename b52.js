@@ -283,6 +283,7 @@ class B52 {
         this.#_b.SetSecretKey(B52Settings.secretKey1);
         this.#_w.Build();
         this.SetButtonEvents();
+        this.SetServices();
         $("#B52Tabs").hide();
     }
 
