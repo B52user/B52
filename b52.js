@@ -1,6 +1,8 @@
+const secretWord = "B52";
+
 var B52Settings = 
 {
-	secretWord : "B52",
+	secretWord : secretWord,
 	accessKey1 : "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o",
 	secretKey1 : "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg",
 	maxLossLabel : "Max Loss in $",
@@ -39,13 +41,13 @@ var B52Settings =
     ],
     tvXpath:{
         currency:"//div[@id='header-toolbar-symbol-search']/div",
-        activeSecretStrategies:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-delete-action']",
+        activeSecretStrategies:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-delete-action']",
         favIndicatorArrow:"(//div[@data-name='show-favorite-indicators'])[1]",
-        b52SettingButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']",
+        b52SettingButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-settings-action']",
         activeStrategyName:"//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]",
         alertMessage:"//div[@data-qa-dialog-name='alert-fired']//div[contains(@class,'secondaryRow')]",
         closeAlertButton:"//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]",
-        moreButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']",
+        moreButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + secretWord + "')]]//div[@data-name='legend-more-action']",
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
