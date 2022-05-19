@@ -345,20 +345,20 @@ class B52 {
                     let messageResponses = [];
                     arr.forEach(e=>{
                         e["symbol"] = currency;
+                        console.log(e);
                         that.Binance.ORDERS_NewOrder(e).then(resp=>{
                             messageResponses.push(resp);
                         });
                     });
-                    s(messageResponses);
                 });
                 B52Tv.CloseAlert();
+                B52Tv.RunNTimes(()=>{
+                    if(B52Tv.XpathItemCount(B52Settings.tvXpath.closeAlertButton)>0)
+                    {
+                        B52Tv.CloseAlert();
+                    }
+                },300,10);
             });
-            B52Tv.RunNTimes(()=>{
-                if(B52Tv.XpathItemCount(B52Settings.tvXpath.closeAlertButton)>0)
-                {
-                    B52Tv.CloseAlert();
-                }
-            },300,10);
         });
     }
 
