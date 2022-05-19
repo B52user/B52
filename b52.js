@@ -908,7 +908,7 @@ class BinanceAdapter {
     ORDERS_SetNoLoss(){
         let that = this;
         B52Tv.GetCurrentCurrencyPair().then(pair=>{
-            let currentRisk = that.#_openedPositions.filter(a=>a.symbol==pair)[0];
+            let currentRisk = that.OpenedPositions.filter(a=>a.symbol==pair)[0];
             let position = parseFloat(currentRisk.positionAmt);
             let entryPrice = parseFloat(currentRisk.entryPrice);
             if(position==0) 
