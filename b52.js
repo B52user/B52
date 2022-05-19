@@ -36,8 +36,18 @@ var B52Settings =
         {name:"STOP_MARKETSELL",col:"rgba(204, 85, 0, .4)"},
         {name:"LIMITBUY",col:"rgba(0, 107, 60, .4)"},
         {name:"LIMITSELL",col:"rgba(165, 42, 42, .4)"}
-    ]
+    ],
+    tvXpath:{
+        currency:"//div[@id='header-toolbar-symbol-search']/div",
+        activeSecretStrategies:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-delete-action']",
+        favIndicatorArrow:"(//div[@data-name='show-favorite-indicators'])[1]",
+        b52SettingButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']",
+        activeStrategyName:"//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]",
+        alertMessage:"//div[@data-qa-dialog-name='alert-fired']//div[contains(@class,'secondaryRow')]",
+        closeAlertButton:"//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]",
+    }
 }
+
 var B52HTML = 
 {
 	B52AreaHtml : `
@@ -227,116 +237,137 @@ var B52HTML =
     `
 }
 
-class B52Tv {
-    constructor() {
+class B52 {
+    #_tv;
+    #_b;
+    #_w;
+    constructor(){
+        this.#_tv = new B52Tv();
+        this.#_b = new BinanceAdapter(this.#_tv);
+        this.#_w = new B52Widget(this.#_tv,this.#_b);
+        this.#_b.SetAccessKey(B52Settings.accessKey1);
+        this.#_b.SetSecretKey(B52Settings.secretKey1);
+        this.#_w.Build();
+
     }
-    triggerMouseEvent(node, eventType) {
+    get TV(){return this.#_tv}
+    get Binance(){return this.#_b}
+    get Widjet(){return this.#_w}
+}
+
+class B52Tv {
+    #_log;
+    constructor(log) {
+    }
+    static TriggerMouseEvent(node, eventType) {
         var clickEvent = document.createEvent('MouseEvents');
         clickEvent.initEvent(eventType, true, true);
         node.dispatchEvent(clickEvent);
     }
-    getCurrentCurrencyPair() {
-        var sign = this.xpathGetFirstItem("//div[@id='header-toolbar-symbol-search']/div");
-	    var pairText = sign.innerText;
-	    if(pairText.substr(pairText.length - 4)=="PERP") pairText = pairText.slice(0,-4);
-        return pairText;
+
+    static GetCurrentCurrencyPair() {
+        return new Promise((s,f)=>{
+            B52Tv.WaitForElement(B52Settings.tvXpath.currency).then(e=>{
+                let pairText = e.innerText;
+                //remove perp in the end as binance doesn't recognize it
+                if(pairText.substr(pairText.length - 4)=="PERP") pairText = pairText.slice(0,-4);
+                s(pairText);
+            });
+        });
     }
-    xpathItemCount(xpath) {
+
+    static XpathItemCount(xpath) {
         return document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
     }
-    xpathGetFirstItem(xpath) {
+    static XpathGetFirstItem(xpath) {
         var items = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
         return items.iterateNext();
     }
-    clearB52s() {
-        var query = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-delete-action']";
-        var itemsCount = this.xpathItemCount(query);
-        for (var i = 0; i < itemsCount; i++) {
-            var item = this.xpathGetFirstItem(query);
+
+    static ClearSecretStrategies() {
+        let itemsCount = B52Tv.XpathItemCount(B52Settings.tvXpath.activeSecretStrategies);
+        for (let i = 0; i < itemsCount; i++) {
+            let item = B52Tv.XpathGetFirstItem(B52Settings.tvXpath.activeSecretStrategies);
             this.triggerMouseEvent(item, "mousedown");
         }
     }
-    runFavIndicator(name) {
-        var arrow = this.xpathGetFirstItem("(//div[@data-name='show-favorite-indicators'])[1]");
-        this.triggerMouseEvent(arrow, "click");
-        var that = this;
-        var fav = "//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]";
+
+    static RunFavIndicator(name) {
+        let arrow = B52Tv.XpathGetFirstItem(B52Settings.tvXpath.favIndicatorArrow);
+        B52Tv.TriggerMouseEvent(arrow, "click");
+        let fav = "//div[./div[text()='Favorite Indicators']]/div[.//span[text()='" + name + "']]";
         return new Promise((s,f)=>{
-            that.waitForElement(fav).then((e)=>{
-                that.triggerMouseEvent(e, "click");
-                var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
-                that.waitForElement(settings).then((e2)=>{
+            B52Tv.WaitForElement(fav).then((e)=>{
+                B52Tv.TriggerMouseEvent(e, "click");
+                B52Tv.WaitForElement(B52Settings.tvXpath.b52SettingButton).then((e2)=>{
                     s();
                 });
             });
         });
     }
-    runStopAlert(currency, name) {
-        var that =this;
-        var play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
+
+    static RunStopAlert(currency, name) {
+        let play = "(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[1]";
         //try clicking if no try openning then clicking
-        var alertMenu = "//div[@data-role='button' and @data-name='alerts']";
+        let alertMenu = "//div[@data-role='button' and @data-name='alerts']";
         return new Promise((s,f)=>{
-            that.waitForElement(alertMenu).then((a)=>{
-                if(that.xpathItemCount(play)<1)
+            B52Tv.WaitForElement(alertMenu).then((a)=>{
+                if(B52Tv.XpathItemCount(play)<1)
                 {
-                    that.triggerMouseEvent(a, "click");
+                    B52Tv.TriggerMouseEvent(a, "click");
                 }
-                that.waitForElement(play).then((e)=>{
-                    that.triggerMouseEvent(e, "click");
+                B52Tv.WaitForElement(play).then((e)=>{
+                    B52Tv.TriggerMouseEvent(e, "click");
                     s();
                 });
             });
         });
     }
-    instantAlertDelete(name)
+    
+    static DeleteAlertQuickly(name)
     {
-        var that =this;
         return new Promise((s,f)=>{
-            var alertEditButton = "//div[starts-with(@class,'dialog') and .//div[text()='"+name+"']]//button[1]";
-            that.triggerMouseEvent(that.xpathGetFirstItem(alertEditButton), "click");
-            that.waitForElement("//div[@data-name='delete']").then(e=>{
-                that.triggerMouseEvent(e,"click");
-                that.waitForElement("//button[@name='yes']").then(b=>{
-                    that.triggerMouseEvent(b,"click");
+            let alertEditButton = "//div[starts-with(@class,'dialog') and .//div[text()='"+name+"']]//button[1]";
+            B52Tv.TriggerMouseEvent(B52Tv.XpathGetFirstItem(alertEditButton), "click");
+            B52Tv.WaitForElement("//div[@data-name='delete']").then(e=>{
+                B52Tv.TriggerMouseEvent(e,"click");
+                B52Tv.WaitForElement("//button[@name='yes']").then(b=>{
+                    B52Tv.TriggerMouseEvent(b,"click");
                     s();
                 });
             });
         });
     }
-    getCurrentStrategyName() {
-        var sign = this.xpathGetFirstItem("//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]");
-        return sign.innerText;
+
+    static GetActiveStrategyName() {
+        return new Promise((s,f)=>{
+            B52Tv.WaitForElement(B52Settings.tvXpath.activeStrategyName).then(e=>{
+                s(e.innerText);
+            });
+        });
     }
-    getAlertMessage() {
-        var alert = this.xpathGetFirstItem("//div[@data-qa-dialog-name='alert-fired']//div[contains(@class,'secondaryRow')]");
-        return alert.innerText;
+
+    static GetAlertMessage() {
+        return new Promise((s,f)=>{
+            B52Tv.WaitForElement(B52Settings.tvXpath.alertMessage).then(e=>{
+                s(e.innerText);
+            });
+        });
     }
-    closeAlert() {
-        var close = this.xpathGetFirstItem("//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]");
-        this.triggerMouseEvent(close, "click");
+
+    static CloseAlert() {
+        return new Promise((s,f)=>{
+            B52Tv.WaitForElement(B52Settings.tvXpath.closeAlertButton).then(e=>{
+                B52Tv.TriggerMouseEvent(e,"click");
+            });
+        });
     }
-    grabAlertMessage(name) {
-        var that = this;
-	    return new Promise((s,f) => {
-            var existCondition = setInterval(function () {
-                if ($("div[data-qa-dialog-name='alert-fired']").length) {
-                    clearInterval(existCondition);
-                    //stop it now
-                    var theMessage = that.getAlertMessage();
-                    that.instantAlertDelete(name).then(()=>{
-                        s(theMessage);
-                    });
-                }
-            }, 100);
-	    });
-    }
-    createNewAlert(alertName) {
-        var that = this;
+
+    static CreateNewAlert(alertName) {
         return new Promise((s,f) => 
         {
-            var more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
-            var item = this.xpathGetFirstItem(more);
+            let more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
+            let item = this.xpathGetFirstItem(more);
             that.triggerMouseEvent(item, "mousedown");
             var newAlert = ["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]"
             ,"//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"];
@@ -352,7 +383,7 @@ class B52Tv {
             });
         });
     }
-    pressEnter() {
+    static PressEnter() {
         return new Promise((s,f)=>{
             setTimeout(() => {
                     const ke = new KeyboardEvent('keydown', {
@@ -365,7 +396,7 @@ class B52Tv {
             }, 50);
         });
     }
-    deleteAlert(currency, name) {
+    static DeleteAlert(currency, name) {
         var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
         this.triggerMouseEvent(del, "click");
         var that = this;
@@ -374,7 +405,7 @@ class B52Tv {
             that.triggerMouseEvent(e, "click");
         });
     }
-	setStrategySettings(sets)
+	static SetStrategySettings(sets)
 	{
 		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
 		var item = tv.xpathGetFirstItem(settings);
@@ -395,7 +426,7 @@ class B52Tv {
             });
         });
 	}
-    waitForElement(xpath)
+    static WaitForElement(xpath)
     {
         var that = this;
         return new Promise((s,f) => {
@@ -1035,12 +1066,16 @@ class B52TvService
 class B52Log {
     constructor() {
         this._log = [];    
+        this._eventLogChanged = [];
     }
     Info(message){
         this._log.push({type:"info",mess:message});
     }
     GetLog(){
         return this._log;
+    }
+    _eventLogChangedTrigger(){
+        this._eventLogChanged.forEach(a=>a());
     }
 }
 
