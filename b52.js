@@ -51,6 +51,7 @@ var B52Settings =
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
+    workBookDepth:1000,
     binanceSettings:{
         serverUrl:"https://fapi.binance.com/",
         orderUrl:"fapi/v1/order",
@@ -60,6 +61,7 @@ var B52Settings =
         positions:"fapi/v1/positionRisk",
         exchangeInfo:"fapi/v1/exchangeInfo",
         balance:"fapi/v1/balance",
+        workbook: "fapi/v1/depth",
     }
 }
 
@@ -1222,6 +1224,25 @@ class BinanceAdapter {
                     B52Log.Info("ORDERS_NewOrder. ", resp);
                     s(resp);
                 });
+        });
+    }
+
+    MARKET_GetCurrentOrderBook(){
+        let that = this;
+        return new Promise((s,f)=>{
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                that.GET_ANON_PARAMS(
+                    B52Settings.binanceSettings.workbook,
+                    {
+                        symbol:currency,
+                        limit:B52Settings.workBookDepth
+                    }
+                    ).then((resp)=>{
+                        B52Log.Info(`MARKET_GetCurrentOrderBook. `, resp);
+                        console.log(resp);
+                        s(resp);
+                    });
+            });
         });
     }
 }
