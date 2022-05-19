@@ -312,7 +312,7 @@ class B52 {
         let that = this;
 		let splitted = b.srcElement.id.split('_');
 		let stratName = splitted[0]+"_"+splitted[1];
-		let loss = parseFloat(splitted[2]);
+		let maxLoss = parseFloat(splitted[2]);
 
         B52Tv.RunFavIndicator(stratName).then(()=>{
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
