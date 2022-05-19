@@ -666,7 +666,7 @@ class B52Tv {
         let itemsCount = B52Tv.XpathItemCount(B52Settings.tvXpath.activeSecretStrategies);
         for (let i = 0; i < itemsCount; i++) {
             let item = B52Tv.XpathGetFirstItem(B52Settings.tvXpath.activeSecretStrategies);
-            this.triggerMouseEvent(item, "mousedown");
+            B52Tv.TriggerMouseEvent(item, "mousedown");
         }
     }
 
