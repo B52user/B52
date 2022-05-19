@@ -258,7 +258,7 @@ var B52Log = {
     _eventLogChanged:[],
     Info : (message,obj=null)=>{
         B52Log._log.push({type:"info",mess:message,obj:obj});
-        if(obj!=null)console.log(obj);
+        //if(obj!=null)console.log(obj);
     },
     GetLog : ()=>{
         return B52Log._log;
