@@ -59,6 +59,7 @@ var B52Settings =
         openedOrders:"fapi/v1/openOrders",
         positions:"fapi/v1/positionRisk",
         exchangeInfo:"fapi/v1/exchangeInfo",
+        balance:"fapi/v1/balance",
     }
 }
 
@@ -1177,9 +1178,11 @@ class BinanceAdapter {
     ORDERS_GetBalance() {
             var that = this;
             return new Promise((s,f)=>{
-                that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",that.accessKey,that.secretKey).then((resp)=>{
-                    s(resp.filter(a=>a.asset=="USDT")[0].balance);
-                });
+                that.GET_SIGNED_PARAMS(B52Settings.binanceSettings.balance,
+                    that.#_accessKey,
+                    that.#_secretKey).then((resp)=>{
+                        s(resp.filter(a=>a.asset=="USDT")[0].balance);
+                    });
             });
     }
 
