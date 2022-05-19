@@ -269,25 +269,171 @@ class B52 {
     #_tv;
     #_b;
     #_w;
+    #_srvs;
     get TV(){return this.#_tv}
     get Binance(){return this.#_b}
     get Widjet(){return this.#_w}
+
     constructor(){
         this.#_tv = new B52Tv();
         this.#_b = new BinanceAdapter();
         this.#_w = new B52Widget();
+        this.#_srvs = {};
         this.#_b.SetAccessKey(B52Settings.accessKey1);
         this.#_b.SetSecretKey(B52Settings.secretKey1);
         this.#_w.Build();
         this.SetButtonEvents();
+        $("#B52Tabs").hide();
     }
 
     SetButtonEvents(){
+        let that = this;
+        $(this.#_w.Button("B52ClearChart")).mouseup(() => {B52Tv.ClearSecretStrategies();});
+        $(this.#_w.Button("B52StartBinance")).mouseup(() => {that.BUTTON_B52StartBinance();});
+        $(this.#_w.Button("B52CloseOpenButton")).mouseup(() => {that.BUTTON_B52CloseOpenButton();});
+        $(this.#_w.Button("B52SellAll")).mouseup(() => {that.BUTTON_B52SellAll();});
+        $(this.#_w.Button("B52SellPart")).mouseup(() => {that.BUTTON_B52SellPart();});
+        $(this.#_w.Button("B52COrders")).mouseup(() => {that.BUTTON_B52COrders();});
+        $(this.#_w.Button("B52NLStop")).mouseup(() => {that.BUTTON_B52NLStop();});
+        $(this.#_w.Button("B52Window2Open")).mouseup(() => {that.BUTTON_B52Window2Open();});
+        for(let i=1;i<5;i++)
+        {
+            $("#B52TabButton"+i.toString()).mouseup(()=>that.tabClick(i));
+            $(this.#_w.Button("B52TabButton"+i.toString())).mouseup(() => that.BUTTON_B52TabButton(i));
+        }
+        $("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.BUTTON_B52Strategy(e);})
+    }
 
+    BUTTON_B52Strategy(b){
+        let that = this;
+		let splitted = b.srcElement.id.split('_');
+		let stratName = splitted[0]+"_"+splitted[1];
+		let loss = parseFloat(splitted[2]);
+
+        B52Tv.RunFavIndicator(stratName).then(()=>{
+            that.Binance().GetTickSize().then(s=>{
+                that.Binance().GetPriceFormatting().then(f=>{
+                    let sets = [];
+					if(s!=1) sets.push({label:"Min buy quantity",value:s});
+					
+					let form = "#.";
+					for(let i=0;i<f.length-2;i++) { form+="#";}
+					if(form!="#.####") sets.push({label:"Price Formatting",value:form});
+					//set maxLoss
+					sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
+					
+                    if(sets.length) B52Tv.SetStrategySettings(sets);
+                });
+            });
+        });
+    }
+
+
+    BUTTON_B52StartBinance(){
+        let theUniqueName = "B52 " + Date.now().toString();
+        let that = this;
+        B52Tv.CreateNewAlert(theUniqueName).then(() => {
+            B52Tv.GetAlertMessage(theUniqueName).then(mess=>{
+                B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                    let arr = JSON.parse(mess);
+                    let messageResponses = [];
+                    arr.forEach(e=>{
+                        e["symbol"] = currency;
+                        that.Binance().ORDERS_NewOrder(e).then(resp=>{
+                            messageResponses.push(resp);
+                        });
+                    });
+                    s(messageResponses);
+                });
+                B52Tv.CloseAlert();
+            });
+            B52Tv.RunNTimes(()=>{
+                if(B52Tv.XpathItemCount(B52Settings.tvXpath.closeAlertButton)>0)
+                {
+                    B52Tv.CloseAlert();
+                }
+            },300,10);
+        });
+    }
+
+    BUTTON_B52CloseOpenButton(){
+        var closed = $("#B52CloseOpenButton").attr("closed")=="true";
+        var closed2 = $("#B52Tabs").attr("hid")=="true";
+        if (closed)
+        {
+            //open
+            $("#B52CloseOpenButton").attr("closed","false");
+            $("#B52CloseOpen").css("right","355px");
+            $("#B52CloseOpen").css("bottom","2px");
+            $("#B52Area1").show();
+            $("#B52Area2").show();
+            if(!closed2)
+            {
+                $("#B52Tabs").show();
+                $("#B52TabButton1").mouseup();
+            }
+        }
+        else
+        {
+            //close
+            $("#B52CloseOpenButton").attr("closed","true");
+            $("#B52CloseOpen").css("right","2px");
+            $("#B52CloseOpen").css("bottom","2px");
+            $("#B52Area1").hide();
+            $("#B52Area2").hide();
+            $("#B52Tabs").hide();
+        }
+    }
+
+    BUTTON_B52SellAll(){
+
+    }
+
+    BUTTON_B52SellPart(){
+
+    }
+
+    BUTTON_B52COrders(){
+
+    }
+
+    BUTTON_B52NLStop(){
+
+    }
+
+    BUTTON_B52Window2Open(){
+        var closed = $("#B52Tabs").attr("hid")=="true";
+        if(!closed)
+        {
+            $("#B52Tabs").attr("hid","true");
+            $("#B52Tabs").hide();
+        }
+        else
+        {
+            $("#B52Tabs").attr("hid","false");
+            $("#B52Tabs").show();
+            $("#B52TabButton1").mouseup();
+        }
+    }
+
+    BUTTON_B52TabButton(num){
+        $(".B52Tab").hide();
+        $("#B52Tab"+num).show();
     }
 
     SetServices()
     {
+        let shitService = this.SERVICE_MakeShitService();
+        shitService.Start();
+        this.#_srvs["Shit"] = shitService;
+
+        let riskSrv = this.SERVICE_MakeRiskService();
+        riskSrv.Start();
+        this.#_srvs["Risk"] = riskSrv;
+
+        let ordSrv = this.SERVICE_MakeOrderService();
+        ordSrv.Start();
+        this.#_srvs["Orders"] = ordSrv;
 
     }
 
@@ -295,9 +441,9 @@ class B52 {
         let that = this;
         let shitService = new B52Service(200);
         //gray buttons observer
-        shitService.push(()=>{
+        shitService.Actions.push(()=>{
             //check gray buttons
-            var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
+            let anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
             if(B52Tv.XpathItemCount(anyStratOnline)<1)
             {
                 $(".B52StrategyButton").each((i,e)=>{
@@ -320,73 +466,53 @@ class B52 {
                 $("#B52ClearChart").css("color","white");
             }
         });
-        shitService.push(()=>{
+        shitService.Actions.push(()=>{
             B52Settings.shitClickers.forEach((shit)=>{
                 if(B52Tv.XpathItemCount(shit)>0) B52Tv.TriggerMouseEvent(B52Tv.XpathGetFirstItem(shit),"click");
             });
         });
+        return shitService;
     }
 
-    _runPositionsService() {
-        var that = this;
-        that.posService = setInterval(()=>{
-                if(!that.openedPositions_lock)
+    #_openedPositions_lock;
+    SERVICE_MakeRiskService(){
+        let that = this;
+        this.#_openedPositions_lock = false;
+        let risksrv = new B52Service(B52Settings.positionsServiceIntervalMS);
+        risksrv.Actions.push(()=>{
+            if(!that.openedPositions_lock)
                 {
-                    that.openedPositions_lock = true;
+                    that.#_openedPositions_lock = true;
                     that.GetPositions().then(pos=>{
-                        that.openedPositions = pos;
-                        that.openedPositions_lock = false;
-                        //run event
+                        that.Binance().OpenedPositions = pos;
+                        that.#_openedPositions_lock = false;
+                        //run events
                         that._eventOpenPositionsChanged.forEach(a=>a());
                     });
                 }
-            },
-            B52Settings.positionsServiceIntervalMS
-        );
+        });
+        return risksrv;
     }
 
-    _stopPositionsService() {
-        var that = this;
-        clearInterval(that.posService);
-    }
-
-    _runOrdersService() {
-        var that = this;
-        that.ordService = setInterval(()=>{
-                if(!that.openedOrders_lock)
+    #_openedOrders_lock;
+    SERVICE_MakeOrderService(){
+        let that = this;
+        this.#_openedOrders_lock = false;
+        let ordService = new B52Service(B52Settings.ordersSerciceIntervalMS);
+        ordService.Actions.push(()=>{
+            if(!that.openedPositions_lock)
                 {
-                    that.openedOrders_lock = true;
+                    that.#_openedOrders_lock = true;
                     that.GetOpenOrders().then(ords=>{
-                        that.openedOrders = ords;
-                        that.openedOrders_lock = false;
-                        //run event
+                        that.Binance().OpenedOrders = ords;
+                        that.#_openedOrders_lock = false;
+                        //run events
                         that._eventOpenOrdersChanged.forEach(a=>a());
                     });
                 }
-            },
-            B52Settings.ordersSerciceIntervalMS
-        );
-    }
-
-    _stopOrdersService() {
-        var that = this;
-        clearInterval(that.ordService);
-    }
-
-    ForEachOrderInMessage(message) {
-        var that = this;
-        return new Promise((s,f)=>{
-            var arr = JSON.parse(message);
-            var messageResponses = [];
-            arr.forEach(e=>{
-                e["symbol"] = that.tv.getCurrentCurrencyPair();
-                that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,e).then((resp)=>{
-                    messageResponses.push(resp);
-                });
-            });
-            s(messageResponses);
         });
-}
+        return ordService;
+    }
 }
 
 class B52Tv {
@@ -653,16 +779,18 @@ class B52Tv {
 class BinanceAdapter {
     #_accessKey;
     #_secretKey;
-    #_openedPositions;
-    get OpenedPositions(){return this.#_openedPositions}
-    #_openedOrders;
-    get OpenedOrders(){return this.#_openedOrders}
+    OpenedPositions;
+    _eventOpenPositionsChanged;
+    OpenedOrders;
+    _eventOpenOrdersChanged;
     #_exchangeInfo;
 
     constructor() {
 	    this.#_exchangeInfo = null;
-        this.#_openedPositions = null;
-        this.#_openedOrders = null;
+        this.OpenedPositions = null;
+        this.OpenedOrders = null;
+        this._eventOpenPositionsChanged = [];
+        this._eventOpenOrdersChanged = [];
     }
 
     ORDERS_SetNoLoss(){
@@ -959,164 +1087,48 @@ class BinanceAdapter {
             B52Log.Info(`ORDERS_ChancelSingleOrder for orderid=${orderid} and currency=${currency} done.`,resp);
         });
     }
+
+    ORDERS_NewOrder(order){
+        let that = this;
+        return new Promise((s,f)=>{
+            that.POST_SIGNED_PARAMS(
+                B52Settings.binanceSettings.orderUrl,
+                that.#_accessKey,
+                that.#_secretKey,
+                order).then((resp)=>{
+                    B52Log.Info("ORDERS_NewOrder. ", resp);
+                    s(resp);
+                });
+        });
+    }
 }
 
 class B52Widget {
     #_buttons;
-    get Buttons(){return this.#_buttons}
 
     constructor() {
         this.#_buttons = [];
+    }
+
+    Button(id){
+        return this.#_buttons.filter(a=>a.id==id)[0];
     }
 
     Build() {
         var that = this;
         $('body').append(B52HTML.B52StyleDark+B52HTML.B52AreaHtml);
 	    that.FillButtonsIn(B52Settings.sButtons);
-
-
-        //events
-        $("#B52ClearChart").mouseup(() => {that.tv.clearB52s();});
-        $("#B52StartBinance").mouseup(() => {that.makeADeal();});
-	    $("#B52CloseOpenButton").mouseup(() => {that.closeOpen();});
-        $("#B52SellAll").mouseup(()=>{that.b.FixPosition();})
-        $("#B52SellPart").mouseup(()=>{that.b.FixPosition();})
-        $("#B52COrders").mouseup(()=>{that.b.ChancelOrders();})
-        $("#B52NLStop").mouseup(()=>{that.b.SetNoLoss();})
-        $("#B52Window2Open").mouseup(()=>{that.closeOpen2();});
-        $("#B52Tabs").hide();
-        for(let i=1;i<5;i++)
-        {
-            $("#B52TabButton"+i.toString()).mouseup(()=>that.tabClick(i));
-        }
+        $("div.B52 button").each((i,b)=>{
+            this.#_buttons.push(b);
+        });
     }
-    closeOpen()
-    {
-        var closed = $("#B52CloseOpenButton").attr("closed")=="true";
-        var closed2 = $("#B52Tabs").attr("hid")=="true";
-        if (closed)
-        {
-            //open
-            $("#B52CloseOpenButton").attr("closed","false");
-            $("#B52CloseOpen").css("right","355px");
-            $("#B52CloseOpen").css("bottom","2px");
-            $("#B52Area1").show();
-            $("#B52Area2").show();
-            if(!closed2)
-            {
-                $("#B52Tabs").show();
-                $("#B52TabButton1").mouseup();
-            }
-        }
-        else
-        {
-            //close
-            $("#B52CloseOpenButton").attr("closed","true");
-            $("#B52CloseOpen").css("right","2px");
-            $("#B52CloseOpen").css("bottom","2px");
-            $("#B52Area1").hide();
-            $("#B52Area2").hide();
-            $("#B52Tabs").hide();
-        }
-    }
-    closeOpen2()
-    {
-        var closed = $("#B52Tabs").attr("hid")=="true";
-        if(!closed)
-        {
-            $("#B52Tabs").attr("hid","true");
-            $("#B52Tabs").hide();
-        }
-        else
-        {
-            $("#B52Tabs").attr("hid","false");
-            $("#B52Tabs").show();
-            $("#B52TabButton1").mouseup();
-        }
-    }
-
-    tabClick(num) {
-        $(".B52Tab").hide();
-        $("#B52Tab"+num).show();
-    }
-
-    startStrategy(strategyName, maxLoss) {
-		var that = this;
-		this.tv.runFavIndicator(strategyName).then(()=>{
-			that.b.GetTickSize().then((s)=>{
-				that.b.GetPriceFormatting().then(f=>{
-					var sets = [];
-					if(s!=1)
-					{
-						sets.push({label:"Min buy quantity",value:s})
-					}
-					//get format
-					var form = "#.";
-					for(var i=0;i<f.length-2;i++)
-					{
-						form+="#";
-					}
-					if(form!="#.####") 
-					{
-						sets.push({label:"Price Formatting",value:form})
-					}
-					//set maxLoss
-					sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
-					if(sets.length)
-					{
-						that.tv.setStrategySettings(sets);
-					}
-				})
-			});
-
-		});
-	}
-
-    makeADeal() {
-        var theUniqueName = "B52 " + Date.now().toString();
-            var that = this;
-            this.tv.createNewAlert(theUniqueName).then(() => {
-                that.tv.grabAlertMessage(theUniqueName).then((res) => {
-                    //process the message
-                    console.log(res);
-                    b.ForEachOrderInMessage(res).then(r=>{
-                        console.log(r);
-                    });
-                    
-                    setTimeout(function () {
-                        that.tv.runNTimes(()=>{
-                            var theButtonClose = "//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]";
-                            if(that.tv.xpathItemCount(theButtonClose)>0)
-                            {
-                                that.tv.closeAlert();
-                            }
-                        },300,10);
-                    }, 50);
-                    
-                });
-            });
-    }
-
 	FillButtonsIn(buttons)
 	{
-		var that = this;
-	    	buttons.forEach(b=>
-			{
-		    	var splitted = b.name.split('_');
-				var stratName = splitted[0]+"_"+splitted[1];
-				var loss = parseFloat(splitted[2]);
-				$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"' origcolor='"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
-			});
-		$("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.strategyButtonClick(e);})
-	}
-
-	strategyButtonClick(b)
-	{
-		var that = this;
-		var splitted = b.srcElement.id.split('_');
-		var stratName = splitted[0]+"_"+splitted[1];
-		var loss = parseFloat(splitted[2]);
-		that.startStrategy(stratName,loss);
+	    buttons.forEach(b=>
+		{
+		   	var splitted = b.name.split('_');
+			$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"' origcolor='"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
+		});
 	}
 }
 
@@ -1143,12 +1155,9 @@ class B52Service
 	}
 }
 
-var tv = new B52Tv();
-var b = new BinanceAdapter(tv);
-b.SetAccessKey(B52Settings.accessKey1);
-b.SetSecretKey(B52Settings.secretKey1);
-var page = new B52Widget(tv,b,"dark");
-page.Build();
+var b52 = new B52();
+b52.Binance.SetAccessKey(B52Settings.accessKey1);
+b52.Binance.SetSecretKey(B52Settings.secretKey1);
 
 
 b._eventOpenPositionsChanged.push(()=>{
