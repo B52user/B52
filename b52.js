@@ -313,8 +313,8 @@ class B52 {
 		let loss = parseFloat(splitted[2]);
 
         B52Tv.RunFavIndicator(stratName).then(()=>{
-            that.Binance().GetTickSize().then(s=>{
-                that.Binance().GetPriceFormatting().then(f=>{
+            that.Binance.GetTickSize().then(s=>{
+                that.Binance.GetPriceFormatting().then(f=>{
                     let sets = [];
 					if(s!=1) sets.push({label:"Min buy quantity",value:s});
 					
@@ -341,7 +341,7 @@ class B52 {
                     let messageResponses = [];
                     arr.forEach(e=>{
                         e["symbol"] = currency;
-                        that.Binance().ORDERS_NewOrder(e).then(resp=>{
+                        that.Binance.ORDERS_NewOrder(e).then(resp=>{
                             messageResponses.push(resp);
                         });
                     });
@@ -390,7 +390,7 @@ class B52 {
     BUTTON_B52SellAll(){
         let that = this;
         B52Tv.GetCurrentCurrencyPair().then(currency=>{
-            that.Binance().ORDERS_FixPosition(currency);
+            that.Binance.ORDERS_FixPosition(currency);
         });
     }
 
@@ -401,12 +401,12 @@ class B52 {
     BUTTON_B52COrders(){
         let that = this;
         B52Tv.GetCurrentCurrencyPair().then(currency=>{
-            that.Binance().ORDERS_ChancelAllOrders(currency);
+            that.Binance.ORDERS_ChancelAllOrders(currency);
         });
     }
 
     BUTTON_B52NLStop(){
-        this.Binance().ORDERS_SetNoLoss();
+        this.Binance.ORDERS_SetNoLoss();
     }
 
     BUTTON_B52Window2Open(){
@@ -492,16 +492,16 @@ class B52 {
                 {
                     that.#_openedPositions_lock = true;
                     that.GetPositions().then(pos=>{
-                        that.Binance().OpenedPositions = pos;
+                        that.Binance.OpenedPositions = pos;
                         that.#_openedPositions_lock = false;
                         //run events
-                        that.Binance()._eventOpenPositionsChanged.forEach(a=>a());
+                        that.Binance._eventOpenPositionsChanged.forEach(a=>a());
                     });
                 }
         });
-        that.Binance()._eventOpenPositionsChanged.push(()=>{
+        that.Binance._eventOpenPositionsChanged.push(()=>{
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
-                let currentRisk = that.Binance().OpenedPositions.filter(a=>a.symbol==currency)[0];
+                let currentRisk = that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0];
                 let entryPrice = parseFloat(currentRisk.entryPrice);
                 let amount = parseFloat(currentRisk.positionAmt);
                 let profit = parseFloat(currentRisk.unRealizedProfit);
@@ -535,8 +535,8 @@ class B52 {
             });
             
         });
-        that.Binance()._eventOpenPositionsChanged.push(()=>{
-            that.Binance().GetBalance().then(bal=>{
+        that.Binance._eventOpenPositionsChanged.push(()=>{
+            that.Binance.GetBalance().then(bal=>{
                 let prevBalance = parseFloat($("#B52Balance").text().split('$').join(''));
                 let currBalance = parseFloat(parseFloat(bal).toFixed(2));
                 if(currBalance!=prevBalance)
@@ -549,8 +549,8 @@ class B52 {
                 }
             });
         });
-        that.Binance()._eventOpenPositionsChanged.push(()=>{
-            let riskOpened = that.Binance().OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
+        that.Binance._eventOpenPositionsChanged.push(()=>{
+            let riskOpened = that.Binance.OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
             $("#B52PosOpenedList").html("Positions:");
             riskOpened.forEach((p)=>{
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
@@ -564,7 +564,7 @@ class B52 {
                     </div>
                 <div>`;
                 $("#B52PosOpenedList").append(control);
-                $("#B52"+p.symbol+"POS").mouseup(()=>that.Binance().ORDERS_FixPosition(p.symbol));
+                $("#B52"+p.symbol+"POS").mouseup(()=>that.Binance.ORDERS_FixPosition(p.symbol));
             });
         });
         return risksrv;
@@ -580,15 +580,15 @@ class B52 {
                 {
                     that.#_openedOrders_lock = true;
                     that.GetOpenOrders().then(ords=>{
-                        that.Binance().OpenedOrders = ords;
+                        that.Binance.OpenedOrders = ords;
                         that.#_openedOrders_lock = false;
                         //run events
                         that._eventOpenOrdersChanged.forEach(a=>a());
                     });
                 }
         });
-        that.Binance()._eventOpenOrdersChanged.push(()=>{
-            let ordersOpened = that.Binance().OpenedOrders;
+        that.Binance._eventOpenOrdersChanged.push(()=>{
+            let ordersOpened = that.Binance.OpenedOrders;
             if(ordersOpened.length)
             {
                 $("#B52COrders").text("C.ORDS ("+ ordersOpened.length + ")");
@@ -602,8 +602,8 @@ class B52 {
                 $("#B52COrders").css("color","#636363");
             }
         });
-        that.Binance()._eventOpenOrdersChanged.push(()=>{
-            var ordersOpened = that.Binance().OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
+        that.Binance._eventOpenOrdersChanged.push(()=>{
+            var ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
             $("#B52Tab1").empty();
             ordersOpened.forEach((o)=>{
                 let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
@@ -621,7 +621,7 @@ class B52 {
                 <div>`;
                 $("#B52Tab1").append(control);
                 let ordid = o.orderId;
-                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance().ORDERS_ChancelSingleOrder(ordid));
+                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordid));
                 $("#B52"+o.clientOrderId+"Line").mouseup(()=>B52Tv.DrawOrderLine(o));
             });
         });
