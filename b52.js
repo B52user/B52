@@ -315,18 +315,20 @@ class B52 {
 		let loss = parseFloat(splitted[2]);
 
         B52Tv.RunFavIndicator(stratName).then(()=>{
-            that.Binance.GetTickSize().then(s=>{
-                that.Binance.GetPriceFormatting().then(f=>{
-                    let sets = [];
-					if(s!=1) sets.push({label:"Min buy quantity",value:s});
-					
-					let form = "#.";
-					for(let i=0;i<f.length-2;i++) { form+="#";}
-					if(form!="#.####") sets.push({label:"Price Formatting",value:form});
-					//set maxLoss
-					sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
-					
-                    if(sets.length) B52Tv.SetStrategySettings(sets);
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                that.Binance.MARKET_GetTickSize(currency).then(s=>{
+                    that.Binance.MARKET_GetPriceFormatPrecision(currency).then(f=>{
+                        let sets = [];
+                        if(s!=1) sets.push({label:"Min buy quantity",value:s});
+                        
+                        let form = "#.";
+                        for(let i=0;i<f.length-2;i++) { form+="#";}
+                        if(form!="#.####") sets.push({label:"Price Formatting",value:form});
+                        //set maxLoss
+                        sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
+                        
+                        if(sets.length) B52Tv.SetStrategySettings(sets);
+                    });
                 });
             });
         });
