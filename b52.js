@@ -488,10 +488,10 @@ class B52 {
         this.#_openedPositions_lock = false;
         let risksrv = new B52Service(B52Settings.positionsServiceIntervalMS);
         risksrv.Actions.push(()=>{
-            if(!that.openedPositions_lock)
+            if(!that.#_openedPositions_lock)
                 {
                     that.#_openedPositions_lock = true;
-                    that.GetPositions().then(pos=>{
+                    that.Binance.ORDERS_GetAllPositions().then(pos=>{
                         that.Binance.OpenedPositions = pos;
                         that.#_openedPositions_lock = false;
                         //run events
@@ -576,14 +576,16 @@ class B52 {
         this.#_openedOrders_lock = false;
         let ordService = new B52Service(B52Settings.ordersSerciceIntervalMS);
         ordService.Actions.push(()=>{
-            if(!that.openedPositions_lock)
+            if(!that.#_openedOrders_lock)
                 {
                     that.#_openedOrders_lock = true;
-                    that.GetOpenOrders().then(ords=>{
-                        that.Binance.OpenedOrders = ords;
-                        that.#_openedOrders_lock = false;
-                        //run events
-                        that._eventOpenOrdersChanged.forEach(a=>a());
+                    B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                        that.Binance.ORDERS_GetOpenOrders(currency).then(ords=>{
+                            that.Binance.OpenedOrders = ords;
+                            that.#_openedOrders_lock = false;
+                            //run events
+                            that._eventOpenOrdersChanged.forEach(a=>a());
+                        });
                     });
                 }
         });
