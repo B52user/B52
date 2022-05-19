@@ -275,6 +275,7 @@ class B52 {
     get TV(){return this.#_tv}
     get Binance(){return this.#_b}
     get Widjet(){return this.#_w}
+    get Srvs(){return this.#_srvs}
 
     constructor(){
         this.#_tv = new B52Tv();
@@ -536,7 +537,7 @@ class B52 {
             
         });
         that.Binance._eventOpenPositionsChanged.push(()=>{
-            that.Binance.GetBalance().then(bal=>{
+            that.Binance.ORDERS_GetBalance().then(bal=>{
                 let prevBalance = parseFloat($("#B52Balance").text().split('$').join(''));
                 let currBalance = parseFloat(parseFloat(bal).toFixed(2));
                 if(currBalance!=prevBalance)
@@ -584,7 +585,7 @@ class B52 {
                             that.Binance.OpenedOrders = ords;
                             that.#_openedOrders_lock = false;
                             //run events
-                            that._eventOpenOrdersChanged.forEach(a=>a());
+                            that.Binance._eventOpenOrdersChanged.forEach(a=>a());
                         });
                     });
                 }
