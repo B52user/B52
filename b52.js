@@ -1103,7 +1103,7 @@ class BinanceAdapter {
                     let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
                     params["signature"] = hash.toString();
                     let toAdd = jQuery.param(params);
-                    fetch(url+"?"+toAdd,{method:"DELETE",headers:{"X-MBX-APIKEY":accessKey}})
+                    fetch(B52Settings.binanceSettings.serverUrl+url+"?"+toAdd,{method:"DELETE",headers:{"X-MBX-APIKEY":accessKey}})
                         .then(response => response.json())
                         .then(resp => {
                             s(resp);
@@ -1125,7 +1125,7 @@ class BinanceAdapter {
                     let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
                     params["signature"] = hash.toString();
                     let toAdd = jQuery.param(params);
-                    fetch(url+"?"+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
+                    fetch(B52Settings.binanceSettings.serverUrl+url+"?"+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
                         .then(response => response.json())
                         .then(resp => {
                             s(resp);
@@ -1143,7 +1143,7 @@ class BinanceAdapter {
             {
                 toAdd+="?" + jQuery.param(params);
             }
-            fetch(url+toAdd,{method:"get"})
+            fetch(B52Settings.binanceSettings.serverUrl+url+toAdd,{method:"get"})
                 .then(response => response.json())
                 .then(resp => {
                     s(resp);
@@ -1162,7 +1162,7 @@ class BinanceAdapter {
                     let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
                     params["signature"] = hash.toString();
                     let toAdd = jQuery.param(params);
-                    fetch(url+"?"+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                    fetch(B52Settings.binanceSettings.serverUrl+url+"?"+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
                         .then(response => response.json())
                         .then(resp => {
                             s(resp);
