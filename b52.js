@@ -345,19 +345,20 @@ class B52 {
                     let messageResponses = [];
                     arr.forEach(e=>{
                         e["symbol"] = currency;
-                        console.log(e);
                         that.Binance.ORDERS_NewOrder(e).then(resp=>{
+                            B52Log.Info("BUTTON_B52StartBinance",resp);
                             messageResponses.push(resp);
                         });
                     });
                 });
-                B52Tv.CloseAlert();
-                B52Tv.RunNTimes(()=>{
-                    if(B52Tv.XpathItemCount(B52Settings.tvXpath.closeAlertButton)>0)
-                    {
-                        B52Tv.CloseAlert();
-                    }
-                },300,10);
+                B52Tv.DeleteAlertQuickly(theUniqueName).then(()=>{
+                    B52Tv.RunNTimes(()=>{
+                        if(B52Tv.XpathItemCount(B52Settings.tvXpath.closeAlertButton)>0)
+                        {
+                            B52Tv.CloseAlert();
+                        }
+                    },300,10);
+                });
             });
         });
     }
@@ -609,26 +610,28 @@ class B52 {
             }
         });
         that.Binance._eventOpenOrdersChanged.push(()=>{
-            var ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
-            $("#B52Tab1").empty();
-            ordersOpened.forEach((o)=>{
-                let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
-                let control = `
-                <div class="B52OrderItem" style="background:${col}">
-                    <div style="width:25px;">
-                        <button id="B52${o.clientOrderId}">x</button>
-                    </div>
-                    <div style="margin-top:5px;width:200px">
-                        ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
-                    </div>
-                    <div>
-                        <button id="B52${o.clientOrderId}Line">*</button>
-                    </div>
-                <div>`;
-                $("#B52Tab1").append(control);
-                let ordid = o.orderId;
-                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordid));
-                $("#B52"+o.clientOrderId+"Line").mouseup(()=>B52Tv.DrawOrderLine(o));
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                var ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
+                $("#B52Tab1").empty();
+                ordersOpened.forEach((o)=>{
+                    let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
+                    let control = `
+                    <div class="B52OrderItem" style="background:${col}">
+                        <div style="width:25px;">
+                            <button id="B52${o.clientOrderId}">x</button>
+                        </div>
+                        <div style="margin-top:5px;width:200px">
+                            ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
+                        </div>
+                        <div>
+                            <button id="B52${o.clientOrderId}Line">*</button>
+                        </div>
+                    <div>`;
+                    $("#B52Tab1").append(control);
+                    let ordid = o.orderId;
+                    $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordid,currency));
+                    $("#B52"+o.clientOrderId+"Line").mouseup(()=>B52Tv.DrawOrderLine(o));
+                });
             });
         });
         return ordService;
