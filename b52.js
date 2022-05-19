@@ -45,21 +45,33 @@ var B52Settings =
         activeStrategyName:"//div[@data-name='legend']//div[@data-name='legend-source-title' and contains(text(),'" + secretWord + "')]",
         alertMessage:"//div[@data-qa-dialog-name='alert-fired']//div[contains(@class,'secondaryRow')]",
         closeAlertButton:"//div[@data-qa-dialog-name='alert-fired']//span[starts-with(@class,'close')]",
+        moreButton:"//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']",
+        newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
+        yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
+    },
+    binanceSettings:{
+        serverUrl:"https://fapi.binance.com/",
+        orderUrl:"fapi/v1/order",
+        allOpenedOrders:"fapi/v1/allOpenOrders",
+        currentPrice: "fapi/v1/ticker/24hr",
+        openedOrders:"fapi/v1/openOrders",
+        positions:"fapi/v1/positionRisk",
+        exchangeInfo:"fapi/v1/exchangeInfo",
     }
 }
 
 var B52HTML = 
 {
-	B52AreaHtml : `
-	<style>
-		div.B52dark {
+    B52StyleDark : `
+    <style>
+		div.B52 {
 			position:absolute;
 			background-color:black;
 			padding:2px;
 			z-index:1000;
             color-scheme: dark;
 		}
-		div.B52dark button {
+		div.B52 button {
 			border: "1px solid gray";
 			margin:1px;
 			
@@ -136,9 +148,10 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
-        
 	</style>
-    <div id="B52CloseOpen" class="B52dark" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
+    `,
+	B52AreaHtml : `
+    <div id="B52CloseOpen" class="B52" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
             <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
                 <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
                     <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
@@ -159,11 +172,11 @@ var B52HTML =
                 </svg>
             </button>
 	</div>
-	<div id="B52Area1" class="B52dark" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:285px;border-right:none;display:flex;">
+	<div id="B52Area1" class="B52" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:285px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons" style="overflow-y: auto;">
 		</div>
 	</div>
-	<div id="B52Area2" class="B52dark" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
+	<div id="B52Area2" class="B52" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
 		<div id="B52ExpandButton" style="margin:1px;height:35px;width:70px;background-color:black;display:flex">
             <div>
                 <button style="width:67px;display:flex" id="B52Window2Open">
@@ -213,7 +226,7 @@ var B52HTML =
 			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR</button>
 		</div>
 	</div>
-    <div id="B52Tabs" class="B52dark" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
+    <div id="B52Tabs" class="B52" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
         <div style="display:flex;height:30px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
@@ -237,22 +250,143 @@ var B52HTML =
     `
 }
 
+var B52Log = {
+    _log:[],
+    _eventLogChanged:[],
+    Info : (message,obj=null)=>{
+        B52Log._log.push({type:"info",mess:message,obj:obj});
+        if(obj!=null)console.log(obj);
+    },
+    GetLog : ()=>{
+        return B52Log._log;
+    },
+    _eventLogChangedTrigger : ()=>{
+        B52Log._eventLogChanged.forEach(a=>a());
+    }
+}
+
 class B52 {
     #_tv;
     #_b;
     #_w;
-    constructor(){
-        this.#_tv = new B52Tv();
-        this.#_b = new BinanceAdapter(this.#_tv);
-        this.#_w = new B52Widget(this.#_tv,this.#_b);
-        this.#_b.SetAccessKey(B52Settings.accessKey1);
-        this.#_b.SetSecretKey(B52Settings.secretKey1);
-        this.#_w.Build();
-
-    }
     get TV(){return this.#_tv}
     get Binance(){return this.#_b}
     get Widjet(){return this.#_w}
+    constructor(){
+        this.#_tv = new B52Tv();
+        this.#_b = new BinanceAdapter();
+        this.#_w = new B52Widget();
+        this.#_b.SetAccessKey(B52Settings.accessKey1);
+        this.#_b.SetSecretKey(B52Settings.secretKey1);
+        this.#_w.Build();
+        this.SetButtonEvents();
+    }
+
+    SetButtonEvents(){
+
+    }
+
+    SetServices()
+    {
+
+    }
+
+    SERVICE_MakeShitService(){
+        let that = this;
+        let shitService = new B52Service(200);
+        //gray buttons observer
+        shitService.push(()=>{
+            //check gray buttons
+            var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
+            if(B52Tv.XpathItemCount(anyStratOnline)<1)
+            {
+                $(".B52StrategyButton").each((i,e)=>{
+                    $(e).css("background-color",$(e).attr("origcolor"));
+                });
+                $(".B52StrategyButton").css("color","white");
+                $("#B52StartBinance").css("background-color","#262626");
+                $("#B52StartBinance").css("color","#636363");
+                $("#B52ClearChart").css("background-color","#262626");
+                $("#B52ClearChart").css("color","#636363");
+            }
+            else
+            {
+                //gray
+                $(".B52StrategyButton").css("background-color","#262626");
+                $(".B52StrategyButton").css("color","#636363");
+                $("#B52StartBinance").css("background-color","maroon");
+                $("#B52StartBinance").css("color","white");
+                $("#B52ClearChart").css("background-color","#000099");
+                $("#B52ClearChart").css("color","white");
+            }
+        });
+        shitService.push(()=>{
+            B52Settings.shitClickers.forEach((shit)=>{
+                if(B52Tv.XpathItemCount(shit)>0) B52Tv.TriggerMouseEvent(B52Tv.XpathGetFirstItem(shit),"click");
+            });
+        });
+    }
+
+    _runPositionsService() {
+        var that = this;
+        that.posService = setInterval(()=>{
+                if(!that.openedPositions_lock)
+                {
+                    that.openedPositions_lock = true;
+                    that.GetPositions().then(pos=>{
+                        that.openedPositions = pos;
+                        that.openedPositions_lock = false;
+                        //run event
+                        that._eventOpenPositionsChanged.forEach(a=>a());
+                    });
+                }
+            },
+            B52Settings.positionsServiceIntervalMS
+        );
+    }
+
+    _stopPositionsService() {
+        var that = this;
+        clearInterval(that.posService);
+    }
+
+    _runOrdersService() {
+        var that = this;
+        that.ordService = setInterval(()=>{
+                if(!that.openedOrders_lock)
+                {
+                    that.openedOrders_lock = true;
+                    that.GetOpenOrders().then(ords=>{
+                        that.openedOrders = ords;
+                        that.openedOrders_lock = false;
+                        //run event
+                        that._eventOpenOrdersChanged.forEach(a=>a());
+                    });
+                }
+            },
+            B52Settings.ordersSerciceIntervalMS
+        );
+    }
+
+    _stopOrdersService() {
+        var that = this;
+        clearInterval(that.ordService);
+    }
+
+    ForEachOrderInMessage(message) {
+        var that = this;
+        return new Promise((s,f)=>{
+            var arr = JSON.parse(message);
+            var messageResponses = [];
+            arr.forEach(e=>{
+                e["symbol"] = that.tv.getCurrentCurrencyPair();
+                that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,e).then((resp)=>{
+                    messageResponses.push(resp);
+                });
+            });
+            s(messageResponses);
+        });
+}
 }
 
 class B52Tv {
@@ -359,6 +493,7 @@ class B52Tv {
         return new Promise((s,f)=>{
             B52Tv.WaitForElement(B52Settings.tvXpath.closeAlertButton).then(e=>{
                 B52Tv.TriggerMouseEvent(e,"click");
+                s();
             });
         });
     }
@@ -366,23 +501,22 @@ class B52Tv {
     static CreateNewAlert(alertName) {
         return new Promise((s,f) => 
         {
-            let more = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-more-action']";
-            let item = this.xpathGetFirstItem(more);
-            that.triggerMouseEvent(item, "mousedown");
-            var newAlert = ["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]"
-            ,"//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"];
-            that.waitForElementOr(newAlert).then((e1)=>{
-                that.triggerMouseEvent(e1, "click");
-                var inputVal = "//input[@name='alert-name']";
-                that.waitForElement(inputVal).then((e2)=>{
-                        that.setReactValue(e2,alertName);
-                        that.pressEnter().then(()=>{
-                            s();
-                        });
+            B52Tv.WaitForElement(B52Settings.tvXpath.moreButton).then(e=>{
+                B52Tv.TriggerMouseEvent(e,"mousedown");
+                B52Tv.WaitForElementOr(B52Settings.tvXpath.newAlertButtons).then(e1=>{
+                    B52Tv.TriggerMouseEvent(e1, "click");
+                    let inputVal = "//input[@name='alert-name']";
+                    B52Tv.WaitForElement(inputVal).then((e2)=>{
+                        B52Tv.SetReactValue(e2,alertName);
+                        B52Tv.PressEnter().then(()=>{
+                                s();
+                            });
+                    });
                 });
             });
         });
     }
+    
     static PressEnter() {
         return new Promise((s,f)=>{
             setTimeout(() => {
@@ -396,46 +530,45 @@ class B52Tv {
             }, 50);
         });
     }
+
     static DeleteAlert(currency, name) {
-        var del = this.xpathGetFirstItem("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]");
-        this.triggerMouseEvent(del, "click");
-        var that = this;
-        var yesButton = "//button[starts-with(@class,'actionButton') and @name='yes']";
-        that.waitForElement(yesButton).then((e)=>{
-            that.triggerMouseEvent(e, "click");
+        B52Tv.WaitForElement("(//div[starts-with(@class,'body')]//div[./div/span[contains(text(),'" + currency + "')] and ./div[contains(text(),'" + name + "')]]//div[@role='button'])[3]").then(e=>{
+            B52Tv.TriggerMouseEvent(e,"click");
+            B52Tv.WaitForElement(B52Settings.tvXpath.yesButton).then(e1=>{
+                B52Tv.TriggerMouseEvent(e1, "click");
+            });
         });
     }
+
 	static SetStrategySettings(sets)
 	{
-		var settings = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
-		var item = tv.xpathGetFirstItem(settings);
-		this.triggerMouseEvent(item, "mousedown");
-		var that = this;
-        var input = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
         return new Promise((s,f)=>{
-            this.waitForElement(input).then((e)=>{
-                for(var i=0;i<sets.length;i++)
-                {
-                    var input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
-                    var inputNode = that.xpathGetFirstItem(input);
-                    that.setReactValue(inputNode,sets[i].value);
-                }
-                var ok = that.xpathGetFirstItem("//button[@data-name='submit-button']");
-                that.triggerMouseEvent(ok, "click");
-                s();
+            B52Tv.WaitForElement(B52Settings.tvXpath.b52SettingButton).then(e=>{
+                B52Tv.TriggerMouseEvent(e,"mousedown");
+                let firstInput = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
+                B52Tv.WaitForElement(firstInput).then(e1=>{
+                    for(let i=0;i<sets.length;i++)
+                    {
+                        let input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+                        let inputNode = B52Tv.XpathGetFirstItem(input);
+                        B52Tv.SetReactValue(inputNode,sets[i].value);
+                    }
+                    let ok = B52Tv.XpathGetFirstItem("//button[@data-name='submit-button']");
+                    B52Tv.TriggerMouseEvent(ok, "click");
+                    s();
+                });
             });
         });
 	}
-    static WaitForElement(xpath)
+
+    static WaitForElement(xpath,maxTimer = 300)
     {
-        var that = this;
         return new Promise((s,f) => {
-            var maxTimer = 300;
-            var existCondition = setInterval(() => {
-                var theElementFound = that.xpathItemCount(xpath)>0;
+            let existCondition = setInterval(() => {
+                let theElementFound = B52Tv.XpathItemCount(xpath)>0;
                 if (theElementFound) {
                     //wait till ready and exit
-                    var theElement = that.xpathGetFirstItem(xpath);
+                    let theElement = B52Tv.XpathGetFirstItem(xpath);
                     $(theElement).ready(()=>{
                         s(theElement);
                     });
@@ -444,7 +577,7 @@ class B52Tv {
                 }
                 else if(maxTimer<1)
                 {
-                    console.log("Didn't find element after 30 seconds: "+xpath);
+                    f("Couldt find object after "+(maxTimer*100).toString()+" ms for "+xpath);
                     clearInterval(existCondition);
                 }
                 else
@@ -454,18 +587,17 @@ class B52Tv {
             }, 100);
         });
     }
-    waitForElementOr(xpaths)
+
+    static WaitForElementOr(xpaths,maxTimer = 300)
     {
-        var that = this;
         return new Promise((s,f) => {
-            var maxTimer = 300;
-            var existCondition = setInterval(() => {
-                var theElementFound = false;
-                var theFoundXpath = "";
-                xpaths.forEach(x=>{if(that.xpathItemCount(x)>0){theElementFound = true;theFoundXpath=x;}});
+            let existCondition = setInterval(() => {
+                let theElementFound = false;
+                let theFoundXpath = "";
+                xpaths.forEach(x=>{if(B52Tv.XpathItemCount(x)>0){theElementFound = true;theFoundXpath=x;}});
                 if (theElementFound) {
                     //wait till ready and exit
-                    var theElement = that.xpathGetFirstItem(theFoundXpath);
+                    let theElement = B52Tv.XpathGetFirstItem(theFoundXpath);
                     $(theElement).ready(()=>{
                         s(theElement);
                     });
@@ -476,7 +608,7 @@ class B52Tv {
                 {
                     xpaths.forEach(x=>console.log("Didn't find element after 30 seconds: "+ x));
                     clearInterval(existCondition);
-                    f();
+                    f("Couldt find objects after "+(maxTimer*100).toString()+" ms for ",xpaths);
                 }
                 else
                 {
@@ -485,7 +617,8 @@ class B52Tv {
             }, 100);
         });
     }
-    setReactValue(element, value) {
+
+    static SetReactValue(element, value) {
         let lastValue = element.value;
         element.value = value;
         let event = new Event("input", { target: element, bubbles: true });
@@ -498,9 +631,10 @@ class B52Tv {
         }
         element.dispatchEvent(event);
     }
-    runNTimes(func,delay,times){
-        var maxTimer = times;
-            var existCondition = setInterval(() => {
+
+    static RunNTimes(func,delay,times){
+        let maxTimer = times;
+            let existCondition = setInterval(() => {
                 func();
                 if(maxTimer<1)
                 {
@@ -512,321 +646,291 @@ class B52Tv {
                 }
             }, delay);
     }
+
+    //endof class
 }
 
 class BinanceAdapter {
-    constructor(B52Tv) {
-        this.tv = B52Tv;
-	    this.ExchangeInfo = null;
-        this.accessKey = "";
-        this.secretKey = "";
-        this.openedPositions = null;
-        this.openedPositions_lock = false;
-        this.openedOrders = null;
-        this.openedOrders_lock = false;
-        this.posService = null;
-        this.ordService = null;
-        this._eventOpenPositionsChanged = [];
-        this._eventOpenOrdersChanged = [];
+    #_accessKey;
+    #_secretKey;
+    #_openedPositions;
+    get OpenedPositions(){return this.#_openedPositions}
+    #_openedOrders;
+    get OpenedOrders(){return this.#_openedOrders}
+    #_exchangeInfo;
+
+    constructor() {
+	    this.#_exchangeInfo = null;
+        this.#_openedPositions = null;
+        this.#_openedOrders = null;
     }
 
-    SetNoLoss(){
-        var that = this;
-        var currentRisk = that.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
-        var position = parseFloat(currentRisk.positionAmt);
-        var entryPrice = parseFloat(currentRisk.entryPrice);
-        if(position==0) return;
-        var direction = position>0?"SELL":"BUY";
-        var priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
-        that.GetPriceFormatting().then(f=>{
-            var closeParams = {
-                side:direction,
-                quantity:Math.abs(position),
-                stopPrice:priceToToStop.toFixed(f.length-2),
-                type:"STOP_MARKET",
-                symbol:that.tv.getCurrentCurrencyPair(),
-                timeInForce:"GTC"
-            };
-            that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
-                console.log(resp);
+    ORDERS_SetNoLoss(){
+        let that = this;
+        B52Tv.GetCurrentCurrencyPair().then(pair=>{
+            let currentRisk = that.#_openedPositions.filter(a=>a.symbol==pair)[0];
+            let position = parseFloat(currentRisk.positionAmt);
+            let entryPrice = parseFloat(currentRisk.entryPrice);
+            if(position==0) 
+            {
+                B52.Info("Couldn't set No Loss Stop Market order as there is 0 position risk info regarding the currency "+pair);
+                return; //we are out
+            }
+            let direction = position>0?"SELL":"BUY";
+            let priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
+            that.GetPriceFormatting().then(f=>{
+                let closeParams = {
+                    side:direction,
+                    quantity:Math.abs(position),
+                    stopPrice:priceToToStop.toFixed(f.length-2),
+                    type:"STOP_MARKET",
+                    symbol:B52Tv.GetCurrentCurrencyPair(),
+                    timeInForce:"GTC"
+                };
+                that.POST_SIGNED_PARAMS(
+                    B52Settings.binanceSettings.orderUrl,
+                    that.#_accessKey,
+                    that.#_secretKey,
+                    closeParams).then((resp)=>{
+                        B52Log.Info("No Loss set sucess. ", resp);
+                    });
             });
         });
     }
 
-    FixPosition() {
-        var that = this;
-        var currentRisk = that.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
-        var position = parseFloat(currentRisk.positionAmt);
-        if(position==0) return;
-        var direction = position>0?"SELL":"BUY";
-        var closeParams = {
+    ORDERS_FixPosition(currency) {
+        let that = this;
+        let currentRisk = that.OpenedPositions.filter(a=>a.symbol==currency)[0];
+        let position = parseFloat(currentRisk.positionAmt);
+        if(position==0) {
+            B52Log.Info("ORDERS_FixPosition there is nothing to fix");
+            return;
+        }
+        let direction = position>0?"SELL":"BUY";
+        let closeParams = {
             side:direction,
             quantity:Math.abs(position),
             type:"MARKET",
-            symbol:that.tv.getCurrentCurrencyPair(),
+            symbol:currency,
             reduceOnly: true
         };
-        that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
-            console.log(resp);
-        });
+        that.POST_SIGNED_PARAMS(
+            B52Settings.binanceSettings.orderUrl,
+            that.#_accessKey,
+            that.#_secretKey,
+            closeParams).then((resp)=>{
+                B52Log.Info(`Position fixed for ${currency}. `, resp);
+            });
     }
 
-    ChancelOrders() {
-        var that = this;
-        var orders = that.openedOrders;
-        if(orders.length==0) return;
-        var closeParams = {
-            symbol:that.tv.getCurrentCurrencyPair()
+    ORDERS_ChancelAllOrders(currency) {
+        let that = this;
+        let orders = that.OpenedOrders;
+        if(orders.length==0) {
+            B52Log.Info("ORDERS_ChancelAllOrders no orders found.");
+            return;
+        }
+        let closeParams = {
+            symbol:currency
         };
-        that._signedDELRequest("https://fapi.binance.com/fapi/v1/allOpenOrders?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
-            console.log(resp);
-        });
-    }
-
-    _runPositionsService() {
-        var that = this;
-        that.posService = setInterval(()=>{
-                if(!that.openedPositions_lock)
-                {
-                    that.openedPositions_lock = true;
-                    that.GetPositions().then(pos=>{
-                        that.openedPositions = pos;
-                        that.openedPositions_lock = false;
-                        //run event
-                        that._eventOpenPositionsChanged.forEach(a=>a());
-                    });
-                }
-            },
-            B52Settings.positionsServiceIntervalMS
-        );
-    }
-
-    _stopPositionsService() {
-        var that = this;
-        clearInterval(that.posService);
-    }
-
-    _runOrdersService() {
-        var that = this;
-        that.ordService = setInterval(()=>{
-                if(!that.openedOrders_lock)
-                {
-                    that.openedOrders_lock = true;
-                    that.GetOpenOrders().then(ords=>{
-                        that.openedOrders = ords;
-                        that.openedOrders_lock = false;
-                        //run event
-                        that._eventOpenOrdersChanged.forEach(a=>a());
-                    });
-                }
-            },
-            B52Settings.ordersSerciceIntervalMS
-        );
-    }
-
-    _stopOrdersService() {
-        var that = this;
-        clearInterval(that.ordService);
+        that.DELETE_SIGNED_PARAMS(
+            B52Settings.binanceSettings.allOpenedOrders,
+            that.#_accessKey,
+            that.#_secretKey,
+            closeParams).then((resp)=>{
+                B52Log.Info(`Chanceled all opened orders for ${currency}. `, resp);
+            });
     }
 
     SetAccessKey(key) {
-        this.accessKey = key;
+        this.#_accessKey = key;
     }
 
     SetSecretKey(key) {
-            this.secretKey = key;
+        this.#_secretKey = key;
     }
     
-    GetPrice() {
-        var that = this;
-        return new Promise((s,f)=>
-        {
-            var url = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="+that.tv.getCurrentCurrencyPair();
-            $.getJSON(url, (priceInfo) => {
-                s(parseFloat(priceInfo.lastPrice));
-            });	
+    MARKET_GetPrice(currency) {
+        let that = this;
+        return new Promise((s,f)=>{
+            let params = {symbol:currency};
+            that.GET_ANON_PARAMS(
+                B52Settings.binanceSettings.currentPrice,
+                params).then((resp)=>{
+                    B52Log.Info(`MARKET_GetPrice for ${currency}. `, resp);
+                    s(parseFloat(resp.lastPrice));
+                });
         });
     }
     
-    GetOpenOrders() {
-		var that = this;
+    ORDERS_GetOpenOrders(currency) {
+		let that = this;
         return new Promise((s,f)=>{
-            that._signedGETWithParamsRequest("https://fapi.binance.com/fapi/v1/openOrders?",
-                that.accessKey,
-                that.secretKey,
-                {"symbol":that.tv.getCurrentCurrencyPair()}).then((resp)=>{
+            let params = {symbol:currency};
+            that.GET_SIGNED_PARAMS(
+                B52Settings.binanceSettings.openedOrders,
+                that.#_accessKey,
+                that.#_secretKey,
+                params).then((resp)=>{
+                    B52Log.Info(`ORDERS_GetOpenOrders for ${currency}. `, resp);
                     s(resp);
                 });
-            });
+        });
     }
 
-    GetPositions() {
-		var that = this;
+    ORDERS_GetAllPositions() {
+		let that = this;
         return new Promise((s,f)=>{
-            that._signedGETRequest("https://fapi.binance.com/fapi/v1/positionRisk?",
-                that.accessKey,
-                that.secretKey).then((resp)=>{
+            that.GET_SIGNED_PARAMS(
+                B52Settings.binanceSettings.positions,
+                that.#_accessKey,
+                that.#_secretKey,
+                params).then((resp)=>{
+                    B52Log.Info(`ORDERS_GetAllPositions. `, resp);
                     s(resp);
                 });
+        });
+    }
+
+    MARKET_GetExchangeInfo(){
+        let that = this;
+        return new Promise((s,f)=>{
+            if(that.#_exchangeInfo!=null)
+            {
+                s(that.#_exchangeInfo);
+                return;
+            }
+            that.GET_ANON_PARAMS(
+                B52Settings.binanceSettings.exchangeInfo
+                ).then((resp)=>{
+                    B52Log.Info(`MARKET_GetExchangeInfo. `, resp);
+                    that.#_exchangeInfo = resp;
+                    s(that.#_exchangeInfo);
+                });
+        });
+    }
+
+	MARKET_GetTickSize(currency)
+	{
+		let that = this;
+		return new Promise((s,f)=>
+		{
+            that.MARKET_GetExchangeInfo().then(info=>{
+                let theSymb = info.symbols.filter(a=>a.symbol==currency);
+                if(!theSymb.length) {
+                    B52Log.Info("MARKET_GetSize couldn't find symbol in exchange info: "+currency);
+                    f();
+                }
+                else
+                {
+                    var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+                    s(theMinSize);
+                }
             });
-    }
-
-	_getExchangeInfo() {
-		var that = this;
-	    return new Promise((s,f)=>
-		{
-			var url = "https://fapi.binance.com/fapi/v1/exchangeInfo";
-			$.getJSON(url, (tiketInfo) => {
-				that.ExchangeInfo = tiketInfo;
-				s();
-			});	
 		});
 	}
 
-	_getSize()
+    MARKET_GetPriceFormatPrecision(currency)
 	{
-		var that = this;
+		let that = this;
 		return new Promise((s,f)=>
 		{
-			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
-			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
-			else
-			{
-				var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
-				s(theMinSize);
-			}
-		});
-	}
-
-    _getPriceFormat()
-	{
-		var that = this;
-		return new Promise((s,f)=>
-		{
-			var theSymb = that.ExchangeInfo.symbols.filter(a=>a.symbol==that.tv.getCurrentCurrencyPair());
-			if(!theSymb.length) {console.log("ERROR! Not found symbol "+that.tv.getCurrentCurrencyPair());}
-			else
-			{
-				var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
-				s(tickSize.toString());
-			}
-		});
-	}
-
-    GetTickSize() {
-		var that = this;
-		return new Promise((s,f) =>
-		{
-			if(this.ExchangeInfo==null)
-			{
-				this._getExchangeInfo().then(()=>{this._getSize().then(s);});
-			}
-			else
-			{
-				this._getSize().then(s);
-			}
-		});
+			that.MARKET_GetExchangeInfo().then(info=>{
+                let theSymb = info.symbols.filter(a=>a.symbol==currency);
+                if(!theSymb.length) {
+                    B52Log.Info("MARKET_GetPriceFormatPrecision couldn't find symbol in exchange info: "+currency);
+                    f();
+                }
+                else
+                {
+                    var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+                    s(tickSize.toString());
+                }
+		    });
+    	});
     }
 
-    GetPriceFormatting() {
-        var that = this;
-		return new Promise((s,f) =>
-		{
-			if(this.ExchangeInfo==null)
-			{
-				this._getExchangeInfo().then(()=>{this._getPriceFormat().then(s);});
-			}
-			else
-			{
-				this._getPriceFormat().then(s);
-			}
-		});
-    }
-
-    _signedDELRequest(url,accessKey,secretKey,params) {
+    DELETE_SIGNED_PARAMS(url,accessKey,secretKey,params={}){
         return new Promise((s,f)=>{
             fetch("https://fapi.binance.com/fapi/v1/time")
             .then(response => response.json())
             .then(timer => {
-                    var  timeCode = timer.serverTime;
+                    let timeCode = timer.serverTime;
                     params["timestamp"] = timeCode;
-                    var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                    let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
                     params["signature"] = hash.toString();
-                    var toAdd = jQuery.param(params);
-                    fetch(url+toAdd,{method:"DELETE",headers:{"X-MBX-APIKEY":accessKey}})
+                    let toAdd = jQuery.param(params);
+                    fetch(url+"?"+toAdd,{method:"DELETE",headers:{"X-MBX-APIKEY":accessKey}})
                         .then(response => response.json())
                         .then(resp => {
                             s(resp);
                         })
-                        .catch(error => console.log(error));
+                        .catch(error => B52Log.Info("DELETE_SIGNED_PARAMS ERROR: ",error));
             })
-            .catch(error => console.log(error));
+            .catch(error => B52Log.Info("DELETE_SIGNED_PARAMS ERROR: ",error));
         });
-}
-
-    _signedGETRequest(url,accessKey,secretKey) {
-            return new Promise((s,f)=>{
-                fetch("https://fapi.binance.com/fapi/v1/time")
-                .then(response => response.json())
-                .then(timer => {
-                        var  timeCode = timer.serverTime;
-                        var queryString = "timestamp=" + timeCode;
-                        var hash = CryptoJS.HmacSHA256(queryString,secretKey);
-                        var toAdd = queryString + "&signature=" + hash;
-                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
-                            .then(response => response.json())
-                            .then(resp => {
-                                s(resp);
-                            })
-                            .catch(error => console.log(error));
-                })
-                .catch(error => console.log(error));
-            });
     }
 
-    _signedPOSTRequest_simple(url,accessKey,secretKey,params) {
-            return new Promise((s,f)=>{
-                fetch("https://fapi.binance.com/fapi/v1/time")
+    POST_SIGNED_PARAMS(url,accessKey,secretKey,params={})
+    {
+        return new Promise((s,f)=>{
+            fetch("https://fapi.binance.com/fapi/v1/time")
+            .then(response => response.json())
+            .then(timer => {
+                    let timeCode = timer.serverTime;
+                    params["timestamp"] = timeCode;
+                    let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                    params["signature"] = hash.toString();
+                    let toAdd = jQuery.param(params);
+                    fetch(url+"?"+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
+                        .then(response => response.json())
+                        .then(resp => {
+                            s(resp);
+                        })
+                        .catch(error => B52Log.Info("POST_SIGNED_PARAMS ERROR: ",error));
+            })
+            .catch(error => B52Log.Info("POST_SIGNED_PARAMS ERROR: ",error));
+        });
+    }
+    
+    GET_ANON_PARAMS(url,params=null){
+        return new Promise((s,f)=>{
+            let toAdd = "";
+            if(params!=null)
+            {
+                toAdd+="?" + jQuery.param(params);
+            }
+            fetch(url+toAdd,{method:"get"})
                 .then(response => response.json())
-                .then(timer => {
-                        var  timeCode = timer.serverTime;
-                        params["timestamp"] = timeCode;
-                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
-                        params["signature"] = hash.toString();
-                        var toAdd = jQuery.param(params);
-                        fetch(url+toAdd,{method:"post",headers:{"X-MBX-APIKEY":accessKey}})
-                            .then(response => response.json())
-                            .then(resp => {
-                                s(resp);
-                            })
-                            .catch(error => console.log(error));
+                .then(resp => {
+                    s(resp);
                 })
-                .catch(error => console.log(error));
-            });
+                .catch(error => B52Log.Info("GET_ANON_PARAMS ERROR: ",error));
+        });
     }
 
-    _signedGETWithParamsRequest(url,accessKey,secretKey,params) {
-            return new Promise((s,f)=>{
-                fetch("https://fapi.binance.com/fapi/v1/time")
-                .then(response => response.json())
-                .then(timer => {
-                        var  timeCode = timer.serverTime;
-                        params["timestamp"] = timeCode;
-                        var hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
-                        params["signature"] = hash.toString();
-                        var toAdd = jQuery.param(params);
-                        fetch(url+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
-                            .then(response => response.json())
-                            .then(resp => {
-                                s(resp);
-                            })
-                            .catch(error => console.log(error));
-                })
-                .catch(error => console.log(error));
-            });
+    GET_SIGNED_PARAMS(url,accessKey,secretKey,params={}){
+        return new Promise((s,f)=>{
+            fetch("https://fapi.binance.com/fapi/v1/time")
+            .then(response => response.json())
+            .then(timer => {
+                    let  timeCode = timer.serverTime;
+                    params["timestamp"] = timeCode;
+                    let hash = CryptoJS.HmacSHA256(jQuery.param(params),secretKey);
+                    params["signature"] = hash.toString();
+                    let toAdd = jQuery.param(params);
+                    fetch(url+"?"+toAdd,{method:"get",headers:{"X-MBX-APIKEY":accessKey}})
+                        .then(response => response.json())
+                        .then(resp => {
+                            s(resp);
+                        })
+                        .catch(error => B52Log.Info("GET_SIGNED_PARAMS ERROR: ",error));
+            })
+            .catch(error => B52Log.Info("GET_SIGNED_PARAMS ERROR: ",error));
+        });
     }
-        
-    GetBalance() {
+
+    ORDERS_GetBalance() {
             var that = this;
             return new Promise((s,f)=>{
                 that._signedGETRequest("https://fapi.binance.com/fapi/v1/balance?",that.accessKey,that.secretKey).then((resp)=>{
@@ -835,45 +939,41 @@ class BinanceAdapter {
             });
     }
 
-    ForEachOrderInMessage(message) {
-            var that = this;
-            return new Promise((s,f)=>{
-                var arr = JSON.parse(message);
-                var messageResponses = [];
-                arr.forEach(e=>{
-                    e["symbol"] = that.tv.getCurrentCurrencyPair();
-                    that._signedPOSTRequest_simple("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,e).then((resp)=>{
-                        messageResponses.push(resp);
-                    });
-                });
-                s(messageResponses);
-            });
-    }
-
-    ChancelOneOrder(orderid){
-        var that = this;
-        var orders = that.openedOrders;
-        if(orders.length==0) return;
-        var closeParams = {
+    ORDERS_ChancelSingleOrder(orderid,currency){
+        let that = this;
+        let orders = that.OpenedOrders;
+        if(orders.length==0) {
+            B52Log.Info("ORDERS_ChancelSingleOrder nothing to cancel, no orders");
+            return;
+        }
+        let closeParams = {
             orderId:orderid,
-            symbol:that.tv.getCurrentCurrencyPair()
+            symbol:currency
         };
-        that._signedDELRequest("https://fapi.binance.com/fapi/v1/order?",that.accessKey,that.secretKey,closeParams).then((resp)=>{
-            console.log(resp);
+        that.DELETE_SIGNED_PARAMS(
+            B52Settings.binanceSettings.orderUrl,
+            that.#_accessKey,
+            that.#_secretKey,
+            closeParams
+        ).then(resp=>{
+            B52Log.Info(`ORDERS_ChancelSingleOrder for orderid=${orderid} and currency=${currency} done.`,resp);
         });
     }
 }
 
 class B52Widget {
-    constructor(B52Tv, BinanceAdapter, theme) {
-        this.tv = B52Tv;
-        this.theme = theme;
-        this.b = BinanceAdapter;
+    #_buttons;
+    get Buttons(){return this.#_buttons}
+
+    constructor() {
+        this.#_buttons = [];
     }
+
     Build() {
         var that = this;
-        $('body').append(B52HTML.B52AreaHtml);
-	    that.fillButtonsIn(B52Settings.sButtons);
+        $('body').append(B52HTML.B52StyleDark+B52HTML.B52AreaHtml);
+	    that.FillButtonsIn(B52Settings.sButtons);
+
 
         //events
         $("#B52ClearChart").mouseup(() => {that.tv.clearB52s();});
@@ -997,7 +1097,7 @@ class B52Widget {
             });
     }
 
-	fillButtonsIn(buttons)
+	FillButtonsIn(buttons)
 	{
 		var that = this;
 	    	buttons.forEach(b=>
@@ -1020,63 +1120,27 @@ class B52Widget {
 	}
 }
 
-class B52TvService
+class B52Service
 {
-	AddAction(action)
-	{
-		this.arrayOfActions.push(action);
-	}
-    AddCloseClickers(closers)
-    {
-        var that = this;
-        that.closers = closers;
+    #_freq;
+    #_service;
+    Actions;
+    constructor(freq){
+        this.#_freq = freq;
+        this.Actions = [];
     }
-	
-	Start() {
-		var that = this;
-		this.service = setInterval(function () {
-			for (var i = 0; i < that.arrayOfActions.length; i++) {
- 			   that.arrayOfActions[i]();
+    Start() {
+		let that = this;
+		this.#_service = setInterval(()=>{
+			for (let i = 0; i < that.Actions.length; i++) {
+ 			   that.Actions[i]();
 			}
-            for(var i=0;i<that.closers.length;i++)
-            {
-                var shit = that.closers[i];
-                if(that.tv.xpathItemCount(shit)>0)
-                {
-                    that.tv.triggerMouseEvent(that.tv.xpathGetFirstItem(shit),"click");
-                }    
-
-            }
 		}
         , this.freq);
 	}
 	Stop() {
-		clearInterval(this.service);
+		clearInterval(this.#_service);
 	}
-
-	constructor(B52Tv,freq){
-		this.arrayOfActions = [];
-		this.service = null;
-		this.freq = freq;
-        this.tv = B52Tv;
-        this.closers = [];
-	}
-}
-
-class B52Log {
-    constructor() {
-        this._log = [];    
-        this._eventLogChanged = [];
-    }
-    Info(message){
-        this._log.push({type:"info",mess:message});
-    }
-    GetLog(){
-        return this._log;
-    }
-    _eventLogChangedTrigger(){
-        this._eventLogChanged.forEach(a=>a());
-    }
 }
 
 var tv = new B52Tv();
@@ -1085,34 +1149,8 @@ b.SetAccessKey(B52Settings.accessKey1);
 b.SetSecretKey(B52Settings.secretKey1);
 var page = new B52Widget(tv,b,"dark");
 page.Build();
-var tvShitObserver = new B52TvService(tv,100);
-tvShitObserver.AddCloseClickers(B52Settings.shitClickers);
-tvShitObserver.AddAction(()=>{
-    //check gray buttons
-    var anyStratOnline = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.secretWord + "')]]//div[@data-name='legend-settings-action']";
-    if(tv.xpathItemCount(anyStratOnline)<1)
-    {
-        $(".B52StrategyButton").each((i,e)=>{
-            $(e).css("background-color",$(e).attr("origcolor"));
-        });
-        $(".B52StrategyButton").css("color","white");
-        $("#B52StartBinance").css("background-color","#262626");
-        $("#B52StartBinance").css("color","#636363");
-        $("#B52ClearChart").css("background-color","#262626");
-        $("#B52ClearChart").css("color","#636363");
-    }
-    else
-    {
-        //gray
-        $(".B52StrategyButton").css("background-color","#262626");
-        $(".B52StrategyButton").css("color","#636363");
-        $("#B52StartBinance").css("background-color","maroon");
-        $("#B52StartBinance").css("color","white");
-        $("#B52ClearChart").css("background-color","#000099");
-        $("#B52ClearChart").css("color","white");
-    }
-});
-tvShitObserver.Start();
+
+
 b._eventOpenPositionsChanged.push(()=>{
     var currentRisk = b.openedPositions.filter(a=>a.symbol==b.tv.getCurrentCurrencyPair())[0];
     var entryPrice = parseFloat(currentRisk.entryPrice);
