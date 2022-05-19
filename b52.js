@@ -298,7 +298,6 @@ class B52 {
         $(this.#_w.Button("B52Window2Open")).mouseup(() => {that.BUTTON_B52Window2Open();});
         for(let i=1;i<5;i++)
         {
-            $("#B52TabButton"+i.toString()).mouseup(()=>that.tabClick(i));
             $(this.#_w.Button("B52TabButton"+i.toString())).mouseup(() => that.BUTTON_B52TabButton(i));
         }
         $("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.BUTTON_B52Strategy(e);})
