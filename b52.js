@@ -342,12 +342,11 @@ class B52 {
             B52Tv.GetAlertMessage(theUniqueName).then(mess=>{
                 B52Tv.GetCurrentCurrencyPair().then(currency=>{
                     let arr = JSON.parse(mess);
-                    let messageResponses = [];
                     arr.forEach(e=>{
                         e["symbol"] = currency;
                         that.Binance.ORDERS_NewOrder(e).then(resp=>{
                             B52Log.Info("BUTTON_B52StartBinance",resp);
-                            messageResponses.push(resp);
+                            console.log(resp);
                         });
                     });
                 });
