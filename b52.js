@@ -52,7 +52,7 @@ var B52Settings =
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
-    workBookDepth:200,
+    workBookDepth:100,
     binanceSettings:{
         serverUrl:"https://fapi.binance.com/",
         orderUrl:"fapi/v1/order",
