@@ -431,7 +431,12 @@ class B52 {
     }
 
     BUTTON_B52SellPart(){
-
+        let that = this;
+        B52Tv.GetCurrentCurrencyPair().then(currency=>{
+            let ord = that.Fixes.shift();
+            that.Binance.ORDERS_FixSinglePosition(currency,ord);
+        });
+        
     }
 
     BUTTON_B52COrders(){
@@ -525,6 +530,7 @@ class B52 {
     }
 
     #_openedPositions_lock;
+    Fixes = [];
     SERVICE_MakeRiskService(){
         let that = this;
         this.#_openedPositions_lock = false;
@@ -552,9 +558,8 @@ class B52 {
                     let charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
                     $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        let takes = that.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
-                        console.log(takes);
-                        $("#B52SellPart").text("FIX ("+takes.length+") ("+ ((profit-charge)/takes.length).toFixed(2) + ")");
+                        if(!that.Fixes.length) that.Fixes = that.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
+                        $("#B52SellPart").text("FIX ("+that.Fixes.length+") ("+ ((profit-charge)/that.Fixes.length).toFixed(2) + ")");
                     });  
                     
                     let colorFilter = (profit-charge)>0?"green":"red";
@@ -1083,6 +1088,38 @@ class BinanceAdapter {
             closeParams).then((resp)=>{
                 B52Log.Info(`Position fixed for ${currency}. `, resp);
             });
+    }
+
+    ORDERS_FixSinglePosition(currency,coins) {
+        let that = this;
+        let currentRisk = that.OpenedPositions.filter(a=>a.symbol==currency)[0];
+        let pos = parseFloat(currentRisk.positionAmt);
+        if(pos==0) {
+            B52Log.Info("ORDERS_FixPosition there is nothing to fix");
+            return;
+        }
+        let direction = pos>0?"SELL":"BUY";
+        that.MARKET_GetPriceFormatPrecision(currency).then(prec=>{
+            let pos
+            if(prec.length!=1)
+            {
+
+            }
+            let closeParams = {
+                side:direction,
+                quantity:coins,
+                type:"MARKET",
+                symbol:currency,
+                reduceOnly: true
+            };
+            that.POST_SIGNED_PARAMS(
+                B52Settings.binanceSettings.orderUrl,
+                that.#_accessKey,
+                that.#_secretKey,
+                closeParams).then((resp)=>{
+                    B52Log.Info(`Position fixed for ${currency}. `, resp);
+                });
+        });
     }
 
     ORDERS_ChancelAllOrders(currency) {
