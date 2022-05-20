@@ -170,6 +170,10 @@ var B52HTML =
             width:1px;
             border-left:1px solid gray;
         }
+        div.B52WorkbookContainer
+        {
+            overflow-y:auto;
+        }
 	</style>
     `,
 	B52AreaHtml : `
@@ -270,8 +274,10 @@ var B52HTML =
         </div>
     </div>
     <div id="B52Workbook" class="B52" style="margin:1px;height:500px;width:160px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
-        <table id="B52WorkBookTable">
-        </table>
+        <div class="B52WorkbookContainer">
+            <table id="B52WorkBookTable">
+            </table>
+        </div>
     </div>
     `
 }
