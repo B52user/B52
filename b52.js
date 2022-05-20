@@ -679,7 +679,7 @@ class B52 {
                         <td>${o[1]}</td>
                         <td>${o[0]}</td>
                     <tr>`;
-                    $("#B52Tab1").append(control);
+                    $("#B52WorkBookTable").append(control);
                 });
                 workbook.bids.forEach((o)=>{
                     let control = `
@@ -687,7 +687,7 @@ class B52 {
                         <td>${o[1]}</td>
                         <td>${o[0]}</td>
                     <tr>`;
-                    $("#B52Tab1").append(control);
+                    $("#B52WorkBookTable").append(control);
                 });
         });
         return wbSrv;
