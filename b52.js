@@ -1298,7 +1298,6 @@ class BinanceAdapter {
                     }
                     ).then((resp)=>{
                         B52Log.Info(`MARKET_GetCurrentOrderBook. `, resp);
-                        console.log(resp);
                         s(resp);
                     });
             });
