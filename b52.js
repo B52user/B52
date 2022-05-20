@@ -18,6 +18,7 @@ var B52Settings =
 	],
     positionsServiceIntervalMS : 1000,
     ordersSerciceIntervalMS : 1000,
+    workbookSerciceIntervalMS : 1000,
     shitClickers:[
         "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
         "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
@@ -62,6 +63,10 @@ var B52Settings =
         exchangeInfo:"fapi/v1/exchangeInfo",
         balance:"fapi/v1/balance",
         workbook: "fapi/v1/depth",
+    },
+    workbookColors:{
+        ask:"rgba(165, 42, 42, .4)",
+        bid:"rgba(0, 107, 60, .4)"
     }
 }
 
@@ -252,7 +257,7 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:500px;width:260px;background:rgba(0, 0, 0, .6);right:5px;bottom:302px;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:500px;width:160px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
         <table id="B52WorkBookTable">
         </table>
     </div>
@@ -453,6 +458,10 @@ class B52 {
         ordSrv.Start();
         this.#_srvs["Orders"] = ordSrv;
 
+        let wSrv = this.SERVICE_MakeWorBookService();
+        wSrv.Start();
+        this.#_srvs["Workbook"] = wSrv;
+
     }
 
     SERVICE_MakeShitService(){
@@ -616,7 +625,7 @@ class B52 {
         });
         that.Binance._eventOpenOrdersChanged.push(()=>{
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
-                var ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
+                let ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
                 $("#B52Tab1").empty();
                 ordersOpened.forEach((o)=>{
                     let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
@@ -640,6 +649,48 @@ class B52 {
             });
         });
         return ordService;
+    }
+
+    #_workbook_lock;
+    SERVICE_MakeWorBookService(){
+        let that = this;
+        this.#_workbook_lock = false;
+        let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS);
+        wbSrv.Actions.push(()=>{
+            if(!that.#_openedOrders_lock)
+                {
+                    that.#_workbook_lock = true;
+                    that.Binance.MARKET_GetCurrentOrderBook().then(wb=>{
+                        that.Binance.WorkBook = ords;
+                        that.#_workbook_lock = false;
+                        //run events
+                        that.Binance._eventWorkbookChanged.forEach(a=>a());
+                    });
+                }
+        });
+        
+        that.Binance._eventWorkbookChanged.push(()=>{
+            
+                let workbook = that.Binance.WorkBook;
+                $("#B52WorkBookTable").empty();
+                workbook.asks.forEach((o)=>{
+                    let control = `
+                    <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
+                        <td>${o[1]}</td>
+                        <td>${o[0]}</td>
+                    <tr>`;
+                    $("#B52Tab1").append(control);
+                });
+                workbook.bids.forEach((o)=>{
+                    let control = `
+                    <tr class="B52WBrow" style="background:${B52Settings.workbookColors.bid}">
+                        <td>${o[1]}</td>
+                        <td>${o[0]}</td>
+                    <tr>`;
+                    $("#B52Tab1").append(control);
+                });
+        });
+        return wbSrv;
     }
 }
 
@@ -912,6 +963,8 @@ class BinanceAdapter {
     OpenedOrders;
     _eventOpenOrdersChanged;
     #_exchangeInfo;
+    WorkBook;
+    _eventWorkbookChanged;
 
     constructor() {
 	    this.#_exchangeInfo = null;
@@ -919,6 +972,8 @@ class BinanceAdapter {
         this.OpenedOrders = null;
         this._eventOpenPositionsChanged = [];
         this._eventOpenOrdersChanged = [];
+        this._eventWorkbookChanged = [];
+        this.WorkBook = null;
     }
 
     ORDERS_SetNoLoss(){
