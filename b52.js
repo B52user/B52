@@ -6,6 +6,9 @@ var B52Settings =
 	accessKey1 : "MlmTyzzGbiFSDNyrI745NboXTBS9AdKXwxLMXd00aUWpWKPcI8hiRIfDpFv0oI8o",
 	secretKey1 : "u3fNSMJlYwTMwCOb3X5Bvp3xrpiogEN1MyQbDdtYS3lisd2VB6aKV8KjCaGmgFIg",
 	maxLossLabel : "Max Loss in $",
+    marketOrderPrice : 0.08,
+    numberOfTakes:5,
+    minnotal: 5,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -27,7 +30,6 @@ var B52Settings =
         "//div[starts-with(@class,'modal') and .//div[text()='Never miss a trade with our server-side alerts']]//button[@aria-label='Close']",
 	    "//div[@data-dialog-name='gopro']//button[@aria-label='Close']"
     ],
-    marketOrderPrice : 0.08,
     redToGreen:[
         {dir:"green",perc:0,col:"#54785c"},
         {dir:"green",perc:0.005,col:"#00a12a"},
@@ -274,7 +276,7 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:500px;width:160px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:160px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
         <div class="B52WorkbookContainer">
             <table id="B52WorkBookTable">
             </table>
@@ -364,7 +366,6 @@ class B52 {
             });
         });
     }
-
 
     BUTTON_B52StartBinance(){
         let theUniqueName = "B52 " + Date.now().toString();
@@ -484,7 +485,6 @@ class B52 {
         let wSrv = this.SERVICE_MakeWorBookService();
         wSrv.Start();
         this.#_srvs["Workbook"] = wSrv;
-
     }
 
     SERVICE_MakeShitService(){
@@ -551,7 +551,11 @@ class B52 {
                 {
                     let charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
                     $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
-                    $("#B52SellPart").text("FIX ("+ (profit-charge).toFixed(2) + ")");
+                    that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        let takes = that.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
+                        console.log(takes);
+                        $("#B52SellPart").text("FIX ("+takes.length+") ("+ ((profit-charge)/takes.length).toFixed(2) + ")");
+                    });  
                     
                     let colorFilter = (profit-charge)>0?"green":"red";
                     let colorProp = Math.abs((profit-charge)/entryPrice*Math.abs(amount));
@@ -574,8 +578,9 @@ class B52 {
                     $("#B52NLStop").css("background-color","#262626");
                     $("#B52NLStop").css("color","#636363");
                 }
+                
+                                  
             });
-            
         });
         that.Binance._eventOpenPositionsChanged.push(()=>{
             that.Binance.ORDERS_GetBalance().then(bal=>{
@@ -715,11 +720,34 @@ class B52 {
         });
         return wbSrv;
     }
+
+    CALC = {
+        GetTakes:(maxTakes,minNotal,amount,minTick,price) => {
+            let numOfTakes = (amount*price/minNotal)>=maxTakes?maxTakes:Math.floor(amount*price/minNotal);
+            let oneTake = Math.floor(amount/numOfTakes/minTick)*minTick;
+            let toReturn = [];
+            let sumDone = 0;
+            for(let i=0;i<numOfTakes;i++)
+            {
+                if(i+1==numOfTakes)
+                {
+                    //last
+                    toReturn.push(amount-sumDone);
+                }
+                else
+                {
+                    toReturn.push(oneTake);
+                    sumDone+=oneTake;
+                }
+                
+            }
+            return toReturn;
+        }
+    }
 }
 
 class B52Tv {
-    #_log;
-    constructor(log) {
+    constructor() {
     }
     static TriggerMouseEvent(node, eventType) {
         var clickEvent = document.createEvent('MouseEvents');
