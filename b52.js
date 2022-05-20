@@ -173,6 +173,7 @@ var B52HTML =
         div.B52WorkbookContainer
         {
             overflow-y:auto;
+            height:100%;
         }
 	</style>
     `,
@@ -318,6 +319,7 @@ class B52 {
         this.SetButtonEvents();
         this.SetServices();
         $("#B52Tabs").hide();
+        $("#B52Workbook").hide();
     }
 
     SetButtonEvents(){
@@ -404,7 +406,7 @@ class B52 {
             $("#B52Area2").show();
             if(!closed2)
             {
-                $("#B52Tabs").show();
+                $("#B52Tabs").show();$("#B52Workbook").show();
                 $("#B52TabButton1").mouseup();
             }
         }
@@ -416,7 +418,7 @@ class B52 {
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").hide();
             $("#B52Area2").hide();
-            $("#B52Tabs").hide();
+            $("#B52Tabs").hide();$("#B52Workbook").hide();
         }
     }
 
@@ -444,15 +446,18 @@ class B52 {
 
     BUTTON_B52Window2Open(){
         var closed = $("#B52Tabs").attr("hid")=="true";
+        
         if(!closed)
         {
             $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").hide();
+            $("#B52Workbook").hide();
         }
         else
         {
             $("#B52Tabs").attr("hid","false");
             $("#B52Tabs").show();
+            $("#B52Workbook").show();
             $("#B52TabButton1").mouseup();
         }
     }
