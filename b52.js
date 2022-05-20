@@ -661,7 +661,7 @@ class B52 {
                 {
                     that.#_workbook_lock = true;
                     that.Binance.MARKET_GetCurrentOrderBook().then(wb=>{
-                        that.Binance.WorkBook = ords;
+                        that.Binance.WorkBook = wb;
                         that.#_workbook_lock = false;
                         //run events
                         that.Binance._eventWorkbookChanged.forEach(a=>a());
