@@ -657,7 +657,7 @@ class B52 {
         this.#_workbook_lock = false;
         let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS);
         wbSrv.Actions.push(()=>{
-            if(!that.#_openedOrders_lock)
+            if(!that.#_workbook_lock)
                 {
                     that.#_workbook_lock = true;
                     that.Binance.MARKET_GetCurrentOrderBook().then(wb=>{
