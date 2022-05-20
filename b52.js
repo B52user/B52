@@ -158,6 +158,18 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
+        tr.B52WBrow
+        {
+            font-size:10px;
+            width:100px;
+            text-align:left;
+        }
+        tr.B52WBRow td:nth-child(2)
+        {
+            text-align:right;
+            width:1px;
+            border-left:1px solid gray;
+        }
 	</style>
     `,
 	B52AreaHtml : `
