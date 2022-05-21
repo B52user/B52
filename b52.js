@@ -260,7 +260,7 @@ var B52HTML =
         <div style="display:flex;height:30px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
-            <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">Income</button>
+            <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">Inc</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
