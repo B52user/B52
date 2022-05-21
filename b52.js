@@ -350,7 +350,7 @@ class B52 {
     }
 
     BUTTON_B52RenewAllOrders() {
-        that.Binance.ORDERS_GetAllOpenedOrders().them(ords=>{
+        that.Binance.ORDERS_GetAllOpenedOrders().then(ords=>{
             $("#B52OrdersOpenedList").empty();
             ords.forEach((o)=>{
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+o.side)[0].col;
