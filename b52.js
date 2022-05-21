@@ -281,7 +281,7 @@ var B52HTML =
                     </div>
                 </div>
             </div>
-            <div class="B52Tab" id="B52Tab3">
+            <div class="B52Tab" id="B52Tab3" style="display:flex">
                 <div style="width:170px;overflow-y:auto;height:100%;" id="B52Transactions">
                     Transactions:
                 </div>
@@ -377,7 +377,7 @@ class B52 {
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
                     <div style="margin-top:5px;width:110px">
-                        ${t.getDate()}.${t.getMonth()} $${inc.toFixed(2)} ${t.symbol}
+                        ${d.getDate()}.${d.getMonth()} $${inc.toFixed(2)} ${t.symbol}
                     </div>
                 <div>`;
                 $("#B52Transactions").append(control);
