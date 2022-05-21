@@ -71,8 +71,12 @@ var B52Settings =
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
         bid:"rgba(0, 107, 60, .4)",
-        posask:"rgba(165, 42, 42)",
-        posbid:"rgba(0, 107, 60)",
+        posask:"rgba(165, 42, 42, .7)",
+        posbid:"rgba(0, 107, 60, .7)",
+        askscale:"rgba(81, 0, 19, 0.8)",
+        bidscale:"rgba(32, 56, 0, 0.8)",
+        big1:"rgba(130, 96, 0, 0.8)",
+        big2:"rgba(94, 0, 135, 0.8)"
     }
 }
 
@@ -864,9 +868,11 @@ class B52 {
                             currPrice-=step;
                             let presum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice).map(b=>parseFloat(b[1]));
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
+                            let scaleSize = Math.round(100*sum/maxOfTwo);
+                            let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.askscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
-                                <td style="width: 50px;background:linear-gradient(to right,${B52Settings.workbookColors.posask} ${Math.round(100*sum/maxOfTwo)}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
@@ -881,9 +887,11 @@ class B52 {
                             currPrice-=step;
                             let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1]));
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
+                            let scaleSize = Math.round(100*sum/maxOfTwo);
+                            let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
-                                <td style="width: 50px;background:linear-gradient(to right,${B52Settings.workbookColors.posbid} ${Math.round(100*sum/maxOfTwo)}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
