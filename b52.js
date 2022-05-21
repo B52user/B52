@@ -380,7 +380,7 @@ class B52 {
             let trans = income.filter(a=>a.incomeType=="COMMISSION"||a.incomeType=="REALIZED_PNL");
             trans.forEach((t)=>{
                 let inc = parseFloat(t.income);
-                let ind = new Date(t.time).toString().slice(' ');
+                let ind = new Date(t.time).toString().split(' ');
                 let d = ind[2]+" "+ind[1];
                 let sim = t.symbol;
                 if(curCoinDate!=d||curCoin!=sim)
@@ -390,8 +390,8 @@ class B52 {
                     {
                         let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                         let control = `
-                            <div class="B52RiskPosItem" style="background:${col};width:140px;">
-                                    ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
+                            <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;">
+                                    $${curCoinSum.toFixed(2)} ${curCoin} ${curCoinDate}
                             <div>`;
                         $("#B52Transactions").prepend(control);
                     }
@@ -428,7 +428,7 @@ class B52 {
             });
             let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                 let control = `
-                    <div class="B52RiskPosItem" style="background:${col};width:140px;">
+                    <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;">
                             ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
                     <div>`;
                 $("#B52Transactions").prepend(control);
