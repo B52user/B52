@@ -268,7 +268,7 @@ var B52HTML =
                 <div style="width:170px;overflow-y:auto;height:100%;" id="B52PosOpenedList">
                 Positions:
                 </div>
-                <div style="width:170px;">
+                <div style="width:180px;">
                     <div style="width:100%;display:flex">Orders: 
                         <button id="B52RenewAllPositions" style="width:20px;height:20px;background:black;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
@@ -276,7 +276,7 @@ var B52HTML =
                             </svg>
                         </button>
                     </div>
-                    <div style="width:100%;height:100%;overflow-y: auto;" id="B52OrdersOpenedList">
+                    <div style="width:100%;height:144px;overflow-y: auto;" id="B52OrdersOpenedList">
                     </div>
                 </div>
             </div>
@@ -358,13 +358,14 @@ class B52 {
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+o.side)[0].col;
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
-                    <div style="width:05px;">
+                    <div style="width:18px;">
                         <button id="B52${o.clientOrderId}">x</button>
                     </div>
                     <div style="margin-top:5px;width:110px">
-                        ${o.symbol} ${(o.price=="0"?o.stopPrice:o.price)} ${o.origQty}
+                        ${o.symbol} ${o.origQty}
                     </div>
                 <div>`;
+                /*${(o.price=="0"?o.stopPrice:o.price)}*/
                 $("#B52OrdersOpenedList").append(control);
                 $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(o.orderId));
             });
