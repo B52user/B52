@@ -375,10 +375,8 @@ class B52 {
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(inc>0?"BUY":"SELL"))[0].col;
                 let d = new Date(t.time);
                 let control = `
-                <div class="B52RiskPosItem" style="background:${col}">
-                    <div style="margin-top:5px;width:140px">
+                <div class="B52RiskPosItem" style="background:${col};width:140px;">
                         ${d.getDate()}.${d.getMonth()} $${inc.toFixed(2)} ${t.symbol}
-                    </div>
                 <div>`;
                 $("#B52Transactions").prepend(control);
             });
