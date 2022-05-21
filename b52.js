@@ -350,6 +350,7 @@ class B52 {
     }
 
     BUTTON_B52RenewAllOrders() {
+        let that = this;
         that.Binance.ORDERS_GetAllOpenedOrders().then(ords=>{
             $("#B52OrdersOpenedList").empty();
             ords.forEach((o)=>{
