@@ -9,6 +9,7 @@ var B52Settings =
     marketOrderPrice : 0.08,
     numberOfTakes:5,
     minnotal: 5,
+    workBookScale:10,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -841,25 +842,38 @@ class B52 {
         });
         
         that.Binance._eventWorkbookChanged.push(()=>{
-            
-                let workbook = that.Binance.WorkBook;
-                $("#B52WorkBookTable").empty();
-                workbook.asks.forEach((o)=>{
-                    let control = `
-                    <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
-                        <td>${o[1]}</td>
-                        <td>${o[0]}</td>
-                    <tr>`;
-                    $("#B52WorkBookTable").append(control);
+
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                b52.Binance.MARKET_GetPriceFormatPrecision(currency).then(tick=>{
+                    let workbook = that.Binance.WorkBook;
+                    let scale = B52Settings.workBookScale;
+                    let step = parseFloat(tick)*scale;
+                    let currPrice = parseFloat(workbook.asks[0][0]);
+                    $("#B52WorkBookTable").empty();
+                    while(currPrice<parseFloat(workbook.asks[workbook.asks.length-1][0]))
+                    {
+                        //do red business
+                        let prevPrice = currPrice;
+                        currPrice+=step;
+                        let sum = workbook.asks.filter(a=>parseFloat(a[0])<=currPrice&&parseFloat(a[0])>prevPrice).map(b=>b[1]).reduce((c,d)=>c+d);
+                        let control = `
+                        <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
+                            <td>${sum}</td>
+                            <td>${currPrice}</td>
+                        <tr>`;
+                        $("#B52WorkBookTable").append(control);
+                    }
+                    workbook.bids.forEach((o)=>{
+                        let control = `
+                        <tr class="B52WBrow" style="background:${B52Settings.workbookColors.bid}">
+                            <td>${o[1]}</td>
+                            <td>${o[0]}</td>
+                        <tr>`;
+                        $("#B52WorkBookTable").append(control);
+                    });
                 });
-                workbook.bids.forEach((o)=>{
-                    let control = `
-                    <tr class="B52WBrow" style="background:${B52Settings.workbookColors.bid}">
-                        <td>${o[1]}</td>
-                        <td>${o[0]}</td>
-                    <tr>`;
-                    $("#B52WorkBookTable").append(control);
-                });
+            });
+                
         });
         return wbSrv;
     }
