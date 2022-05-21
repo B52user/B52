@@ -371,33 +371,51 @@ class B52 {
         that.Binance.ORDERS_GetIncome().then(income=>{
             $("#B52Transactions").empty();
             $("#B52IncomeDays").empty();
-            var currDate = "";
-            var currSum = 0.0;
-            income.forEach((t)=>{
+            //filter by "COMMISSION" and "REALIZED_PNL" then append date then draw
+            var curCoin = "";
+            var curCoinDate = "";
+            var curCoinSum = 0.0;
+            var curDayDate = "";
+            var curDaySum = 0.0;
+            let trans = income.filter(a=>a.incomeType=="COMMISSION"||a.incomeType=="REALIZED_PNL");
+            trans.forEach((t)=>{
                 let inc = parseFloat(t.income);
-                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(inc>0?"BUY":"SELL"))[0].col;
-                let d = new Date(t.time);
-                let control = `
-                <div class="B52RiskPosItem" style="background:${col};width:140px;">
-                        ${d.getDate()}.${d.getMonth()} $${inc.toFixed(2)} ${t.symbol}
-                <div>`;
-                $("#B52Transactions").prepend(control);
-
-                let soDate =  d.getDate().toString()+"."+d.getMonth().toString();
-                if(soDate!=currDate)
+                let d = new Date(t.time).toISOString().slice(5,10);
+                let sim = t.symbol;
+                if(curCoinDate!=d||curCoin!=sim)
                 {
-                    let col2 = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(currSum>0?"BUY":"SELL"))[0].col;
-                    let control2 = `
-                    <div class="B52RiskPosItem" style="background:${col2};width:100px;">
-                            ${currDate} $${currSum.toFixed(2)}
-                    <div>`;
-                    $("#B52IncomeDays").prepend(control2);
-                    currDate = soDate;
-                    currSum = inc;
+                    //renew coin drop result
+                    let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
+                    let control = `
+                        <div class="B52RiskPosItem" style="background:${col};width:140px;">
+                                ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
+                        <div>`;
+                    $("#B52Transactions").prepend(control);
+                    curCoinDate = d;
+                    curCoin = sim;
+                    curCoinSum = inc;
                 }
-                else
+                else 
                 {
-                    currSum+=inc;
+                    //add summ
+                    curCoinSum+=inc;
+                }
+                if(curDayDate!=d)
+                {
+                    //renew day drop result
+                    let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
+                    let control = `
+                        <div class="B52RiskPosItem" style="background:${col};width:100px;">
+                                ${curDayDate} $${curDaySum.toFixed(2)}
+                        <div>`;
+                    $("#B52IncomeDays").prepend(control);
+                    curDayDate = d;
+                    curDaySum = inc;
+                }
+                else 
+                {
+                    //add summ
+                    curDaySum+=inc;
                 }
             });
         });
@@ -1498,8 +1516,7 @@ class BinanceAdapter {
             that.GET_SIGNED_PARAMS(
                 B52Settings.binanceSettings.income,
                 that.#_accessKey,
-                that.#_secretKey,
-                {incomeType:"REALIZED_PNL"}
+                that.#_secretKey
                 ).then((resp)=>{
                     B52Log.Info(`ORDERS_GetIncome. `, resp);
                     s(resp);
