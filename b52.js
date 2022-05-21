@@ -138,28 +138,6 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
-        div.B52RiskPosItem
-        {
-            height:24px;
-            width:170px;
-            margin:2px;
-            padding:2px;
-            font-size:14px;
-            display:flex;
-        }
-        div.B52RiskPosItem div
-        {
-            margin-right:8px;
-        }
-        div.B52RiskPosItem button
-        {
-            height:23px;
-            width:23px;
-            text-align: center;
-            font-size:17px;
-            background:black;
-            padding-top:0px;
-        }
         tr.B52WBrow
         {
             font-size:10px;
@@ -176,6 +154,28 @@ var B52HTML =
         {
             overflow-y:auto;
             height:100%;
+        }
+        div.B52RiskPosItem
+        {
+            height:24px;
+            width:150px;
+            margin:2px;
+            padding:2px;
+            font-size:12px;
+            display:flex;
+        }
+        div.B52RiskPosItem div
+        {
+            margin-right:8px;
+        }
+        div.B52RiskPosItem button
+        {
+            height:23px;
+            width:23px;
+            text-align: center;
+            font-size:17px;
+            background:black;
+            padding-top:0px;
         }
 	</style>
     `,
@@ -608,10 +608,10 @@ class B52 {
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
-                    <div style="width:25px;">
+                    <div style="width:05px;">
                         <button id="B52${p.symbol}POS">x</button>
                     </div>
-                    <div style="margin-top:5px;width:120px">
+                    <div style="margin-top:5px;width:110px">
                         ${p.symbol} $${parseFloat(p.unRealizedProfit).toFixed(2)}
                     </div>
                 <div>`;
