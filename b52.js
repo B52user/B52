@@ -842,22 +842,23 @@ class B52 {
         });
         
         that.Binance._eventWorkbookChanged.push(()=>{
-
+            let that = b52;
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        console.log(tick);
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
                         let currPrice = parseFloat(workbook.asks[0][0]);
-                        let theTick = parseFloat(tick)<1?theTick.length-2:0;
+                        let theTick = tick<1?tick.toString().length-2:0;
                         $("#B52WorkBookTable").empty();
                         while(currPrice<parseFloat(workbook.asks[workbook.asks.length-1][0]))
                         {
                             //do red business
                             let prevPrice = currPrice;
                             currPrice+=step;
-                            let sum = workbook.asks.filter(a=>parseFloat(a[0])<=currPrice&&parseFloat(a[0])>prevPrice).map(b=>b[1]).reduce((c,d)=>c+d);
+                            let sum = workbook.asks.filter(a=>parseFloat(a[0])<=currPrice&&parseFloat(a[0])>prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
                             <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
                                 <td>${sum.toFixed(theTick)}</td>
