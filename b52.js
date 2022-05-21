@@ -289,7 +289,7 @@ var B52HTML =
                     Income by day:
                 </div>
                 <div style="width:30px;height:30px;">
-                    <button id="B52RenewTransactions" style="width:30px;height:30px;background:black;">
+                    <button id="B52RenewTransactions" style="width:40px;height:30px;background:black;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
                             <path fill="white" d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
                         </svg>
@@ -376,11 +376,11 @@ class B52 {
                 let d = new Date(t.time);
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
-                    <div style="margin-top:5px;width:110px">
+                    <div style="margin-top:5px;width:140px">
                         ${d.getDate()}.${d.getMonth()} $${inc.toFixed(2)} ${t.symbol}
                     </div>
                 <div>`;
-                $("#B52Transactions").append(control);
+                $("#B52Transactions").prepend(control);
             });
         });
     }
