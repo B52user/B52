@@ -369,8 +369,8 @@ class B52 {
     BUTTON_B52RenewTransactions(){
         let that = this;
         that.Binance.ORDERS_GetIncome().then(income=>{
-            $("#B52Transactions").empty();
-            $("#B52IncomeDays").empty();
+            $("#B52Transactions").html("Transactions:");
+            $("#B52IncomeDays").html("Income by day:");
             //filter by "COMMISSION" and "REALIZED_PNL" then append date then draw
             var curCoin = "";
             var curCoinDate = "";
