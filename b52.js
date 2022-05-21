@@ -70,7 +70,9 @@ var B52Settings =
     },
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
-        bid:"rgba(0, 107, 60, .4)"
+        bid:"rgba(0, 107, 60, .4)",
+        posask:"rgba(165, 42, 42, .7)",
+        posbid:"rgba(0, 107, 60, .4)",
     }
 }
 
@@ -860,12 +862,14 @@ class B52 {
                             let sum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
                             <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
-                                <td>${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                         }
+                        $("#B52WorkBookTable").children().last().css("background",B52Settings.workbookColors.posask);
                         currPrice = parseFloat(workbook.bids[0][0]);
+                        let cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
                         {
                             //do red business
@@ -873,11 +877,12 @@ class B52 {
                             currPrice-=step;
                             let sum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
-                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.bid}">
-                                <td>${sum.toFixed(theTick)}</td>
+                            <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width: 50px;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
+                            cola = B52Settings.workbookColors.bid;
                         }
                     });
                 });
