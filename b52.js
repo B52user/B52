@@ -65,6 +65,7 @@ var B52Settings =
         exchangeInfo:"fapi/v1/exchangeInfo",
         balance:"fapi/v1/balance",
         workbook: "fapi/v1/depth",
+        income:"fapi/v1/income"
     },
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
@@ -259,7 +260,7 @@ var B52HTML =
         <div style="display:flex;height:30px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
-            <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">State</button>
+            <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">Income</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
@@ -280,7 +281,21 @@ var B52HTML =
                     </div>
                 </div>
             </div>
-            <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
+            <div class="B52Tab" id="B52Tab3">
+                <div style="width:170px;overflow-y:auto;height:100%;" id="B52Transactions">
+                    Transactions:
+                </div>
+                <div style="width:100px;overflow-y:auto;height:100%;" id="B52IncomeDays">
+                    Income by day:
+                </div>
+                <div style="width:30px;height:30px;">
+                    <button id="B52RenewTransactions" style="width:30px;height:30px;background:black;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                            <path fill="white" d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
     </div>
@@ -348,6 +363,26 @@ class B52 {
         }
         $("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.BUTTON_B52Strategy(e);})
         $("#B52RenewAllPositions").mouseup(()=>{that.BUTTON_B52RenewAllOrders();});
+        $("#B52RenewTransactions").mouseup(()=>{that.BUTTON_B52RenewTransactions();});
+    }
+
+    BUTTON_B52RenewTransactions(){
+        let that = this;
+        that.Binance.ORDERS_GetIncome().then(income=>{
+            $("#B52Transactions").empty();
+            income.forEach((t)=>{
+                let inc = parseFloat(t.income);
+                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(inc>0?"BUY":"SELL"))[0].col;
+                let d = new Date(t.time);
+                let control = `
+                <div class="B52RiskPosItem" style="background:${col}">
+                    <div style="margin-top:5px;width:110px">
+                        ${t.getDate()}.${t.getMonth()} $${inc.toFixed(2)} ${t.symbol}
+                    </div>
+                <div>`;
+                $("#B52Transactions").append(control);
+            });
+        });
     }
 
     BUTTON_B52RenewAllOrders() {
@@ -1434,6 +1469,21 @@ class BinanceAdapter {
                 that.#_secretKey,
                 ).then((resp)=>{
                     B52Log.Info(`ORDERS_GetAllOpenedOrders. `, resp);
+                    s(resp);
+                });
+        });
+    }
+
+    ORDERS_GetIncome(){
+        let that = this;
+        return new Promise((s,f)=>{
+            that.GET_SIGNED_PARAMS(
+                B52Settings.binanceSettings.income,
+                that.#_accessKey,
+                that.#_secretKey,
+                {incomeType:"REALIZED_PNL"}
+                ).then((resp)=>{
+                    B52Log.Info(`ORDERS_GetIncome. `, resp);
                     s(resp);
                 });
         });
