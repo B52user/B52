@@ -842,7 +842,6 @@ class B52 {
         });
         
         that.Binance._eventWorkbookChanged.push(()=>{
-            let that = b52;
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
