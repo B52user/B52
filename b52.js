@@ -385,12 +385,15 @@ class B52 {
                 if(curCoinDate!=d||curCoin!=sim)
                 {
                     //renew coin drop result
-                    let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
-                    let control = `
-                        <div class="B52RiskPosItem" style="background:${col};width:140px;">
-                                ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
-                        <div>`;
-                    $("#B52Transactions").prepend(control);
+                    if(curCoin!="")
+                    {
+                        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
+                        let control = `
+                            <div class="B52RiskPosItem" style="background:${col};width:140px;">
+                                    ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
+                            <div>`;
+                        $("#B52Transactions").prepend(control);
+                    }
                     curCoinDate = d;
                     curCoin = sim;
                     curCoinSum = inc;
@@ -403,12 +406,15 @@ class B52 {
                 if(curDayDate!=d)
                 {
                     //renew day drop result
-                    let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
-                    let control = `
-                        <div class="B52RiskPosItem" style="background:${col};width:100px;">
-                                ${curDayDate} $${curDaySum.toFixed(2)}
-                        <div>`;
-                    $("#B52IncomeDays").prepend(control);
+                    if(curDayDate!="")
+                    {
+                        let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
+                        let control = `
+                            <div class="B52RiskPosItem" style="background:${col};width:100px;">
+                                    ${curDayDate} $${curDaySum.toFixed(2)}
+                            <div>`;
+                        $("#B52IncomeDays").prepend(control);
+                    }
                     curDayDate = d;
                     curDaySum = inc;
                 }
