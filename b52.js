@@ -390,7 +390,7 @@ class B52 {
                     {
                         let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                         let control = `
-                            <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;">
+                            <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;white-space: nowrap;">
                                     $${curCoinSum.toFixed(2)} ${curCoin} ${curCoinDate}
                             <div>`;
                         $("#B52Transactions").prepend(control);
@@ -428,8 +428,8 @@ class B52 {
             });
             let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                 let control = `
-                    <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;">
-                            ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
+                    <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;white-space: nowrap;">
+                        $${curCoinSum.toFixed(2)} ${curCoin} ${curCoinDate}
                     <div>`;
                 $("#B52Transactions").prepend(control);
                 let col2 = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
