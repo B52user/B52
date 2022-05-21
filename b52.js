@@ -359,17 +359,17 @@ class B52 {
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
                     <div style="width:18px;">
-                        <button id="B52${o.clientOrderId}">x</button>
+                        <button id="B52${o.clientOrderId}OC">x</button>
                     </div>
                     <div style="margin-top:5px;width:110px">
-                        ${o.symbol} ${o.origQty}
+                        ${o.symbol} $${(o.origQty*parseFloat(o.price=="0"?o.stopPrice:o.price).toFixed(2))}
                     </div>
                 <div>`;
                 /*${(o.price=="0"?o.stopPrice:o.price)}*/
                 $("#B52OrdersOpenedList").append(control);
                 let ordID = o.orderId;
                 let symB = o.symbol;
-                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordID,symB));
+                $("#B52"+o.clientOrderId+"OC").mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordID,symB));
             });
         });
     }
