@@ -265,7 +265,7 @@ var B52HTML =
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
-                <div style="width:170px;overflow-y: auto;height:100%;" id="B52PosOpenedList">
+                <div style="width:170px;overflow-y:auto;height:100%;" id="B52PosOpenedList">
                 Positions:
                 </div>
                 <div style="width:170px;">
@@ -277,7 +277,6 @@ var B52HTML =
                         </button>
                     <div>
                     <div style="width:100%;height:100%;overflow-y: auto;" id="B52OrdersOpenedList"><div>
-                Orders:
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab3">Some 3333 interesting text</div>
@@ -351,23 +350,23 @@ class B52 {
     }
 
     BUTTON_B52RenewAllOrders() {
-        //B52OrdersOpenedList
-        let riskOpened = that.Binance.OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
-            $("#B52PosOpenedList").html("Positions:");
-            riskOpened.forEach((p)=>{
-                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
+        that.Binance.ORDERS_GetAllOpenedOrders().them(ords=>{
+            $("#B52OrdersOpenedList").empty();
+            ords.forEach((o)=>{
+                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+o.side)[0].col;
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
                     <div style="width:05px;">
-                        <button id="B52${p.symbol}POS">x</button>
+                        <button id="B52${o.clientOrderId}">x</button>
                     </div>
                     <div style="margin-top:5px;width:110px">
-                        ${p.symbol} $${parseFloat(p.unRealizedProfit).toFixed(2)}
+                        ${o.symbol} ${(o.price=="0"?o.stopPrice:o.price)} ${o.origQty}
                     </div>
                 <div>`;
-                $("#B52PosOpenedList").append(control);
-                $("#B52"+p.symbol+"POS").mouseup(()=>that.Binance.ORDERS_FixPosition(p.symbol));
+                $("#B52OrdersOpenedList").append(control);
+                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(o.orderId));
             });
+        });
     }
 
     BUTTON_B52Strategy(b){
