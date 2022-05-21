@@ -417,6 +417,18 @@ class B52 {
                     //add summ
                     curDaySum+=inc;
                 }
+                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
+                let control = `
+                    <div class="B52RiskPosItem" style="background:${col};width:140px;">
+                            ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
+                    <div>`;
+                $("#B52Transactions").prepend(control);
+                let col2 = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
+                let control2 = `
+                    <div class="B52RiskPosItem" style="background:${col2};width:100px;">
+                            ${curDayDate} $${curDaySum.toFixed(2)}
+                    <div>`;
+                $("#B52IncomeDays").prepend(control2);
             });
         });
     }
