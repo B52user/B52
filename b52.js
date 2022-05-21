@@ -55,7 +55,7 @@ var B52Settings =
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
-    workBookDepth:100,
+    workBookDepth:500,
     binanceSettings:{
         serverUrl:"https://fapi.binance.com/",
         orderUrl:"fapi/v1/order",
@@ -846,44 +846,43 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        console.log(tick);
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
-                        let currPrice = parseFloat(workbook.asks[0][0]);
+                        let currPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                         let theTick = tick<1?tick.toString().length-2:0;
+                        let theForm = step<1?step.toString().length-2:0;
                         $("#B52WorkBookTable").empty();
-                        while(currPrice<parseFloat(workbook.asks[workbook.asks.length-1][0]))
+                        while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
                             let prevPrice = currPrice;
-                            currPrice+=step;
-                            let sum = workbook.asks.filter(a=>parseFloat(a[0])<=currPrice&&parseFloat(a[0])>prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
+                            currPrice-=step;
+                            let sum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
                             <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
                                 <td>${sum.toFixed(theTick)}</td>
-                                <td>${currPrice}</td>
+                                <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                         }
                         currPrice = parseFloat(workbook.bids[0][0]);
-                        while(currPrice<parseFloat(workbook.bids[workbook.bids.length-1][0]))
+                        while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
                         {
                             //do red business
                             let prevPrice = currPrice;
-                            currPrice+=step;
-                            let sum = workbook.bids.filter(a=>parseFloat(a[0])<=currPrice&&parseFloat(a[0])>prevPrice).map(b=>b[1]).reduce((c,d)=>c+d);
+                            currPrice-=step;
+                            let sum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
                             <tr class="B52WBrow" style="background:${B52Settings.workbookColors.bid}">
                                 <td>${sum.toFixed(theTick)}</td>
-                                <td>${currPrice}</td>
+                                <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                         }
                     });
                 });
             });
-                
         });
         return wbSrv;
     }
