@@ -380,7 +380,8 @@ class B52 {
             let trans = income.filter(a=>a.incomeType=="COMMISSION"||a.incomeType=="REALIZED_PNL");
             trans.forEach((t)=>{
                 let inc = parseFloat(t.income);
-                let d = new Date(t.time).toISOString().slice(5,10);
+                let ind = new Date(t.time).toString().slice(' ');
+                let d = ind[2]+" "+ind[1];
                 let sim = t.symbol;
                 if(curCoinDate!=d||curCoin!=sim)
                 {
@@ -403,6 +404,7 @@ class B52 {
                     //add summ
                     curCoinSum+=inc;
                 }
+
                 if(curDayDate!=d)
                 {
                     //renew day drop result
@@ -423,7 +425,8 @@ class B52 {
                     //add summ
                     curDaySum+=inc;
                 }
-                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
+            });
+            let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                 let control = `
                     <div class="B52RiskPosItem" style="background:${col};width:140px;">
                             ${curCoinDate} $${curCoinSum.toFixed(2)} ${curCoin}
@@ -435,7 +438,6 @@ class B52 {
                             ${curDayDate} $${curDaySum.toFixed(2)}
                     <div>`;
                 $("#B52IncomeDays").prepend(control2);
-            });
         });
     }
 
