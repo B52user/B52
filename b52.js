@@ -265,10 +265,18 @@ var B52HTML =
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
-                <div style="width:50%;" id="B52PosOpenedList">
+                <div style="width:170px;overflow-y: auto;height:100%;" id="B52PosOpenedList">
                 Positions:
                 </div>
-                <div style="width:50%;" id="B52OrdersOpenedList">
+                <div style="width:170px;">
+                    <div style="width:100%;">Orders: 
+                        <button id="B52RenewAllPositions" style="width:20px;height:20px;background:black;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="white" d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
+                            </svg>
+                        </button>
+                    <div>
+                    <div style="width:100%;height:100%;overflow-y: auto;" id="B52OrdersOpenedList"><div>
                 Orders:
                 </div>
             </div>
@@ -339,6 +347,27 @@ class B52 {
             $(this.#_w.Button("B52TabButton"+i.toString())).mouseup(() => that.BUTTON_B52TabButton(i));
         }
         $("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.BUTTON_B52Strategy(e);})
+        $("#B52RenewAllPositions").mouseup(()=>{that.BUTTON_B52RenewAllOrders();});
+    }
+
+    BUTTON_B52RenewAllOrders() {
+        //B52OrdersOpenedList
+        let riskOpened = that.Binance.OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
+            $("#B52PosOpenedList").html("Positions:");
+            riskOpened.forEach((p)=>{
+                let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
+                let control = `
+                <div class="B52RiskPosItem" style="background:${col}">
+                    <div style="width:05px;">
+                        <button id="B52${p.symbol}POS">x</button>
+                    </div>
+                    <div style="margin-top:5px;width:110px">
+                        ${p.symbol} $${parseFloat(p.unRealizedProfit).toFixed(2)}
+                    </div>
+                <div>`;
+                $("#B52PosOpenedList").append(control);
+                $("#B52"+p.symbol+"POS").mouseup(()=>that.Binance.ORDERS_FixPosition(p.symbol));
+            });
     }
 
     BUTTON_B52Strategy(b){
@@ -1389,6 +1418,20 @@ class BinanceAdapter {
                         s(resp);
                     });
             });
+        });
+    }
+
+    ORDERS_GetAllOpenedOrders(){
+        let that = this;
+        return new Promise((s,f)=>{
+            that.GET_SIGNED_PARAMS(
+                B52Settings.binanceSettings.openedOrders,
+                that.#_accessKey,
+                that.#_secretKey,
+                ).then((resp)=>{
+                    B52Log.Info(`ORDERS_GetAllOpenedOrders. `, resp);
+                    s(resp);
+                });
         });
     }
 }
