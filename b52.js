@@ -370,6 +370,9 @@ class B52 {
         let that = this;
         that.Binance.ORDERS_GetIncome().then(income=>{
             $("#B52Transactions").empty();
+            $("#B52IncomeDays").empty();
+            var currDate = "";
+            var currSum = 0.0;
             income.forEach((t)=>{
                 let inc = parseFloat(t.income);
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(inc>0?"BUY":"SELL"))[0].col;
@@ -379,6 +382,23 @@ class B52 {
                         ${d.getDate()}.${d.getMonth()} $${inc.toFixed(2)} ${t.symbol}
                 <div>`;
                 $("#B52Transactions").prepend(control);
+
+                let soDate =  d.getDate().toString()+"."+d.getMonth().toString();
+                if(soDate!=currDate)
+                {
+                    let col2 = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(currSum>0?"BUY":"SELL"))[0].col;
+                    let control2 = `
+                    <div class="B52RiskPosItem" style="background:${col2};width:100px;">
+                            ${currDate} $${currSum.toFixed(2)}
+                    <div>`;
+                    $("#B52IncomeDays").prepend(control2);
+                    currDate = soDate;
+                    currSum = inc;
+                }
+                else
+                {
+                    currSum+=inc;
+                }
             });
         });
     }
