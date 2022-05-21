@@ -367,7 +367,9 @@ class B52 {
                 <div>`;
                 /*${(o.price=="0"?o.stopPrice:o.price)}*/
                 $("#B52OrdersOpenedList").append(control);
-                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(o.orderId));
+                let ordID = o.orderId;
+                let symB = o.symbol;
+                $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordID,symB));
             });
         });
     }
