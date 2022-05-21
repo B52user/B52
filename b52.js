@@ -1516,7 +1516,8 @@ class BinanceAdapter {
             that.GET_SIGNED_PARAMS(
                 B52Settings.binanceSettings.income,
                 that.#_accessKey,
-                that.#_secretKey
+                that.#_secretKey,
+                {limit:1000}
                 ).then((resp)=>{
                     B52Log.Info(`ORDERS_GetIncome. `, resp);
                     s(resp);
