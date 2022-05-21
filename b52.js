@@ -856,7 +856,7 @@ class B52 {
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
-                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*10;
+                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*5;
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
@@ -881,7 +881,7 @@ class B52 {
                             let sum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1])).reduce((c,d)=>c+d);
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
-                                <td style="width: 50px;">${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;background:linear-gradient(to right,${B52Settings.workbookColors.posbid} ${Math.round(100*sum/maxOfTwo)}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
