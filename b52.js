@@ -9,7 +9,7 @@ var B52Settings =
     marketOrderPrice : 0.08,
     numberOfTakes:5,
     minnotal: 5,
-    workBookScale:10,
+    workBookScale:5,
     workBookScaleInc:2,
 	sButtons : 
 	[
@@ -831,6 +831,8 @@ class B52 {
     }
 
     #_workbook_lock;
+    #_scrollPrice1;
+    #_scrollPriceChanged1;
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -872,14 +874,18 @@ class B52 {
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.askscale;
+                            let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
                             let control = `
-                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
+                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}"${scrollHere}}>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                         }
+
                         $("#B52WorkBookTable").children().last().prev().css("background",B52Settings.workbookColors.posask);
+                        $("#B52WorkBookTable").children().last().prev().attr("priceat","true");
+
                         currPrice = parseFloat(workbook.bids[0][0]);
                         let cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
@@ -891,14 +897,30 @@ class B52 {
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.bidscale;
+                            let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
                             let control = `
-                            <tr class="B52WBrow" style="background:${cola}">
+                            <tr class="B52WBrow" style="background:${cola}"${scrollHere}}>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                             cola = B52Settings.workbookColors.bid;
                         }
+
+                        if(that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>10000)
+                        {
+                            //refresh time
+                            $("tr[scrollhere='true']").attr("scrollhere","false");
+                            $("tr[priceat='true']").attr("scrollhere","true");
+                            that.#_scrollPrice1 = $("tr[scrollhere='true']").children().last().text();
+                            that.#_scrollPriceChanged1 = new Date().getTime();
+                        }
+                        
+                        $("tr[scrollhere='true']")[0].scrollIntoView({
+                            behavior: 'auto',
+                            block: 'center',
+                            inline: 'center'
+                        });
                     });
                 });
             });
