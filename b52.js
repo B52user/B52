@@ -71,12 +71,12 @@ var B52Settings =
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
         bid:"rgba(0, 107, 60, .4)",
-        posask:"rgba(165, 42, 42, .7)",
-        posbid:"rgba(0, 107, 60, .7)",
-        askscale:"rgba(81, 0, 19, 0.8)",
-        bidscale:"rgba(32, 56, 0, 0.8)",
-        big1:"rgba(130, 96, 0, 0.8)",
-        big2:"rgba(94, 0, 135, 0.8)"
+        posask:"rgba(165, 42, 42, .8)",
+        posbid:"rgba(0, 107, 60, .8)",
+        askscale:"rgb(114 15 15 / 88%)",
+        bidscale:"rgb(169 86 0)",
+        big1:"rgba(175, 162, 0)",
+        big2:"rgba(126, 0, 181)"
     }
 }
 
@@ -848,6 +848,7 @@ class B52 {
         });
         
         that.Binance._eventWorkbookChanged.push(()=>{
+            let that = b52;
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
@@ -860,7 +861,7 @@ class B52 {
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
-                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScale;
+                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*2*B52Settings.workBookScale;
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
@@ -877,7 +878,7 @@ class B52 {
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
                         }
-                        $("#B52WorkBookTable").children().last().css("background",B52Settings.workbookColors.posask);
+                        $("#B52WorkBookTable").children().last().prev().css("background",B52Settings.workbookColors.posask);
                         currPrice = parseFloat(workbook.bids[0][0]);
                         let cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
