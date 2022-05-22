@@ -863,7 +863,7 @@ class B52 {
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
                         let toCut = step.toString().replace('.','').length;
-                        let precPrice = currPrice.toFixed(theTick);
+                        let precPrice = currPrice.toFixed(theForm);
                         currPrice = parseFloat(precPrice.substring(0,precPrice.length-toCut));
                         console.log(currPrice);
                         $("#B52WorkBookTable").empty();
