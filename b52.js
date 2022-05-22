@@ -333,7 +333,7 @@ var B52HTML =
             </div>
         </div>
             <div style="width:30px;height:100%;">
-                <input type="range" min="0.1" max="3" value="0.2" id="B52WBScale" style="height:100px;width:25px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="30" value="2" id="B52WBScale" style="height:100px;width:25px;-webkit-appearance: slider-vertical;">
             </div>
         <div>
     </div>
@@ -412,8 +412,8 @@ class B52 {
         $("#B52RenewTransactions").mouseup(()=>{that.BUTTON_B52RenewTransactions();});
         let scaleSlider = document.getElementById("B52WBScale");
         scaleSlider.onchange = (e)=>{
-                B52Settings.workBookScale = scaleSlider.value;
-                B52Settings.workBookScale2 = scaleSlider.value;
+                B52Settings.workBookScale = parseFloat(scaleSlider.value)/10;
+                B52Settings.workBookScale2 = parseFloat(scaleSlider.value)/10;
         };
     }
 
