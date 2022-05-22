@@ -9,8 +9,8 @@ var B52Settings =
     marketOrderPrice : 0.08,
     numberOfTakes:5,
     minnotal: 5,
-    workBookScale:5,
-    workBookScaleInc:2,
+    workBookScale:10,
+    workBookScaleInc:0.2,
     workbookEmptyCells:20,
 	sButtons : 
 	[
