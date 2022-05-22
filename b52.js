@@ -335,7 +335,7 @@ var B52HTML =
             <div style="width:30px;height:100%;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <input type="range" min="1" max="30" value="5" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <button style="margin-left:3px;width:40px;height:20px;" id="B52WBDepth">500</button>
+                <button style="margin-left:5px;width:40px;height:40px;" id="B52WBDepth">500</button>
             </div>
         <div>
     </div>
@@ -426,6 +426,7 @@ class B52 {
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
+            $("#B52WBDepth").text(B52Settings.workBookDepth);
             that.#_scrollPriceChanged1 = null;
             that.#_scrollPriceChanged2 = null;
         });
