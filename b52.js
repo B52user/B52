@@ -16,7 +16,7 @@ var B52Settings =
     workbookEmptyCells:10,
     workbookDollars:true,
     workbookAutoScroll:120,
-    workBookDepth:100,
+    workBookDepth:50,
     workBookColorPerc:0.005,
 	sButtons : 
 	[
