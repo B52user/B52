@@ -424,7 +424,11 @@ class B52 {
                 B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/10;
                 B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/10;
         };
-        $("#B52WBDepth").mouseup(()=>{B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))});
+        $("#B52WBDepth").mouseup(()=>{
+            B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
+            that.#_scrollPriceChanged1 = null;
+            that.#_scrollPriceChanged2 = null;
+        });
     }
 
     BUTTON_B52RenewTransactions(){
