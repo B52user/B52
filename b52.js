@@ -13,6 +13,7 @@ var B52Settings =
     workBookScaleInc:0.2,
     workbookEmptyCells:10,
     workbookDollars:true,
+    workbookAutoScroll:3000,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -859,7 +860,7 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        let worldIsChangingThisTime = (that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>10000);
+                        let worldIsChangingThisTime = (that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>B52Settings.workbookAutoScroll);
                         
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
@@ -867,9 +868,7 @@ class B52 {
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
                         $("#B52WorkBookTable").empty();
-                        let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
-                        let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
-                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScaleInc*B52Settings.workBookScale;
+                        var maxOfTwo = 1;
                         if(worldIsChangingThisTime)
                         {
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
@@ -893,6 +892,7 @@ class B52 {
                             {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
+                            if(sum>maxOfTwo)maxOfTwo=sum;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
@@ -926,6 +926,7 @@ class B52 {
                             {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
+                            if(sum>maxOfTwo)maxOfTwo=sum;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
