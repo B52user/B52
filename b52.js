@@ -195,10 +195,9 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
-        input.B52VertRange[type=range][orient=vertical]
+        input.B52VertRange
         {
-            writing-mode: bt-lr; /* IE */
-            -webkit-appearance: slider-vertical; /* Chromium */
+            -webkit-appearance: slider-vertical;
         }
 	</style>
     `,
