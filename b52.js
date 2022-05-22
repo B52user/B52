@@ -992,8 +992,11 @@ class B52 {
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
                         let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll);
+                        console.log("1");
                         let workbook = that.Binance.WorkBook2;
+                        console.log(workbook);
                         if(workbook==null) return;
+                        console.log("2");
                         let scale = B52Settings.workBookScale2;
                         let step = parseFloat(form)*scale;
                         let theTick = tick<1?tick.toString().length-2:0;
@@ -1004,12 +1007,14 @@ class B52 {
                         {
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                             let precPrice = topPrice.toFixed(theForm-1);
-                            that.#_wbFrom2 = parseFloat(precPrice)+B52Settings.workbookEmptyCells2*step;
+                            that.#_wbFrom2 = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
                         }
                         let currPrice = that.#_wbFrom2;
                         let cola = "";
+                        console.log("3");
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
+                            console.log("4");
                             //do red business
                             let prevPrice = currPrice;
                             currPrice-=step;
@@ -1036,6 +1041,7 @@ class B52 {
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable2").append(control);
+                            console.log("5");
                         }
 
                         $("#B52WorkBookTable2").children().last().prev().css("background",B52Settings.workbookColors.posask);
