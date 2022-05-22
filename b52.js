@@ -11,9 +11,12 @@ var B52Settings =
     minnotal: 5,
     workBookScale:5,
     workBookScaleInc:0.2,
+    workBookScale2:5,
+    workBookScaleInc2:0.2,
     workbookEmptyCells:10,
     workbookDollars:true,
     workbookAutoScroll:3000,
+    workBookDepth:100,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -27,6 +30,7 @@ var B52Settings =
     positionsServiceIntervalMS : 1000,
     ordersSerciceIntervalMS : 1000,
     workbookSerciceIntervalMS : 1000,
+    workbookSerciceIntervalMS2 : 1000,
     shitClickers:[
         "//article[.//h2[text()='Unlock the full power of TradingView']]//button[starts-with(@class,'close-button')]",
         "//div[starts-with(@class,'modal') and .//div[text()='No ads on any chart']]//button[@aria-label='Close']",
@@ -59,9 +63,9 @@ var B52Settings =
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
-    workBookDepth:100,
     binanceSettings:{
         serverUrl:"https://fapi.binance.com/",
+        serverUrl2:"https://api.binance.com/",
         orderUrl:"fapi/v1/order",
         allOpenedOrders:"fapi/v1/allOpenOrders",
         currentPrice: "fapi/v1/ticker/24hr",
@@ -70,7 +74,8 @@ var B52Settings =
         exchangeInfo:"fapi/v1/exchangeInfo",
         balance:"fapi/v1/balance",
         workbook: "fapi/v1/depth",
-        income:"fapi/v1/income"
+        income:"fapi/v1/income",
+        workbook2:"api/v3/depth"
     },
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
@@ -639,7 +644,11 @@ class B52 {
 
         let wSrv = this.SERVICE_MakeWorBookService();
         wSrv.Start();
-        this.#_srvs["Workbook"] = wSrv;
+        this.#_srvs["Workbook1"] = wSrv;
+
+        let wSrv2 = this.SERVICE_MakeWorBookService2();
+        wSrv2.Start();
+        this.#_srvs["Workbook2"] = wSrv2;
     }
 
     SERVICE_MakeShitService(){
@@ -835,9 +844,8 @@ class B52 {
     }
 
     #_workbook_lock;
-    _wbFrom;
-    _wbTo;
-    _scrollPriceChanged1;
+    #_wbFrom;
+    #_scrollPriceChanged1;
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -856,11 +864,10 @@ class B52 {
         });
         
         that.Binance._eventWorkbookChanged.push(()=>{
-            let that = b52;
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        let worldIsChangingThisTime = (that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>B52Settings.workbookAutoScroll);
+                        let worldIsChangingThisTime = (that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>B52Settings.workbookAutoScroll);
                         
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
@@ -873,9 +880,9 @@ class B52 {
                         {
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                             let precPrice = topPrice.toFixed(theForm-1);
-                            that._wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
+                            that.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
                         }
-                        let currPrice = that._wbFrom;
+                        let currPrice = that.#_wbFrom;
                         let cola = "";
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
@@ -942,8 +949,128 @@ class B52 {
 
                         if(worldIsChangingThisTime){
                             //refresh time
-                            that._scrollPriceChanged1 = new Date().getTime();
+                            that.#_scrollPriceChanged1 = new Date().getTime();
                             $("tr[priceat='true']")[0].scrollIntoView({
+                                behavior: 'auto',
+                                block: 'center',
+                                inline: 'center'
+                            });
+                        }
+                    });
+                });
+            });
+        });
+        return wbSrv;
+    }
+
+    #_workbook_lock2;
+    #_wbFrom2;
+    #_scrollPriceChanged2;
+    SERVICE_MakeWorBookService2(){
+        let that = this;
+        this.#_workbook_lock2 = false;
+        let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS2);
+        wbSrv.Actions.push(()=>{
+            if(!that.#_workbook_lock2)
+                {
+                    that.#_workbook_lock2 = true;
+                    that.Binance.MARKET_GetSpotOrderBook().then(wb=>{
+                        that.Binance.WorkBook2 = wb;
+                        that.#_workbook_lock2 = false;
+                        //run events
+                        that.Binance._eventWorkbookChanged2.forEach(a=>a());
+                    });
+                }
+        });
+        
+        that.Binance._eventWorkbookChanged2.push(()=>{
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
+                    that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll);
+                        
+                        let workbook = that.Binance.WorkBook2;
+                        let scale = B52Settings.workBookScale2;
+                        let step = parseFloat(form)*scale;
+                        let theTick = tick<1?tick.toString().length-2:0;
+                        let theForm = step<1?step.toString().length-2:0;
+                        $("#B52WorkBookTable2").empty();
+                        var maxOfTwo2 = 1;
+                        if(worldIsChangingThisTime)
+                        {
+                            let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
+                            let precPrice = topPrice.toFixed(theForm-1);
+                            that.#_wbFrom2 = parseFloat(precPrice)+B52Settings.workbookEmptyCells2*step;
+                        }
+                        let currPrice = that.#_wbFrom2;
+                        let cola = "";
+                        while(currPrice>parseFloat(workbook.asks[0][0]))
+                        {
+                            //do red business
+                            let prevPrice = currPrice;
+                            currPrice-=step;
+                            let presum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
+                            let sum = 0;
+                            if(B52Settings.workbookDollars)
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+                            }
+                            else
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+                            }
+                            if(sum>maxOfTwo2)maxOfTwo2=sum;
+                            let scaleSize = Math.round(100*sum/maxOfTwo2);
+                            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
+                            cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
+                            
+                            let control = `
+                            <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
+                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                </td>
+                                <td>${currPrice.toFixed(theForm)}</td>
+                            <tr>`;
+                            $("#B52WorkBookTable2").append(control);
+                        }
+
+                        $("#B52WorkBookTable2").children().last().prev().css("background",B52Settings.workbookColors.posask);
+                        $("#B52WorkBookTable2").children().last().prev().attr("priceat2","true");
+
+                        cola = B52Settings.workbookColors.posbid;
+                        while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0])-B52Settings.workbookEmptyCells*step)
+                        {
+                            //do red business
+                            let prevPrice = currPrice;
+                            currPrice-=step;
+                            let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+                            let sum = 0;
+                            if(B52Settings.workbookDollars)
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+                            }
+                            else
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+                            }
+                            if(sum>maxOfTwo2)maxOfTwo2=sum;
+                            let scaleSize = Math.round(100*sum/maxOfTwo2);
+                            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
+                            let control = `
+                            <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
+                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                </td>
+                                <td>${currPrice.toFixed(theForm)}</td>
+                            <tr>`;
+                            $("#B52WorkBookTable2").append(control);
+                            cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.bid;
+                        }
+
+                        if(worldIsChangingThisTime){
+                            //refresh time
+                            that.#_scrollPriceChanged2 = new Date().getTime();
+                            $("tr[priceat2='true']")[0].scrollIntoView({
                                 behavior: 'auto',
                                 block: 'center',
                                 inline: 'center'
@@ -1250,7 +1377,9 @@ class BinanceAdapter {
     _eventOpenOrdersChanged;
     #_exchangeInfo;
     WorkBook;
+    WorkBook2;
     _eventWorkbookChanged;
+    _eventWorkbookChanged2;
 
     constructor() {
 	    this.#_exchangeInfo = null;
@@ -1260,6 +1389,8 @@ class BinanceAdapter {
         this._eventOpenOrdersChanged = [];
         this._eventWorkbookChanged = [];
         this.WorkBook = null;
+        this._eventWorkbookChanged2 = [];
+        this.WorkBook2 = null;
     }
 
     ORDERS_SetNoLoss(){
@@ -1537,6 +1668,22 @@ class BinanceAdapter {
         });
     }
 
+    GET_SPOT_ANON_PARAMS(url,params=null){
+        return new Promise((s,f)=>{
+            let toAdd = "";
+            if(params!=null)
+            {
+                toAdd+="?" + jQuery.param(params);
+            }
+            fetch(B52Settings.binanceSettings.serverUrl2+url+toAdd,{method:"get"})
+                .then(response => response.json())
+                .then(resp => {
+                    s(resp);
+                })
+                .catch(error => B52Log.Info("GET_SPOT_ANON_PARAMS ERROR: ",error));
+        });
+    }
+
     GET_SIGNED_PARAMS(url,accessKey,secretKey,params={}){
         return new Promise((s,f)=>{
             fetch("https://fapi.binance.com/fapi/v1/time")
@@ -1648,6 +1795,24 @@ class BinanceAdapter {
                     B52Log.Info(`ORDERS_GetIncome. `, resp);
                     s(resp);
                 });
+        });
+    }
+
+    MARKET_GetSpotOrderBook(){
+        let that = this;
+        return new Promise((s,f)=>{
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                that.GET_SPOT_ANON_PARAMS(
+                    B52Settings.binanceSettings.workbook2,
+                    {
+                        symbol:currency,
+                        limit:B52Settings.workBookDepth
+                    }
+                    ).then((resp)=>{
+                        B52Log.Info(`MARKET_GetSpotOrderBook. `, resp);
+                        s(resp);
+                    });
+            });
         });
     }
 }
