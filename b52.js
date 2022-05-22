@@ -15,7 +15,7 @@ var B52Settings =
     workBookScaleInc2:1.5,
     workbookEmptyCells:10,
     workbookDollars:true,
-    workbookAutoScroll:10000,
+    workbookAutoScroll:120,
     workBookDepth:500,
     workBookColorPerc:0.005,
 	sButtons : 
@@ -338,7 +338,8 @@ var B52HTML =
             <div style="width:30px;height:100%;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <input type="range" min="1" max="30" value="5" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <button style="margin-left:5px;width:40px;height:40px;" id="B52WBDepth">500</button>
+                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBDepth">500</button>
+                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBCent">CENT</button>
             </div>
         <div>
     </div>
@@ -430,6 +431,10 @@ class B52 {
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
             $("#B52WBDepth").text(B52Settings.workBookDepth);
+            that.#_scrollPriceChanged1 = null;
+            that.#_scrollPriceChanged2 = null;
+        });
+        $("#B52WBCent").mouseup(()=>{
             that.#_scrollPriceChanged1 = null;
             that.#_scrollPriceChanged2 = null;
         });
@@ -908,7 +913,7 @@ class B52 {
                         var colaPerc = "";
                         var lastColaPercPrice = 0;
                         
-                        let worldIsChangingThisTime = (that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>B52Settings.workbookAutoScroll);
+                        let worldIsChangingThisTime = (that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>B52Settings.workbookAutoScroll*1000);
 
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
@@ -1041,7 +1046,7 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll);
+                        let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll*1000);
                         let workbook = that.Binance.WorkBook2;
                         if(workbook==null) return;
                         let scale = B52Settings.workBookScale2;
