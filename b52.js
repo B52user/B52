@@ -334,6 +334,7 @@ var B52HTML =
         </div>
             <div style="width:30px;height:100%;">
                 <input type="range" min="1" max="50" value="5" id="B52WBScale" style="height:100px;width:25px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="30" value="5" id="B52WBBars" style="height:100px;width:25px;-webkit-appearance: slider-vertical;">
             </div>
         <div>
     </div>
@@ -414,6 +415,13 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
+                console.log(parseFloat(scaleSlider.value));
+        };
+        let scaleSlider2 = document.getElementById("B52WBBars");
+        scaleSlider2.onchange = (e)=>{
+                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value);
+                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value);
+                console.log(parseFloat(scaleSlider2.value));
         };
     }
 
