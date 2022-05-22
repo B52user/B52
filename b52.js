@@ -833,9 +833,9 @@ class B52 {
     }
 
     #_workbook_lock;
-    #_wbFrom;
-    #_wbTo;
-    #_scrollPriceChanged1;
+    _wbFrom;
+    _wbTo;
+    _scrollPriceChanged1;
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -867,13 +867,13 @@ class B52 {
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
                         let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScaleInc*B52Settings.workBookScale;
-                        if(that.#_wbFrom==null)
+                        if(that._wbFrom==null)
                         {
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                             let precPrice = topPrice.toFixed(theForm-1);
-                            that.#_wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
+                            that._wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
                         }
-                        let currPrice = that.#_wbFrom;
+                        let currPrice = that._wbFrom;
                         let cola = "";
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
@@ -918,10 +918,10 @@ class B52 {
                             cola = B52Settings.workbookColors.bid;
                         }
 
-                        if(that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>10000)
+                        if(that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>10000)
                         {
                             //refresh time
-                            that.#_scrollPriceChanged1 = new Date().getTime();
+                            that._scrollPriceChanged1 = new Date().getTime();
                             $("tr[priceat='true']")[0].scrollIntoView({
                                 behavior: 'auto',
                                 block: 'center',
@@ -929,7 +929,7 @@ class B52 {
                             });
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                             let precPrice = topPrice.toFixed(theForm-1);
-                            that.#_wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
+                            that._wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
                         }
                     });
                 });
