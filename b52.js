@@ -86,7 +86,9 @@ var B52Settings =
         bidscale:"rgb(169 86 0)",
         big1:"rgba(175, 162, 0)",
         big2:"rgba(126, 0, 181)",
-        empty:"rgba(0, 0, 0, .6)"
+        empty:"rgba(0, 0, 0, .6)",
+        bar025_1:"rgba(69, 69, 69, 1)",
+        bar025_2:"rgba(175, 175, 175, 1)"
     }
 }
 
@@ -902,8 +904,11 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        let worldIsChangingThisTime = (that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>B52Settings.workbookAutoScroll);
+                        var colaPerc = "";
+                        var lastColaPercPrice = 0;
                         
+                        let worldIsChangingThisTime = (that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>B52Settings.workbookAutoScroll);
+
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
@@ -940,8 +945,14 @@ class B52 {
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             
+                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>0.0025)
+                            {
+                                colaPerc = colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                                lastColaPercPrice = currPrice;
+                            }
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width:5px;background:${colaPerc}"></td>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
                                 ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
