@@ -195,10 +195,6 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
-        input.
-        {
-            
-        }
 	</style>
     `,
 	B52AreaHtml : `
