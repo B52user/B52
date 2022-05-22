@@ -339,7 +339,7 @@ var B52HTML =
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <input type="range" min="1" max="30" value="5" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <button style="margin-left:4px;width:38px;height:40px;" id="B52WBDepth">500</button>
-                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBCent">CENT</button>
+                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBCent">CE</button>
             </div>
         <div>
     </div>
