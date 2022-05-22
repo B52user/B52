@@ -985,6 +985,7 @@ class B52 {
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width:5px;background:${colaPerc}"></td>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
                                 ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
