@@ -992,8 +992,8 @@ class B52 {
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
                         let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll);
-                        
                         let workbook = that.Binance.WorkBook2;
+                        if(workbook==null) return;
                         let scale = B52Settings.workBookScale2;
                         let step = parseFloat(form)*scale;
                         let theTick = tick<1?tick.toString().length-2:0;
