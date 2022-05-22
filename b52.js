@@ -17,6 +17,7 @@ var B52Settings =
     workbookDollars:true,
     workbookAutoScroll:10000,
     workBookDepth:500,
+    workBookColorPerc:0.005,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -945,7 +946,7 @@ class B52 {
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             
-                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>0.0025)
+                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
                             {
                                 colaPerc = colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                                 lastColaPercPrice = currPrice;
@@ -983,6 +984,11 @@ class B52 {
                             if(sum>maxOfTwo)maxOfTwo=sum;
                             let scaleSize = Math.round(100*sum/(maxOfTwo*B52Settings.workBookScaleInc));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
+                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
+                            {
+                                colaPerc = colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                                lastColaPercPrice = currPrice;
+                            }
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width:5px;background:${colaPerc}"></td>
@@ -1072,9 +1078,14 @@ class B52 {
                             let scaleSize = Math.round(100*sum/(maxOfTwo2*B52Settings.workBookScaleInc2));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
-                            
+                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
+                            {
+                                colaPerc = colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                                lastColaPercPrice = currPrice;
+                            }
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width:5px;background:${colaPerc}"></td>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
                                 ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
@@ -1105,8 +1116,14 @@ class B52 {
                             if(sum>maxOfTwo2)maxOfTwo2=sum;
                             let scaleSize = Math.round(100*sum/(maxOfTwo2*B52Settings.workBookScaleInc2));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
+                            if(colaPerc==""||(lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
+                            {
+                                colaPerc = colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                                lastColaPercPrice = currPrice;
+                            }
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
+                                <td style="width:5px;background:${colaPerc}"></td>
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
                                     ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
