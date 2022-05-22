@@ -858,6 +858,8 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        let worldIsChangingThisTime = (that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>10000);
+                        
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
@@ -867,11 +869,11 @@ class B52 {
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
                         let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScaleInc*B52Settings.workBookScale;
-                        if(that._wbFrom==null)
+                        if(worldIsChangingThisTime)
                         {
                             let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                             let precPrice = topPrice.toFixed(theForm-1);
-                            that._wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
+                            that._wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
                         }
                         let currPrice = that._wbFrom;
                         let cola = "";
@@ -899,7 +901,7 @@ class B52 {
 
                         //currPrice = parseFloat(workbook.bids[0][0]);
                         cola = B52Settings.workbookColors.posbid;
-                        while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
+                        while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0])-B52Settings.workbookEmptyCells*step)
                         {
                             //do red business
                             let prevPrice = currPrice;
@@ -915,11 +917,10 @@ class B52 {
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
-                            cola = B52Settings.workbookColors.bid;
+                            cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.bid;
                         }
 
-                        if(that._scrollPriceChanged1==null||new Date().getTime()-that._scrollPriceChanged1>10000)
-                        {
+                        if(worldIsChangingThisTime){
                             //refresh time
                             that._scrollPriceChanged1 = new Date().getTime();
                             $("tr[priceat='true']")[0].scrollIntoView({
@@ -927,9 +928,6 @@ class B52 {
                                 block: 'center',
                                 inline: 'center'
                             });
-                            let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
-                            let precPrice = topPrice.toFixed(theForm-1);
-                            that._wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
                         }
                     });
                 });
