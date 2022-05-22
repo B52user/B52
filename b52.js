@@ -902,6 +902,7 @@ class B52 {
                         let step = parseFloat(form)*scale;
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
+                        console.log(theForm);
                         $("#B52WorkBookTable").empty();
                         var maxOfTwo = 1;
                         if(worldIsChangingThisTime)
