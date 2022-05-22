@@ -195,9 +195,9 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
-        input.B52VertRange
+        input.
         {
-            -webkit-appearance: slider-vertical;
+            
         }
 	</style>
     `,
@@ -337,7 +337,7 @@ var B52HTML =
             </div>
         </div>
             <div style="width:30px;height:100%;">
-                <input type="range" min="0.1" max="3" value="0.2" id="B52WBScale" style="height:100px;width:25px" class="B52VertRange">
+                <input type="range" min="0.1" max="3" value="0.2" id="B52WBScale" style="height:100px;width:25px;-webkit-appearance: slider-vertical;">
             </div>
         <div>
     </div>
@@ -414,13 +414,11 @@ class B52 {
         $("#B52StrategyButtons").on("click",".B52StrategyButton",e=>{that.BUTTON_B52Strategy(e);})
         $("#B52RenewAllPositions").mouseup(()=>{that.BUTTON_B52RenewAllOrders();});
         $("#B52RenewTransactions").mouseup(()=>{that.BUTTON_B52RenewTransactions();});
-        $("#B52WBScale").slider({
-            slide:function(event,ui)
-            {
-                B52Settings.workBookScale = ui.value;
-                B52Settings.workBookScale2 = ui.value;
-            }
-        });
+        let scaleSlider = document.getElementById("B52WBScale");
+        scaleSlider.onchange = (e)=>{
+                B52Settings.workBookScale = scaleSlider.value;
+                B52Settings.workBookScale2 = scaleSlider.value;
+        };
     }
 
     BUTTON_B52RenewTransactions(){
