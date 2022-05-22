@@ -411,7 +411,7 @@ class B52 {
         $(this.#_w.Button("B52COrders")).mouseup(() => {that.BUTTON_B52COrders();});
         $(this.#_w.Button("B52NLStop")).mouseup(() => {that.BUTTON_B52NLStop();});
         $(this.#_w.Button("B52Window2Open")).mouseup(() => {that.BUTTON_B52Window2Open();});
-        for(let i=1;i<5;i++)
+        for(let i=1;i<6;i++)
         {
             $(this.#_w.Button("B52TabButton"+i.toString())).mouseup(() => that.BUTTON_B52TabButton(i));
         }
