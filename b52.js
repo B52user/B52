@@ -10,6 +10,7 @@ var B52Settings =
     numberOfTakes:5,
     minnotal: 5,
     workBookScale:10,
+    workBookScaleInc:2,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -861,7 +862,7 @@ class B52 {
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
-                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*2*B52Settings.workBookScale;
+                        let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScaleInc*B52Settings.workBookScale;
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
