@@ -859,12 +859,10 @@ class B52 {
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
                         let currPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
-                        console.log(currPrice);
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
                         let precPrice = currPrice.toFixed(theForm-1);
                         currPrice = parseFloat(precPrice);
-                        console.log(currPrice);
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
