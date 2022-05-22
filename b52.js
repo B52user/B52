@@ -885,8 +885,7 @@ class B52 {
                             let presum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice).map(b=>parseFloat(b[1]));
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
-                            let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.askscale;
-                            //let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
+                            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
@@ -899,7 +898,6 @@ class B52 {
                         $("#B52WorkBookTable").children().last().prev().css("background",B52Settings.workbookColors.posask);
                         $("#B52WorkBookTable").children().last().prev().attr("priceat","true");
 
-                        //currPrice = parseFloat(workbook.bids[0][0]);
                         cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0])-B52Settings.workbookEmptyCells*step)
                         {
@@ -909,8 +907,7 @@ class B52 {
                             let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1]));
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
-                            let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.bidscale;
-                            //let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
+                            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
