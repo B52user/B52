@@ -1046,6 +1046,8 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        var colaPerc = "";
+                        var lastColaPercPrice = 0;
                         let worldIsChangingThisTime = (that.#_scrollPriceChanged2==null||new Date().getTime()-that.#_scrollPriceChanged2>B52Settings.workbookAutoScroll*1000);
                         let workbook = that.Binance.WorkBook2;
                         if(workbook==null) return;
