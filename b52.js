@@ -900,6 +900,7 @@ class B52 {
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
+                        step = parseFloat(step.toFixed(form.length));
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
                         console.log(theForm);
@@ -1021,6 +1022,7 @@ class B52 {
                         if(workbook==null) return;
                         let scale = B52Settings.workBookScale2;
                         let step = parseFloat(form)*scale;
+                        step = parseFloat(step.toFixed(form.length));
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
                         $("#B52WorkBookTable2").empty();
