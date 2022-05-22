@@ -928,14 +928,14 @@ class B52 {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
                             if(sum>maxOfTwo)maxOfTwo=sum;
-                            let scaleSize = Math.round(100*sum/maxOfTwo);
+                            let scaleSize = Math.round(100*sum/(maxOfTwo*B52Settings.workBookScaleInc));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
-                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -962,12 +962,12 @@ class B52 {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
                             if(sum>maxOfTwo)maxOfTwo=sum;
-                            let scaleSize = Math.round(100*sum/maxOfTwo);
+                            let scaleSize = Math.round(100*sum/(maxOfTwo*B52Settings.workBookScaleInc));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
-                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -1048,14 +1048,14 @@ class B52 {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
                             if(sum>maxOfTwo2)maxOfTwo2=sum;
-                            let scaleSize = Math.round(100*sum/maxOfTwo2);
+                            let scaleSize = Math.round(100*sum/(maxOfTwo2*B52Settings.workBookScaleInc2));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
-                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -1082,12 +1082,12 @@ class B52 {
                                 sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
                             }
                             if(sum>maxOfTwo2)maxOfTwo2=sum;
-                            let scaleSize = Math.round(100*sum/maxOfTwo2);
+                            let scaleSize = Math.round(100*sum/(maxOfTwo2*B52Settings.workBookScaleInc2));
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
-                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                    ${B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick)}
                                 </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
