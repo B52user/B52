@@ -340,8 +340,8 @@ var B52HTML =
             <div style="width:30px;height:100%;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <input type="range" min="1" max="30" value="5" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBDepth">500</button>
-                <button style="margin-left:4px;width:38px;height:40px;" id="B52WBCent">CE</button>
+                <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBDepth">500</button>
+                <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBCent">CE</button>
             </div>
         <div>
     </div>
