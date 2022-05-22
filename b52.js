@@ -316,9 +316,13 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:200px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:200px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;display:flex;" hid="true">
         <div class="B52WorkbookContainer">
             <table id="B52WorkBookTable">
+            </table>
+        </div>
+        <div class="B52WorkbookContainer">
+            <table id="B52WorkBookTable2">
             </table>
         </div>
     </div>
