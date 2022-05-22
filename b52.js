@@ -282,7 +282,7 @@ var B52HTML =
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
             <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">Inc</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
-            <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton5">Log</button>
+            <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton5">Sets</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
