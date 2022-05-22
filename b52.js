@@ -861,6 +861,9 @@ class B52 {
                         let currPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
+                        let toCut = step.toString().replace('.','').length;
+                        let precPrice = currPrice.toFixed(theTick);
+                        currPrice = parseFloat(precPrice.substring(0,precPrice.length-toCut));
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
@@ -886,7 +889,7 @@ class B52 {
                         $("#B52WorkBookTable").children().last().prev().css("background",B52Settings.workbookColors.posask);
                         $("#B52WorkBookTable").children().last().prev().attr("priceat","true");
 
-                        currPrice = parseFloat(workbook.bids[0][0]);
+                        //currPrice = parseFloat(workbook.bids[0][0]);
                         let cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
                         {
