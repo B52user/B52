@@ -9,9 +9,10 @@ var B52Settings =
     marketOrderPrice : 0.08,
     numberOfTakes:5,
     minnotal: 5,
-    workBookScale:10,
+    workBookScale:5,
     workBookScaleInc:0.2,
-    workbookEmptyCells:20,
+    workbookEmptyCells:10,
+    workbookDollars:true,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -309,7 +310,7 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:160px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:200px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;" hid="true">
         <div class="B52WorkbookContainer">
             <table id="B52WorkBookTable">
             </table>
@@ -882,14 +883,25 @@ class B52 {
                             //do red business
                             let prevPrice = currPrice;
                             currPrice-=step;
-                            let presum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice).map(b=>parseFloat(b[1]));
-                            let sum = presum.length?presum.reduce((c,d)=>c+d):0;
+                            let presum = workbook.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
+                            let sum = 0;
+                            if(B52Settings.workbookDollars)
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+                            }
+                            else
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+                            }
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
+                            
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
-                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
+                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
@@ -904,13 +916,23 @@ class B52 {
                             //do red business
                             let prevPrice = currPrice;
                             currPrice-=step;
-                            let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice).map(b=>parseFloat(b[1]));
-                            let sum = presum.length?presum.reduce((c,d)=>c+d):0;
+                            let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+                            let sum = 0;
+                            if(B52Settings.workbookDollars)
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+                            }
+                            else
+                            {
+                                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+                            }
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
                             let control = `
                             <tr class="B52WBrow" style="background:${cola}">
-                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
+                                <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">
+                                    ${B52Settings.workbookDollars?"$":""}${sum.toFixed(theTick)}
+                                </td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
                             $("#B52WorkBookTable").append(control);
