@@ -11,6 +11,7 @@ var B52Settings =
     minnotal: 5,
     workBookScale:5,
     workBookScaleInc:2,
+    workbookEmptyCells:20,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -56,7 +57,7 @@ var B52Settings =
         newAlertButtons:["//div[@id='overlap-manager-root']//tr[.//span[starts-with(text(),'Add alert on')]]","//div[@id='overlap-manager-root']//li[.//span[starts-with(text(),'Add alert on')]]"],
         yesButton:"//button[starts-with(@class,'actionButton') and @name='yes']",
     },
-    workBookDepth:500,
+    workBookDepth:100,
     binanceSettings:{
         serverUrl:"https://fapi.binance.com/",
         orderUrl:"fapi/v1/order",
@@ -831,7 +832,8 @@ class B52 {
     }
 
     #_workbook_lock;
-    #_scrollPrice1;
+    #_wbFrom;
+    #_wbTo;
     #_scrollPriceChanged1;
     SERVICE_MakeWorBookService(){
         let that = this;
@@ -858,15 +860,19 @@ class B52 {
                         let workbook = that.Binance.WorkBook;
                         let scale = B52Settings.workBookScale;
                         let step = parseFloat(form)*scale;
-                        let currPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
-                        let precPrice = currPrice.toFixed(theForm-1);
-                        currPrice = parseFloat(precPrice);
                         $("#B52WorkBookTable").empty();
                         let maxOfTwo1 = Math.max(...workbook.asks.map(a=>parseFloat(a[1])));
                         let maxOfTwo2 = Math.max(...workbook.bids.map(a=>parseFloat(a[1])));
                         let maxOfTwo = (maxOfTwo1>maxOfTwo2?maxOfTwo1:maxOfTwo2)*B52Settings.workBookScaleInc*B52Settings.workBookScale;
+                        if(that.#_wbFrom==null)
+                        {
+                            let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
+                            let precPrice = topPrice.toFixed(theForm-1);
+                            that.#_wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
+                        }
+                        let currPrice = that.#_wbFrom;
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
@@ -876,9 +882,9 @@ class B52 {
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.askscale;
-                            let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
+                            //let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
                             let control = `
-                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}"${scrollHere}}>
+                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -899,9 +905,9 @@ class B52 {
                             let sum = presum.length?presum.reduce((c,d)=>c+d):0;
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.bidscale;
-                            let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
+                            //let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
                             let control = `
-                            <tr class="B52WBrow" style="background:${cola}"${scrollHere}}>
+                            <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -912,17 +918,16 @@ class B52 {
                         if(that.#_scrollPriceChanged1==null||new Date().getTime()-that.#_scrollPriceChanged1>10000)
                         {
                             //refresh time
-                            $("tr[scrollhere='true']").attr("scrollhere","false");
-                            $("tr[priceat='true']").attr("scrollhere","true");
-                            that.#_scrollPrice1 = $("tr[scrollhere='true']").children().last().text();
                             that.#_scrollPriceChanged1 = new Date().getTime();
+                            $("tr[priceat='true']")[0].scrollIntoView({
+                                behavior: 'auto',
+                                block: 'center',
+                                inline: 'center'
+                            });
+                            let topPrice = parseFloat(workbook.asks[workbook.asks.length-1][0]);
+                            let precPrice = topPrice.toFixed(theForm-1);
+                            that.#_wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
                         }
-                        
-                        $("tr[scrollhere='true']")[0].scrollIntoView({
-                            behavior: 'auto',
-                            block: 'center',
-                            inline: 'center'
-                        });
                     });
                 });
             });
