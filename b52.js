@@ -15,7 +15,7 @@ var B52Settings =
     workBookScaleInc2:1.5,
     workbookEmptyCells:10,
     workbookDollars:true,
-    workbookAutoScroll:3000,
+    workbookAutoScroll:10000,
     workBookDepth:100,
 	sButtons : 
 	[
@@ -415,13 +415,13 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
-                console.log(parseFloat(scaleSlider.value));
+                that.#_scrollPriceChanged1 = null;
+                that.#_scrollPriceChanged2 = null;
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
                 B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/10;
                 B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/10;
-                console.log(parseFloat(scaleSlider2.value)/10);
         };
     }
 
@@ -903,7 +903,6 @@ class B52 {
                         step = parseFloat(step.toFixed(form.length));
                         let theTick = tick<1?tick.toString().length-2:0;
                         let theForm = step<1?step.toString().length-2:0;
-                        console.log(theForm);
                         $("#B52WorkBookTable").empty();
                         var maxOfTwo = 1;
                         if(worldIsChangingThisTime)
