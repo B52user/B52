@@ -78,7 +78,8 @@ var B52Settings =
         askscale:"rgb(114 15 15 / 88%)",
         bidscale:"rgb(169 86 0)",
         big1:"rgba(175, 162, 0)",
-        big2:"rgba(126, 0, 181)"
+        big2:"rgba(126, 0, 181)",
+        empty:"rgba(0, 0, 0, .6)"
     }
 }
 
@@ -873,6 +874,7 @@ class B52 {
                             that.#_wbFrom = parseFloat(precPrice)-B52Settings.workbookEmptyCells*step;
                         }
                         let currPrice = that.#_wbFrom;
+                        let cola = "";
                         while(currPrice>parseFloat(workbook.asks[0][0]))
                         {
                             //do red business
@@ -883,8 +885,9 @@ class B52 {
                             let scaleSize = Math.round(100*sum/maxOfTwo);
                             let scaleColor = scaleSize>50?scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1:B52Settings.workbookColors.askscale;
                             //let scrollHere = currPrice.toFixed(theForm)==that.#_scrollPrice1?" scrollhere=\"true\" ":"";
+                            cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
                             let control = `
-                            <tr class="B52WBrow" style="background:${B52Settings.workbookColors.ask}">
+                            <tr class="B52WBrow" style="background:${cola}">
                                 <td style="width: 50px;background:linear-gradient(to right,${scaleColor} ${scaleSize}%, transparent 0) no-repeat;">${sum.toFixed(theTick)}</td>
                                 <td>${currPrice.toFixed(theForm)}</td>
                             <tr>`;
@@ -895,7 +898,7 @@ class B52 {
                         $("#B52WorkBookTable").children().last().prev().attr("priceat","true");
 
                         //currPrice = parseFloat(workbook.bids[0][0]);
-                        let cola = B52Settings.workbookColors.posbid;
+                        cola = B52Settings.workbookColors.posbid;
                         while(currPrice>parseFloat(workbook.bids[workbook.bids.length-1][0]))
                         {
                             //do red business
