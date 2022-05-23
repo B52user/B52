@@ -1201,7 +1201,7 @@ class B52Stakan{
         diff.forEach(tr=>{
             let sid = "#"+this.#_uniqieid+tr.priceText.replace(".","_");
             $(sid).css("background",tr.background);
-            $("tr[priceat='true']").attr("priceat","false");
+            $(this.#_table).children("tr[priceat='true']").attr("priceat","false");
             if(tr.thisIsPrice) $(sid).attr("priceat","true");
             $(sid).children("td").eq(1).text(tr.sumText); 
             $(sid).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
