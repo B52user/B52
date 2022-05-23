@@ -1247,20 +1247,21 @@ class B52Stakan{
     #_lastColaPercPrice;
     #_maxSum;
     #_wbFrom;
-    constructor(tableElement,form,tick,sets,wb){
+    #_uniqieid;
+    constructor(tableElement,form,tick,sets,wb,uniqueid){
         this.#_table = tableElement;
         this.#_sets = sets;
         this.#_form = form;
         this.#_tick = tick;
         this.#_wb = wb;
+        this.#_uniqieid = uniqueid;
     }
 
     ReDraw(){
-        console.log("redraw");
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
-            html+=`<tr id="B52${tr.priceText.replace(".","_")}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
+            html+=`<tr id="${this.#_uniqieid}${tr.priceText.replace(".","_")}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
             <td style="width:5px;background:${tr.scaleColor}"></td>
             <td style="width: 50px;background:linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat;">
             ${tr.sumText}
@@ -1273,16 +1274,16 @@ class B52Stakan{
 
     #_lastProcessedWB;
     Refine(newwb){
-        console.log("refine");
         this.#_wb = newwb;
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
         diff.forEach(tr=>{
-            $("#B52"+tr.priceText.replace(".","_")).css("background",tr.background);
-            if(tr.thisIsPrice) $("#B52"+tr.priceText.replace(".","_")).attr("priceat","true");
-            $("#B52"+tr.priceText.replace(".","_")).children("td").eq(1).text(tr.sumText); 
-            $("#B52"+tr.priceText.replace(".","_")).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
+            let sid = "#"+this.#_uniqieid+tr.priceText.replace(".","_");
+            $(sid).css("background",tr.background);
+            if(tr.thisIsPrice) $(sid).attr("priceat","true");
+            $(sid).children("td").eq(1).text(tr.sumText); 
+            $(sid).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
         });
         this.#_lastProcessedWB = pb;
     }
