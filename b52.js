@@ -1250,6 +1250,11 @@ class B52Stakan{
         this.#_tick = tick;
         this.#_wb = wb;
         this.#_uniqieid = uniqueid;
+        this.#_colaPerc = null;
+        this.#_lastColaPercPrice = null;
+        this.#_maxSum = null;
+        this.#_wbFrom = null;
+        this.#_lastProcessedWB = null;
     }
 
     ReDraw(){
