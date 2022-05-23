@@ -892,6 +892,10 @@ class B52 {
     //B52Stakan
     #_workbook_lock;
     #_stakan1;
+
+    #_scrollPriceChanged1; // delete
+    #_scrollPriceChanged2; //delete
+
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -925,10 +929,12 @@ class B52 {
             });
         });
     }
+
+    
     /*
     #_workbook_lock;
     #_wbFrom;
-    #_scrollPriceChanged1;
+    
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -1386,7 +1392,6 @@ class B52Stakan{
     }
 
     Center(){
-        that.#_scrollPriceChanged1 = new Date().getTime();
         $("tr[priceat='true']")[0].scrollIntoView({
             behavior: 'auto',
             block: 'center',
