@@ -690,10 +690,11 @@ class B52 {
         let wSrv = this.SERVICE_MakeWorBookService();
         wSrv.Start();
         this.#_srvs["Workbook1"] = wSrv;
-
+/*
         let wSrv2 = this.SERVICE_MakeWorBookService2();
         wSrv2.Start();
         this.#_srvs["Workbook2"] = wSrv2;
+        */
     }
 
     SERVICE_MakeShitService(){
@@ -888,6 +889,43 @@ class B52 {
         return ordService;
     }
 
+    //B52Stakan
+    #_workbook_lock;
+    #_stakan1;
+    SERVICE_MakeWorBookService(){
+        let that = this;
+        this.#_workbook_lock = false;
+        let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS);
+        wbSrv.Actions.push(()=>{
+            if(!that.#_workbook_lock)
+                {
+                    that.#_workbook_lock = true;
+                    that.Binance.MARKET_GetCurrentOrderBook().then(wb=>{
+                        that.Binance.WorkBook = wb;
+                        that.#_workbook_lock = false;
+                        //run events
+                        that.Binance._eventWorkbookChanged.forEach(a=>a());
+                    });
+                }
+        });
+        
+        that.Binance._eventWorkbookChanged.push(()=>{
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
+                    that.Binance.MARKET_GetTickSize(currency).then(tick=>{
+                        if(this.#_stakan1==null) this.#_stakan1 = new B52Stakan(
+                            document.getElementById("B52WorkBookTable"),
+                            form,
+                            tick,
+                            B52Settings,
+                            that.Binance.WorkBook
+                        );
+                    });
+                });
+            });
+        });
+    }
+    /*
     #_workbook_lock;
     #_wbFrom;
     #_scrollPriceChanged1;
@@ -1157,6 +1195,7 @@ class B52 {
         });
         return wbSrv;
     }
+    */
 
     CALC = {
         GetTakes:(maxTakes,minNotal,amount,minTick,price) => {
@@ -1180,6 +1219,179 @@ class B52 {
             }
             return toReturn;
         }
+    }
+}
+
+class B52Stakan{
+    #_table;
+    #_sets;
+    #_form;
+    #_tick;
+    #_wb;
+    #_colaPerc;
+    #_lastColaPercPrice;
+    #_maxSum;
+    #_wbFrom;
+    constructor(tableElement,form,tick,sets,wb){
+        this.#_table = tableElement;
+        this.#_sets = sets;
+        this.#_form = form;
+        this.#_tick = tick;
+        this.#_wb = wb;
+    }
+
+    ReDraw(){
+        let html = "";
+        this.#_lastProcessedWB = this.ProcessWB();
+        this.#_lastProcessedWB.forEach(tr=>{
+            html+=`<tr id="B52${tr.priceText}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
+            <td style="width:5px;background:${tr.scaleColor}"></td>
+            <td style="width: 50px;background:linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat;">
+            ${tr.sumText}
+            </td>
+            <td>${tr.priceText}</td>
+            <tr>`;
+        });
+        this.#_table.innerHTML =  html;
+    }
+
+    #_lastProcessedWB;
+    Refine(){
+        let pb = this.ProcessWB();
+        //only change what required
+        let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
+        diff.forEach(tr=>{
+            $("#B52"+tr.priceText).css("background",tr.background);
+            if(tr.thisIsPrice) $("#B52"+tr.priceText).attr("priceat","true");
+            $("#B52"+tr.priceText).children("td").eq(1).text(tr.sumText); 
+            $("#B52"+tr.priceText).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
+        });
+        this.#_lastProcessedWB = pb;
+    }
+
+    ProcessWB(){
+        //out json
+        let scale = B52Settings.workBookScale;
+        let step = parseFloat(this.#_form)*scale;
+        step = parseFloat(step.toFixed(this.#_form.length));
+        //num of decimals in sum
+        let theTick = this.#_tick<1?tick.toString().length-2:0;
+        //num of decimals in price
+        let theForm = step<1?step.toString().length-2:0;
+        if(this.#_wbFrom == null)
+        {
+            //calcualte start of the wb
+            let topPrice = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
+            let precPrice = topPrice.toFixed(theForm-1);
+            this.#_wbFrom = parseFloat(precPrice)+this.#_sets.workbookEmptyCells*step;
+        }
+        let currPrice = that.#_wbFrom;
+        let cola = "";
+        let toReturn = [];
+        while(currPrice>parseFloat(this.#_wb.asks[0][0])) {
+            let prevPrice = currPrice;
+            currPrice-=step;
+            let presum = this.#_wb.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
+            let sum = 0;
+            //calc sums based on sumof USD or sumof coins
+            if(this.#_sets.workbookDollars)
+            {
+                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+            }
+            else
+            {
+                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+            }
+            //find max sum of the Stakan, to highlight
+            if(sum>this.#_maxSum)this.#_maxSum=sum;
+                            
+            //size of bar
+            let scaleSize = Math.round(100*sum/(maxOfTwo*this.#_sets.workBookScaleInc));
+            //color of bar
+            let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
+            //color of the background main
+            cola = sum==0?this.#_sets.workbookColors.empty:this.#_sets.workbookColors.ask;
+            //colorize high volume 1 and high volume 2
+            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>this.#_sets.workBookColorPerc)
+            {
+                this.#_colaPerc = this.#_colaPerc==this.#_sets.workbookColors.bar025_1?this.#_sets.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                this.#_lastColaPercPrice = currPrice;
+            }
+            //we are ready to add element
+            toReturn.push({
+                background:cola,
+                scaleColor:this.#_colaPerc,
+                barColor:scaleColor,
+                barSize: scaleSize,
+                sumText:this.#_sets.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                priceText:currPrice.toFixed(theForm),
+                thisIsPrice: false
+            });
+        }
+        //set top as a price
+        toReturn[toReturn.length-1].background = this.#_sets.workbookColors.posask;
+        toReturn[toReturn.length-1].thisIsPrice = true;
+
+        //color top of bids
+        cola = this.#_sets.workbookColors.posbid;
+        while(currPrice>parseFloat(this.#_wb.bids[this.#_wb.bids.length-1][0])-this.#_sets.workbookEmptyCells*step)
+        {
+            let prevPrice = currPrice;
+            currPrice-=step;
+            let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+            let sum = 0;
+            //calc sums based on sumof USD or sumof coins
+            if(this.#_sets.workbookDollars)
+            {
+                sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
+            }
+            else
+            {
+                sum = presum.length?presum.map(b=>parseFloat(b[1])).reduce((c,d)=>c+d):0;
+            }
+            //find max sum of the Stakan, to highlight
+            if(sum>this.#_maxSum)this.#_maxSum=sum;
+
+            //size of bar
+            let scaleSize = Math.round(100*sum/(maxOfTwo*this.#_sets.workBookScaleInc));
+            //color of bar
+            let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
+
+            //colorize high volume 1 and high volume 2
+            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>this.#_sets.workBookColorPerc)
+            {
+                this.#_colaPerc = this.#_colaPerc==this.#_sets.workbookColors.bar025_1?this.#_sets.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                this.#_lastColaPercPrice = currPrice;
+            }
+            //we are ready to add element
+            toReturn.push({
+                background:cola,
+                scaleColor:this.#_colaPerc,
+                barColor:scaleColor,
+                barSize: scaleSize,
+                sumText:this.#_sets.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                priceText:currPrice.toFixed(theForm),
+                thisIsPrice: false
+            });
+            //sometimes it is null
+            if(sum==0){
+                cola = this.#_sets.workbookColors.empty;
+                toReturn[toReturn.length-1].background = this.#_sets.workbookColors.empty;
+            }
+            else
+            {
+                cola = this.#_sets.workbookColors.bid;
+            }
+        }
+    }
+
+    Center(){
+        that.#_scrollPriceChanged1 = new Date().getTime();
+        $("tr[priceat='true']")[0].scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
     }
 }
 
