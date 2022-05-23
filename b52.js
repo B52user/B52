@@ -1253,6 +1253,7 @@ class B52Stakan{
     }
 
     ReDraw(){
+        console.log("redraw");
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
@@ -1269,6 +1270,7 @@ class B52Stakan{
 
     #_lastProcessedWB;
     Refine(){
+        console.log("refine");
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
