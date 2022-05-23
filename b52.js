@@ -933,6 +933,7 @@ class B52 {
                 });
             });
         });
+        return wbSrv;
     }
 
     
