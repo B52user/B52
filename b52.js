@@ -928,7 +928,10 @@ class B52 {
                             );
                             this.#_stakan1.ReDraw();
                         }
-                        else this.#_stakan1.Refine();
+                        else {
+                            this.#_stakan1.Center();
+                            this.#_stakan1.ReDraw();
+                        }
                     });
                 });
             });
@@ -1269,8 +1272,9 @@ class B52Stakan{
     }
 
     #_lastProcessedWB;
-    Refine(){
+    Refine(newwb){
         console.log("refine");
+        this.#_wb = newwb;
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
