@@ -1080,7 +1080,7 @@ class B52Stakan{
         let step = parseFloat(this.#_form)*scale;
         step = parseFloat(step.toFixed(this.#_form.length));
         //num of decimals in sum
-        let theTick = this.#_tick<1?tick.toString().length-2:0;
+        let theTick = this.#_tick<1?this.#_tick.toString().length-2:0;
         //num of decimals in price
         let theForm = step<1?step.toString().length-2:0;
         if(this.#_wbFrom == null)
