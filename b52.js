@@ -422,8 +422,7 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
-                that.#_scrollPriceChanged1 = null;
-                that.#_scrollPriceChanged2 = null;
+                that.#_stakan1 = null;
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
@@ -433,12 +432,10 @@ class B52 {
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
             $("#B52WBDepth").text(B52Settings.workBookDepth);
-            that.#_scrollPriceChanged1 = null;
-            that.#_scrollPriceChanged2 = null;
+            that.#_stakan1 = null;
         });
         $("#B52WBCent").mouseup(()=>{
-            that.#_scrollPriceChanged1 = null;
-            that.#_scrollPriceChanged2 = null;
+            that.#_stakan1.Center();
         });
     }
 
@@ -1279,6 +1276,7 @@ class B52Stakan{
         diff.forEach(tr=>{
             let sid = "#"+this.#_uniqieid+tr.priceText.replace(".","_");
             $(sid).css("background",tr.background);
+            $("tr[priceat='true']").attr("priceat","false");
             if(tr.thisIsPrice) $(sid).attr("priceat","true");
             $(sid).children("td").eq(1).text(tr.sumText); 
             $(sid).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
