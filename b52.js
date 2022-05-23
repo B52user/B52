@@ -1350,7 +1350,7 @@ class B52Stakan{
         {
             let prevPrice = currPrice;
             currPrice-=step;
-            let presum = workbook.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+            let presum = this.#_wb.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
             let sum = 0;
             //calc sums based on sumof USD or sumof coins
             if(this.#_sets.workbookDollars)
