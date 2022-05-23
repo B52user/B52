@@ -1260,7 +1260,7 @@ class B52Stakan{
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
-            html+=`<tr id="B52${tr.priceText}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
+            html+=`<tr id="B52${tr.priceText.replace(".","_")}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
             <td style="width:5px;background:${tr.scaleColor}"></td>
             <td style="width: 50px;background:linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat;">
             ${tr.sumText}
@@ -1279,10 +1279,10 @@ class B52Stakan{
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
         diff.forEach(tr=>{
-            $("#B52"+tr.priceText).css("background",tr.background);
-            if(tr.thisIsPrice) $("#B52"+tr.priceText).attr("priceat","true");
-            $("#B52"+tr.priceText).children("td").eq(1).text(tr.sumText); 
-            $("#B52"+tr.priceText).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
+            $("#B52"+tr.priceText.replace(".","_")).css("background",tr.background);
+            if(tr.thisIsPrice) $("#B52"+tr.priceText.replace(".","_")).attr("priceat","true");
+            $("#B52"+tr.priceText.replace(".","_")).children("td").eq(1).text(tr.sumText); 
+            $("#B52"+tr.priceText.replace(".","_")).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
         });
         this.#_lastProcessedWB = pb;
     }
