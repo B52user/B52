@@ -888,6 +888,7 @@ class B52 {
         return ordService;
     }
 
+    #_lastCurrPair;
     #_workbook_lock;
     #_stakan1;
     SERVICE_MakeWorBookService(){
@@ -911,23 +912,25 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(this.#_stakan1==null) {
-                            this.#_stakan1 = new B52Stakan(
+                        if(currency!=that.#_lastCurrPair) that.#_stakan1 = null;
+                        if(that.#_stakan1==null) {
+                            that.#_stakan1 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable"),
                                 form,
                                 tick,
                                 that.Binance.WorkBook,
                                 "_1"
                             );
-                            this.#_stakan1.ReDraw();
-                            this.#_stakan1.Refine(that.Binance.WorkBook);
-                            this.#_stakan1.Center();
+                            that.#_stakan1.ReDraw();
+                            that.#_stakan1.Refine(that.Binance.WorkBook);
+                            that.#_stakan1.Center();
                         }
                         else {
-                            this.#_stakan1.Refine(that.Binance.WorkBook);
+                            that.#_stakan1.Refine(that.Binance.WorkBook);
                         }
                     });
                 });
+                that.#_lastCurrPair = currency;
             });
         });
         return wbSrv;
@@ -935,6 +938,7 @@ class B52 {
 
     #_workbook_lock2;
     #_stakan2;
+    #_lastCurrPair2;
     SERVICE_MakeWorBookService2(){
         let that = this;
         this.#_workbook_lock2 = false;
@@ -956,23 +960,25 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(this.#_stakan2==null) {
-                            this.#_stakan2 = new B52Stakan(
+                        if(currency!=that.#_lastCurrPair2) that.#_stakan2 = null;
+                        if(that.#_stakan2==null) {
+                            that.#_stakan2 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable2"),
                                 form,
                                 tick,
                                 that.Binance.WorkBook2,
                                 "_2"
                             );
-                            this.#_stakan2.ReDraw();
-                            this.#_stakan2.Refine(that.Binance.WorkBook2);
-                            this.#_stakan2.Center();
+                            that.#_stakan2.ReDraw();
+                            that.#_stakan2.Refine(that.Binance.WorkBook2);
+                            that.#_stakan2.Center();
                         }
                         else {
-                            this.#_stakan2.Refine(that.Binance.WorkBook2);
+                            that.#_stakan2.Refine(that.Binance.WorkBook2);
                         }
                     });
                 });
+                that.#_lastCurrPair2 = currency;
             });
         });
         return wbSrv;
