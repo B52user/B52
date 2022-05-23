@@ -596,8 +596,8 @@ class B52 {
     }
 
     BUTTON_B52CloseOpenButton(){
-        var closed = $("#B52CloseOpenButton").attr("closed")=="true";
-        var closed2 = $("#B52Tabs").attr("hid")=="true";
+        let closed = $("#B52CloseOpenButton").attr("closed")=="true";
+        let closed2 = $("#B52Tabs").attr("hid")=="true";
         if (closed)
         {
             //open
@@ -610,6 +610,9 @@ class B52 {
             {
                 $("#B52Tabs").show();$("#B52Workbook").show();
                 $("#B52TabButton1").mouseup();
+                //start workbook
+                this.Srvs.Workbook1.Start();
+                this.Srvs.Workbook2.Start();
             }
         }
         else
@@ -621,6 +624,10 @@ class B52 {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();$("#B52Workbook").hide();
+            this.Srvs.Workbook1.Stop();
+            this.Srvs.Workbook2.Stop();
+            this.Stakan1 = null;
+            this.Stakan2 = null;
         }
     }
 
@@ -659,6 +666,10 @@ class B52 {
             $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").hide();
             $("#B52Workbook").hide();
+            this.Srvs.Workbook1.Stop();
+            this.Srvs.Workbook2.Stop();
+            this.Stakan1 = null;
+            this.Stakan2 = null;
         }
         else
         {
@@ -666,6 +677,8 @@ class B52 {
             $("#B52Tabs").show();
             $("#B52Workbook").show();
             $("#B52TabButton1").mouseup();
+            this.Srvs.Workbook1.Start();
+            this.Srvs.Workbook2.Start();
         }
     }
 
