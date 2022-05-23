@@ -912,7 +912,11 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(currency!=that.#_lastCurrPair) that.#_stakan1 = null;
+                        if(currency!=that.#_lastCurrPair)
+                        {
+                            console.log("Currency changed");
+                            that.#_stakan1 = null;
+                        }
                         if(that.#_stakan1==null) {
                             that.#_stakan1 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable"),
@@ -960,7 +964,11 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(currency!=that.#_lastCurrPair2) that.#_stakan2 = null;
+                        if(currency!=that.#_lastCurrPair2) 
+                        {
+                            that.#_stakan2 = null;
+                            console.log("Currency changed");
+                        }
                         if(that.#_stakan2==null) {
                             that.#_stakan2 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable2"),
