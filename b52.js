@@ -917,13 +917,18 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(this.#_stakan1==null) this.#_stakan1 = new B52Stakan(
-                            document.getElementById("B52WorkBookTable"),
-                            form,
-                            tick,
-                            B52Settings,
-                            that.Binance.WorkBook
-                        );
+                        if(this.#_stakan1==null) {
+                            this.#_stakan1 = new B52Stakan(
+                                document.getElementById("B52WorkBookTable"),
+                                form,
+                                tick,
+                                B52Settings,
+                                that.Binance.WorkBook
+                                
+                            );
+                            this.#_stakan1.ReDraw();
+                        }
+                        else this.#_stakan1.Refine();
                     });
                 });
             });
