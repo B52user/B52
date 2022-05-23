@@ -16,8 +16,9 @@ var B52Settings =
     workbookEmptyCells:10,
     workbookDollars:true,
     workbookAutoScroll:120,
-    workBookDepth:500,
+    workBookDepth:100,
     workBookColorPerc:0.005,
+    workBookMaxRows:3000,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -927,7 +928,6 @@ class B52 {
                                 "_1"
                             );
                             that.Stakan1.ReDraw();
-                            that.Stakan1.Refine(that.Binance.WorkBook);
                             that.Stakan1.Center();
                         }
                         else {
@@ -980,7 +980,6 @@ class B52 {
                                 "_2"
                             );
                             that.Stakan2.ReDraw();
-                            that.Stakan2.Refine(that.Binance.WorkBook2);
                             that.Stakan2.Center();
                         }
                         else {
@@ -1085,14 +1084,19 @@ class B52Stakan{
         let theForm = step<1?step.toString().length-2:0;
         if(this.#_wbFrom == null)
         {
-            console.log("X"+this.uniqueid);
             //calcualte start of the wb
             let topPrice = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
             let precPrice = topPrice.toFixed(theForm-1);
             this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
-            console.log("Y"+this.#_wbFrom);
         }
         let currPrice = this.#_wbFrom;
+        let maxRowsPerPart = B52Settings.workBookMaxRows/2;
+        //decrease price to the max num of rows
+        if(((currPrice-parseFloat(this.#_wb.asks[0][0]))/step)>(B52Settings.workbookEmptyCells+B52Settings.workBookMaxRows/2))
+        {
+            //need to reduce to max
+            currPrice = parseFloat(this.#_wb.asks[0][0]+maxRowsPerPart*step);
+        }
         let cola = "";
         let toReturn = [];
         while(currPrice>parseFloat(this.#_wb.asks[0][0])) {
@@ -1189,6 +1193,8 @@ class B52Stakan{
             {
                 cola = B52Settings.workbookColors.bid;
             }
+            maxRowsPerPart--;
+            if(maxRowsPerPart==0) break;
         }
         return toReturn;
     }
