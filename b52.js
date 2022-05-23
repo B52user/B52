@@ -932,9 +932,10 @@ class B52 {
                         else {
                             that.Stakan1.Refine(that.Binance.WorkBook);
                         }
+                        that.#_lastCurrPair = currency;
                     });
                 });
-                that.#_lastCurrPair = currency;
+                
             });
         });
         return wbSrv;
@@ -984,9 +985,10 @@ class B52 {
                         else {
                             that.Stakan2.Refine(that.Binance.WorkBook2);
                         }
+                        that.#_lastCurrPair2 = currency;
                     });
                 });
-                that.#_lastCurrPair2 = currency;
+                
             });
         });
         return wbSrv;
