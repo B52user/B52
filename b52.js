@@ -1085,10 +1085,12 @@ class B52Stakan{
         let theForm = step<1?step.toString().length-2:0;
         if(this.#_wbFrom == null)
         {
+            console.log("X"+this.uniqueid);
             //calcualte start of the wb
             let topPrice = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
             let precPrice = topPrice.toFixed(theForm-1);
             this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
+            console.log("Y"+this.#_wbFrom);
         }
         let currPrice = this.#_wbFrom;
         let cola = "";
@@ -1134,7 +1136,6 @@ class B52Stakan{
             });
         }
         //set top as a price
-        if(!toReturn.length) return;
         toReturn[toReturn.length-1].background = B52Settings.workbookColors.posask;
         toReturn[toReturn.length-1].thisIsPrice = true;
 
