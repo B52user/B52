@@ -1297,7 +1297,7 @@ class B52Stakan{
             let precPrice = topPrice.toFixed(theForm-1);
             this.#_wbFrom = parseFloat(precPrice)+this.#_sets.workbookEmptyCells*step;
         }
-        let currPrice = that.#_wbFrom;
+        let currPrice = this.#_wbFrom;
         let cola = "";
         let toReturn = [];
         while(currPrice>parseFloat(this.#_wb.asks[0][0])) {
