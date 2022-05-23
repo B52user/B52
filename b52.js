@@ -922,9 +922,8 @@ class B52 {
                                 document.getElementById("B52WorkBookTable"),
                                 form,
                                 tick,
-                                B52Settings,
-                                that.Binance.WorkBook
-                                
+                                that.Binance.WorkBook,
+                                "_1"
                             );
                             this.#_stakan1.ReDraw();
                             this.#_stakan1.Refine(that.Binance.WorkBook);
@@ -1240,7 +1239,6 @@ class B52 {
 
 class B52Stakan{
     #_table;
-    #_sets;
     #_form;
     #_tick;
     #_wb;
@@ -1249,9 +1247,8 @@ class B52Stakan{
     #_maxSum;
     #_wbFrom;
     #_uniqieid;
-    constructor(tableElement,form,tick,sets,wb,uniqueid){
+    constructor(tableElement,form,tick,wb,uniqueid){
         this.#_table = tableElement;
-        this.#_sets = sets;
         this.#_form = form;
         this.#_tick = tick;
         this.#_wb = wb;
@@ -1303,7 +1300,7 @@ class B52Stakan{
             //calcualte start of the wb
             let topPrice = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
             let precPrice = topPrice.toFixed(theForm-1);
-            this.#_wbFrom = parseFloat(precPrice)+this.#_sets.workbookEmptyCells*step;
+            this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
         }
         let currPrice = this.#_wbFrom;
         let cola = "";
@@ -1314,7 +1311,7 @@ class B52Stakan{
             let presum = this.#_wb.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
             let sum = 0;
             //calc sums based on sumof USD or sumof coins
-            if(this.#_sets.workbookDollars)
+            if(B52Settings.workbookDollars)
             {
                 sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
             }
@@ -1326,15 +1323,15 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
                             
             //size of bar
-            let scaleSize = Math.round(100*sum/(this.#_maxSum*this.#_sets.workBookScaleInc));
+            let scaleSize = Math.round(100*sum/(this.#_maxSum*B52Settings.workBookScaleInc));
             //color of bar
-            let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
+            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
             //color of the background main
-            cola = sum==0?this.#_sets.workbookColors.empty:this.#_sets.workbookColors.ask;
+            cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
             //colorize high volume 1 and high volume 2
-            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>this.#_sets.workBookColorPerc)
+            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
             {
-                this.#_colaPerc = this.#_colaPerc==this.#_sets.workbookColors.bar025_1?this.#_sets.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                this.#_colaPerc = this.#_colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                 this.#_lastColaPercPrice = currPrice;
             }
             //we are ready to add element
@@ -1343,25 +1340,25 @@ class B52Stakan{
                 scaleColor:this.#_colaPerc,
                 barColor:scaleColor,
                 barSize: scaleSize,
-                sumText:this.#_sets.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                sumText:B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
                 priceText:currPrice.toFixed(theForm),
                 thisIsPrice: false
             });
         }
         //set top as a price
-        toReturn[toReturn.length-1].background = this.#_sets.workbookColors.posask;
+        toReturn[toReturn.length-1].background = B52Settings.workbookColors.posask;
         toReturn[toReturn.length-1].thisIsPrice = true;
 
         //color top of bids
-        cola = this.#_sets.workbookColors.posbid;
-        while(currPrice>parseFloat(this.#_wb.bids[this.#_wb.bids.length-1][0])-this.#_sets.workbookEmptyCells*step)
+        cola = B52Settings.workbookColors.posbid;
+        while(currPrice>parseFloat(this.#_wb.bids[this.#_wb.bids.length-1][0])-B52Settings.workbookEmptyCells*step)
         {
             let prevPrice = currPrice;
             currPrice-=step;
             let presum = this.#_wb.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
             let sum = 0;
             //calc sums based on sumof USD or sumof coins
-            if(this.#_sets.workbookDollars)
+            if(B52Settings.workbookDollars)
             {
                 sum = presum.length?presum.map(b=>parseFloat(b[1])*parseFloat(b[0])).reduce((c,d)=>c+d):0;
             }
@@ -1373,14 +1370,14 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
 
             //size of bar
-            let scaleSize = Math.round(100*sum/(this.#_maxSum*this.#_sets.workBookScaleInc));
+            let scaleSize = Math.round(100*sum/(this.#_maxSum*B52Settings.workBookScaleInc));
             //color of bar
-            let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
+            let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
 
             //colorize high volume 1 and high volume 2
-            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>this.#_sets.workBookColorPerc)
+            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
             {
-                this.#_colaPerc = this.#_colaPerc==this.#_sets.workbookColors.bar025_1?this.#_sets.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
+                this.#_colaPerc = this.#_colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                 this.#_lastColaPercPrice = currPrice;
             }
             //we are ready to add element
@@ -1389,18 +1386,18 @@ class B52Stakan{
                 scaleColor:this.#_colaPerc,
                 barColor:scaleColor,
                 barSize: scaleSize,
-                sumText:this.#_sets.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                sumText:B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
                 priceText:currPrice.toFixed(theForm),
                 thisIsPrice: false
             });
             //sometimes it is null
             if(sum==0){
-                cola = this.#_sets.workbookColors.empty;
-                toReturn[toReturn.length-1].background = this.#_sets.workbookColors.empty;
+                cola = B52Settings.workbookColors.empty;
+                toReturn[toReturn.length-1].background = B52Settings.workbookColors.empty;
             }
             else
             {
-                cola = this.#_sets.workbookColors.bid;
+                cola = B52Settings.workbookColors.bid;
             }
         }
         return toReturn;
