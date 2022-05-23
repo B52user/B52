@@ -916,6 +916,7 @@ class B52 {
                         {
                             console.log("Currency changed");
                             that.Stakan1 = null;
+                            that.#_lastCurrPair = currency;
                         }
                         if(that.Stakan1==null) {
                             that.Stakan1 = new B52Stakan(
@@ -932,7 +933,6 @@ class B52 {
                         else {
                             that.Stakan1.Refine(that.Binance.WorkBook);
                         }
-                        that.#_lastCurrPair = currency;
                     });
                 });
                 
@@ -969,6 +969,7 @@ class B52 {
                         {
                             that.Stakan2 = null;
                             console.log("Currency changed");
+                            that.#_lastCurrPair2 = currency;
                         }
                         if(that.Stakan2==null) {
                             that.Stakan2 = new B52Stakan(
@@ -985,7 +986,6 @@ class B52 {
                         else {
                             that.Stakan2.Refine(that.Binance.WorkBook2);
                         }
-                        that.#_lastCurrPair2 = currency;
                     });
                 });
                 
