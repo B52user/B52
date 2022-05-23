@@ -422,8 +422,8 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
-                that.#_stakan1 = null;
-                that.#_stakan2 = null;
+                that.Stakan1 = null;
+                that.Stakan2 = null;
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
@@ -433,12 +433,12 @@ class B52 {
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
             $("#B52WBDepth").text(B52Settings.workBookDepth);
-            that.#_stakan1 = null;
-            that.#_stakan2 = null;
+            that.Stakan1 = null;
+            that.Stakan2 = null;
         });
         $("#B52WBCent").mouseup(()=>{
-            that.#_stakan1.Center();
-            that.#_stakan2.Center();
+            that.Stakan1.Center();
+            that.Stakan2.Center();
         });
     }
 
@@ -890,7 +890,7 @@ class B52 {
 
     #_lastCurrPair;
     #_workbook_lock;
-    #_stakan1;
+    Stakan1;
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
@@ -915,22 +915,22 @@ class B52 {
                         if(currency!=that.#_lastCurrPair)
                         {
                             console.log("Currency changed");
-                            that.#_stakan1 = null;
+                            that.Stakan1 = null;
                         }
-                        if(that.#_stakan1==null) {
-                            that.#_stakan1 = new B52Stakan(
+                        if(that.Stakan1==null) {
+                            that.Stakan1 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable"),
                                 form,
                                 tick,
                                 that.Binance.WorkBook,
                                 "_1"
                             );
-                            that.#_stakan1.ReDraw();
-                            that.#_stakan1.Refine(that.Binance.WorkBook);
-                            that.#_stakan1.Center();
+                            that.Stakan1.ReDraw();
+                            that.Stakan1.Refine(that.Binance.WorkBook);
+                            that.Stakan1.Center();
                         }
                         else {
-                            that.#_stakan1.Refine(that.Binance.WorkBook);
+                            that.Stakan1.Refine(that.Binance.WorkBook);
                         }
                     });
                 });
@@ -941,7 +941,7 @@ class B52 {
     }
 
     #_workbook_lock2;
-    #_stakan2;
+    Stakan2;
     #_lastCurrPair2;
     SERVICE_MakeWorBookService2(){
         let that = this;
@@ -966,23 +966,23 @@ class B52 {
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
                         if(currency!=that.#_lastCurrPair2) 
                         {
-                            that.#_stakan2 = null;
+                            that.Stakan2 = null;
                             console.log("Currency changed");
                         }
-                        if(that.#_stakan2==null) {
-                            that.#_stakan2 = new B52Stakan(
+                        if(that.Stakan2==null) {
+                            that.Stakan2 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable2"),
                                 form,
                                 tick,
                                 that.Binance.WorkBook2,
                                 "_2"
                             );
-                            that.#_stakan2.ReDraw();
-                            that.#_stakan2.Refine(that.Binance.WorkBook2);
-                            that.#_stakan2.Center();
+                            that.Stakan2.ReDraw();
+                            that.Stakan2.Refine(that.Binance.WorkBook2);
+                            that.Stakan2.Center();
                         }
                         else {
-                            that.#_stakan2.Refine(that.Binance.WorkBook2);
+                            that.Stakan2.Refine(that.Binance.WorkBook2);
                         }
                     });
                 });
