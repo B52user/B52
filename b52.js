@@ -1395,6 +1395,7 @@ class B52Stakan{
                 cola = this.#_sets.workbookColors.bid;
             }
         }
+        return toReturn;
     }
 
     Center(){
