@@ -932,7 +932,6 @@ class B52 {
                         }
                         else {
                             this.#_stakan1.Refine(that.Binance.WorkBook);
-                            this.#_stakan1.Center();
                         }
                     });
                 });
