@@ -1318,7 +1318,7 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
                             
             //size of bar
-            let scaleSize = Math.round(100*sum/(maxOfTwo*this.#_sets.workBookScaleInc));
+            let scaleSize = Math.round(100*sum/(this.#_maxSum*this.#_sets.workBookScaleInc));
             //color of bar
             let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
             //color of the background main
@@ -1365,7 +1365,7 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
 
             //size of bar
-            let scaleSize = Math.round(100*sum/(maxOfTwo*this.#_sets.workBookScaleInc));
+            let scaleSize = Math.round(100*sum/(this.#_maxSum*this.#_sets.workBookScaleInc));
             //color of bar
             let scaleColor = scaleSize>50?(scaleSize>90?this.#_sets.workbookColors.big2:this.#_sets.workbookColors.big1):this.#_sets.workbookColors.bidscale;
 
