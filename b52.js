@@ -1134,6 +1134,7 @@ class B52Stakan{
             });
         }
         //set top as a price
+        if(!toReturn.length) return;
         toReturn[toReturn.length-1].background = B52Settings.workbookColors.posask;
         toReturn[toReturn.length-1].thisIsPrice = true;
 
