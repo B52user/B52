@@ -18,7 +18,7 @@ var B52Settings =
     workbookAutoScroll:120,
     workBookDepth:100,
     workBookColorPerc:0.005,
-    workBookMaxRows:3000,
+    workBookMaxRows:1000,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
