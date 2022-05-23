@@ -1274,7 +1274,7 @@ class B52Stakan{
     #_lastProcessedWB;
     Refine(newwb){
         console.log("refine");
-        //this.#_wb = newwb;
+        this.#_wb = newwb;
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
