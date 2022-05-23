@@ -1332,7 +1332,7 @@ class B52Stakan{
             //color of the background main
             cola = sum==0?B52Settings.workbookColors.empty:B52Settings.workbookColors.ask;
             //colorize high volume 1 and high volume 2
-            if(this.#_colaPerc==""||(this.#_lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
+            if(this.#_colaPerc==null||(this.#_lastColaPercPrice-currPrice)/currPrice>B52Settings.workBookColorPerc)
             {
                 this.#_colaPerc = this.#_colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                 this.#_lastColaPercPrice = currPrice;
