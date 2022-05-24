@@ -1257,6 +1257,18 @@ class B52Stakan{
             redraw:false
         };
     }
+
+    DrawOrders(orders){
+        orders.forEach(ord=>{
+            let price = ord.price=="0"?ord.stopPrice:ord.price;
+            let sid = "#"+this.#_uniqieid+price.replace(".","_");
+            let col = ord.side=="BUY"?"green":"red";
+            if($(sid).length)
+            {
+                $(sid).css("border","2px solid "+col);
+            }
+        });
+    }
 }
 
 class B52Tv {
