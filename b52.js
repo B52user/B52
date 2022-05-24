@@ -423,8 +423,8 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
-                that.Stakan1 = null;
-                that.Stakan2 = null;
+                that.Stakan1.ReDraw();
+                that.Stakan2.ReDraw();
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
@@ -434,8 +434,8 @@ class B52 {
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
             $("#B52WBDepth").text(B52Settings.workBookDepth);
-            that.Stakan1 = null;
-            that.Stakan2 = null;
+            that.Stakan1.ReDraw();
+            that.Stakan2.ReDraw();
         });
         $("#B52WBCent").mouseup(()=>{
             that.Stakan1.Center();
@@ -610,6 +610,11 @@ class B52 {
             {
                 $("#B52Tabs").show();$("#B52Workbook").show();
                 $("#B52TabButton1").mouseup();
+                console.log("starting");
+                this.Srvs.Workbook1.Start();
+                this.Srvs.Workbook2.Start();
+                this.Stakan1.Center();
+                this.Stakan2.Center();
             }
         }
         else
@@ -621,6 +626,9 @@ class B52 {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();$("#B52Workbook").hide();
+            console.log("stopping");
+            this.Srvs.Workbook1.Stop();
+            this.Srvs.Workbook2.Stop();
         }
     }
 
@@ -659,6 +667,8 @@ class B52 {
             $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").hide();
             $("#B52Workbook").hide();
+            this.Srvs.Workbook1.Stop();
+            this.Srvs.Workbook2.Stop();
         }
         else
         {
@@ -666,6 +676,10 @@ class B52 {
             $("#B52Tabs").show();
             $("#B52Workbook").show();
             $("#B52TabButton1").mouseup();
+            this.Srvs.Workbook1.Start();
+            this.Srvs.Workbook2.Start();
+            this.Stakan1.Center();
+            this.Stakan2.Center();
         }
     }
 
@@ -699,7 +713,7 @@ class B52 {
 
     SERVICE_MakeShitService(){
         let that = this;
-        let shitService = new B52Service(200);
+        let shitService = new B52Service("Shit",200);
         //gray buttons observer
         shitService.Actions.push(()=>{
             //check gray buttons
@@ -739,7 +753,7 @@ class B52 {
     SERVICE_MakeRiskService(){
         let that = this;
         this.#_openedPositions_lock = false;
-        let risksrv = new B52Service(B52Settings.positionsServiceIntervalMS);
+        let risksrv = new B52Service("Risk",B52Settings.positionsServiceIntervalMS);
         risksrv.Actions.push(()=>{
             if(!that.#_openedPositions_lock)
                 {
@@ -831,7 +845,7 @@ class B52 {
     SERVICE_MakeOrderService(){
         let that = this;
         this.#_openedOrders_lock = false;
-        let ordService = new B52Service(B52Settings.ordersSerciceIntervalMS);
+        let ordService = new B52Service("Order",B52Settings.ordersSerciceIntervalMS);
         ordService.Actions.push(()=>{
             if(!that.#_openedOrders_lock)
                 {
@@ -894,7 +908,7 @@ class B52 {
     SERVICE_MakeWorBookService(){
         let that = this;
         this.#_workbook_lock = false;
-        let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS);
+        let wbSrv = new B52Service("WorkBook1",B52Settings.workbookSerciceIntervalMS);
         wbSrv.Actions.push(()=>{
             if(!that.#_workbook_lock)
                 {
@@ -940,7 +954,7 @@ class B52 {
     SERVICE_MakeWorBookService2(){
         let that = this;
         this.#_workbook_lock2 = false;
-        let wbSrv = new B52Service(B52Settings.workbookSerciceIntervalMS2);
+        let wbSrv = new B52Service("WorkBook2",B52Settings.workbookSerciceIntervalMS2);
         wbSrv.Actions.push(()=>{
             if(!that.#_workbook_lock2)
                 {
@@ -1061,10 +1075,10 @@ class B52Stakan{
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
+        $(this.#_table).find("tr[priceat='true']").attr("priceat","false");
         diff.forEach(tr=>{
             let sid = "#"+this.#_uniqieid+tr.priceText.replace(".","_");
             $(sid).css("background",tr.background);
-            $(this.#_table).children("tr[priceat='true']").attr("priceat","false");
             if(tr.thisIsPrice) $(sid).attr("priceat","true");
             $(sid).children("td").eq(1).text(tr.sumText); 
             $(sid).children("td").eq(1).css("background",`linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat`);
@@ -2013,28 +2027,32 @@ class B52Service
 {
     #_freq;
     #_service;
+    #_name;
     Actions;
-    constructor(freq){
+    static Srvs = [];
+    constructor(name,freq){
         this.#_freq = freq;
+        this.#_name = name;
         this.Actions = [];
     }
     Start() {
 		let that = this;
+        if(this.#_service!=null) this.Stop();
 		this.#_service = setInterval(()=>{
 			for (let i = 0; i < that.Actions.length; i++) {
  			   that.Actions[i]();
 			}
 		}
-        , this.freq);
+        , this.#_freq);
+        B52Service.Srvs.push({name:this.#_name,id:this.#_service});
 	}
 	Stop() {
+        B52Service.Srvs = B52Service.Srvs.filter(a=>a.id!=this.#_service);
 		clearInterval(this.#_service);
 	}
 }
 
 var b52 = new B52();
-b52.Binance.SetAccessKey(B52Settings.accessKey1);
-b52.Binance.SetSecretKey(B52Settings.secretKey1);
 
 
 //libs afterall
