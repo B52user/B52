@@ -925,7 +925,7 @@ class B52 {
                         }
                         else {
                             //refine will redraw automatically if required
-                            that.Stakan1.Refine(that.Binance.WorkBook);
+                            that.Stakan1.Refine(that.Binance.WorkBook,form,tick);
                         }
                     });
                 });
@@ -971,7 +971,7 @@ class B52 {
                         }
                         else {
                             //refine will redraw automatically if required
-                            that.Stakan2.Refine(that.Binance.WorkBook2);
+                            that.Stakan2.Refine(that.Binance.WorkBook2,form,tick);
                         }
                     });
                 });
