@@ -13,12 +13,12 @@ var B52Settings =
     workBookScaleInc:1.5,
     workBookScale2:5,
     workBookScaleInc2:1.5,
-    workbookEmptyCells:10,
+    workbookEmptyCells:20,
     workbookDollars:true,
     workbookAutoScroll:120,
     workBookDepth:100,
     workBookColorPerc:0.005,
-    workBookMaxRows:1000,
+    workBookMaxRows:600,
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -432,7 +432,7 @@ class B52 {
                 B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/10;
         };
         $("#B52WBDepth").mouseup(()=>{
-            B52Settings.workBookDepth=(B52Settings.workBookDepth==100?500:(B52Settings.workBookDepth==500?1000:100))
+            B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
             $("#B52WBDepth").text(B52Settings.workBookDepth);
             that.Stakan1 = null;
             that.Stakan2 = null;
@@ -610,9 +610,6 @@ class B52 {
             {
                 $("#B52Tabs").show();$("#B52Workbook").show();
                 $("#B52TabButton1").mouseup();
-                //start workbook
-                this.Srvs.Workbook1.Start();
-                this.Srvs.Workbook2.Start();
             }
         }
         else
@@ -624,10 +621,6 @@ class B52 {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();$("#B52Workbook").hide();
-            this.Srvs.Workbook1.Stop();
-            this.Srvs.Workbook2.Stop();
-            this.Stakan1 = null;
-            this.Stakan2 = null;
         }
     }
 
@@ -666,10 +659,6 @@ class B52 {
             $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").hide();
             $("#B52Workbook").hide();
-            this.Srvs.Workbook1.Stop();
-            this.Srvs.Workbook2.Stop();
-            this.Stakan1 = null;
-            this.Stakan2 = null;
         }
         else
         {
@@ -677,8 +666,6 @@ class B52 {
             $("#B52Tabs").show();
             $("#B52Workbook").show();
             $("#B52TabButton1").mouseup();
-            this.Srvs.Workbook1.Start();
-            this.Srvs.Workbook2.Start();
         }
     }
 
@@ -902,7 +889,6 @@ class B52 {
         return ordService;
     }
 
-    #_lastCurrPair;
     #_workbook_lock;
     Stakan1;
     SERVICE_MakeWorBookService(){
@@ -926,12 +912,6 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(currency!=that.#_lastCurrPair)
-                        {
-                            console.log("Currency changed");
-                            that.Stakan1 = null;
-                            that.#_lastCurrPair = currency;
-                        }
                         if(that.Stakan1==null) {
                             that.Stakan1 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable"),
@@ -944,6 +924,7 @@ class B52 {
                             that.Stakan1.Center();
                         }
                         else {
+                            //refine will redraw automatically if required
                             that.Stakan1.Refine(that.Binance.WorkBook);
                         }
                     });
@@ -956,7 +937,6 @@ class B52 {
 
     #_workbook_lock2;
     Stakan2;
-    #_lastCurrPair2;
     SERVICE_MakeWorBookService2(){
         let that = this;
         this.#_workbook_lock2 = false;
@@ -978,12 +958,6 @@ class B52 {
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(currency!=that.#_lastCurrPair2) 
-                        {
-                            that.Stakan2 = null;
-                            console.log("Currency changed");
-                            that.#_lastCurrPair2 = currency;
-                        }
                         if(that.Stakan2==null) {
                             that.Stakan2 = new B52Stakan(
                                 document.getElementById("B52WorkBookTable2"),
@@ -996,6 +970,7 @@ class B52 {
                             that.Stakan2.Center();
                         }
                         else {
+                            //refine will redraw automatically if required
                             that.Stakan2.Refine(that.Binance.WorkBook2);
                         }
                     });
@@ -1041,6 +1016,7 @@ class B52Stakan{
     #_maxSum;
     #_wbFrom;
     #_uniqieid;
+    #_wbEnd;
     constructor(tableElement,form,tick,wb,uniqueid){
         this.#_table = tableElement;
         this.#_form = form;
@@ -1052,9 +1028,11 @@ class B52Stakan{
         this.#_maxSum = null;
         this.#_wbFrom = null;
         this.#_lastProcessedWB = null;
+        this.#_wbEnd = null;
     }
 
     ReDraw(){
+        console.log(this.#_uniqieid+" redraw");
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
@@ -1067,11 +1045,21 @@ class B52Stakan{
             <tr>`;
         });
         this.#_table.innerHTML =  html;
+        this.Center();
     }
 
     #_lastProcessedWB;
-    Refine(newwb){
+    Refine(newwb,form,tick){
+        this.#_form = form;
+        this.#_tick = tick;
         this.#_wb = newwb;
+        //calculate if we are redrawing
+        if(this.CalcBorders().redraw) 
+        {
+            this.ReDraw();
+            return;
+        }
+        console.log(this.#_uniqieid+" refine");
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
@@ -1095,27 +1083,25 @@ class B52Stakan{
         let theTick = this.#_tick<1?this.#_tick.toString().length-2:0;
         //num of decimals in price
         let theForm = step<1?step.toString().length-2:0;
-        if(this.#_wbFrom == null)
+        let borders = this.CalcBorders();
+        if(borders.redraw)
         {
-            //calcualte start of the wb
-            let topPrice = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
-            let precPrice = topPrice.toFixed(theForm-1);
-            this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
+            this.#_wbFrom = borders.from;
+            this.#_wbEnd = borders.to;
         }
+        
         let currPrice = this.#_wbFrom;
-        let maxRowsPerPart = B52Settings.workBookMaxRows/2;
-        //decrease price to the max num of rows
-        if(((currPrice-parseFloat(this.#_wb.asks[0][0]))/step)>(B52Settings.workbookEmptyCells+B52Settings.workBookMaxRows/2))
-        {
-            //need to reduce to max
-            currPrice = parseFloat(this.#_wb.asks[0][0]+maxRowsPerPart*step);
-        }
+        
         let cola = "";
         let toReturn = [];
         while(currPrice>parseFloat(this.#_wb.asks[0][0])) {
             let prevPrice = currPrice;
             currPrice-=step;
-            let presum = this.#_wb.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
+            let presum = 0;
+            if(currPrice<=borders.askFrom)
+            {
+                presum = this.#_wb.asks.filter(a=>parseFloat(a[0])>currPrice&&parseFloat(a[0])<=prevPrice);
+            }
             let sum = 0;
             //calc sums based on sumof USD or sumof coins
             if(B52Settings.workbookDollars)
@@ -1158,11 +1144,15 @@ class B52Stakan{
 
         //color top of bids
         cola = B52Settings.workbookColors.posbid;
-        while(currPrice>parseFloat(this.#_wb.bids[this.#_wb.bids.length-1][0])-B52Settings.workbookEmptyCells*step)
+        while(currPrice>this.#_wbEnd)
         {
             let prevPrice = currPrice;
             currPrice-=step;
-            let presum = this.#_wb.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+            let presum = 0;
+            if(currPrice>=borders.bidEnd)
+            {
+                presum = this.#_wb.bids.filter(a=>parseFloat(a[0])>=currPrice&&parseFloat(a[0])<prevPrice);
+            }
             let sum = 0;
             //calc sums based on sumof USD or sumof coins
             if(B52Settings.workbookDollars)
@@ -1213,11 +1203,64 @@ class B52Stakan{
     }
 
     Center(){
-        $("tr[priceat='true']")[0].scrollIntoView({
-            behavior: 'auto',
-            block: 'center',
-            inline: 'center'
-        });
+        let that = this;
+        if($(that.#_table).find("tr[priceat='true']").length)
+        {
+            $(that.#_table).find("tr[priceat='true']")[0].scrollIntoView({
+                behavior: 'auto',
+                block: 'center',
+                inline: 'center'
+            });
+        }
+    }
+
+    CalcBorders(){
+        //calc data
+        let scale = B52Settings.workBookScale;
+        let step = parseFloat(this.#_form)*scale;
+        step = parseFloat(step.toFixed(this.#_form.length));
+        let theForm = step<1?step.toString().length-2:0;
+        let maxRowsPerPart = B52Settings.workBookMaxRows/2-B52Settings.workbookEmptyCells;
+        let askStart = parseFloat(this.#_wb.asks[this.#_wb.asks.length-1][0]);
+        let askEnd = parseFloat(this.#_wb.asks[0][0]);
+        let bidStart = parseFloat(this.#_wb.bids[0][0]);
+        let bidEnd = parseFloat(this.#_wb.bids[this.#_wb.bids.length-1][0]);
+        //atjust the start to the max rows per stakan
+        let askStartAtjusted =  askStart;
+        if(((askStart-askEnd)/step)>maxRowsPerPart) {
+            askStartAtjusted = askEnd + maxRowsPerPart*step;
+            askStartAtjusted = parseFloat(askStartAtjusted.toFixed(theForm-1));
+        }
+        let bidEndAtjusted = bidEnd;
+        if(((bidStart-bidkEnd)/step)>maxRowsPerPart) {
+            bidEndAtjusted = bidStart + maxRowsPerPart*step;
+            bidEndAtjusted = parseFloat(bidEndAtjusted.toFixed(theForm-1));
+        }
+        
+        if (this.#_wbFrom==null|| //null
+            this.#_wbFrom==""|| //null
+            askStartAtjusted>this.#_wbFrom|| //hit top
+            bidEndAtjusted<this.#_wbEnd //hit bottom
+            ) 
+        {
+            let from = askStartAtjusted + B52Settings.workbookEmptyCells*step;
+            let to = bidEndAtjusted - B52Settings.workbookEmptyCells*step;
+            this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
+            return {
+                from:from,
+                to:to,
+                askFrom:askStartAtjusted,
+                bidEnd:bidEndAtjusted,
+                redraw:true
+            };
+        }
+        return {
+            from:this.#_wbFrom,
+            to:this.#_wbEnd,
+            askFrom:askStartAtjusted,
+            bidEnd:bidEndAtjusted,
+            redraw:false
+        };
     }
 }
 
