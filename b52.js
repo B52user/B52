@@ -1032,7 +1032,6 @@ class B52Stakan{
     }
 
     ReDraw(){
-        console.log(this.#_uniqieid+" redraw");
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
@@ -1059,7 +1058,6 @@ class B52Stakan{
             this.ReDraw();
             return;
         }
-        console.log(this.#_uniqieid+" refine");
         let pb = this.ProcessWB();
         //only change what required
         let diff = pb.filter(a=>!this.#_lastProcessedWB.some(b=>b.priceText==a.priceText&&b.sumText==a.sumText));
@@ -1196,8 +1194,6 @@ class B52Stakan{
             {
                 cola = B52Settings.workbookColors.bid;
             }
-            maxRowsPerPart--;
-            if(maxRowsPerPart==0) break;
         }
         return toReturn;
     }
@@ -1232,7 +1228,7 @@ class B52Stakan{
             askStartAtjusted = parseFloat(askStartAtjusted.toFixed(theForm-1));
         }
         let bidEndAtjusted = bidEnd;
-        if(((bidStart-bidkEnd)/step)>maxRowsPerPart) {
+        if(((bidStart-bidEnd)/step)>maxRowsPerPart) {
             bidEndAtjusted = bidStart + maxRowsPerPart*step;
             bidEndAtjusted = parseFloat(bidEndAtjusted.toFixed(theForm-1));
         }
@@ -1245,7 +1241,6 @@ class B52Stakan{
         {
             let from = askStartAtjusted + B52Settings.workbookEmptyCells*step;
             let to = bidEndAtjusted - B52Settings.workbookEmptyCells*step;
-            this.#_wbFrom = parseFloat(precPrice)+B52Settings.workbookEmptyCells*step;
             return {
                 from:from,
                 to:to,
