@@ -1229,7 +1229,7 @@ class B52Stakan{
         }
         let bidEndAtjusted = bidEnd;
         if(((bidStart-bidEnd)/step)>maxRowsPerPart) {
-            bidEndAtjusted = bidStart + maxRowsPerPart*step;
+            bidEndAtjusted = bidStart - maxRowsPerPart*step;
             bidEndAtjusted = parseFloat(bidEndAtjusted.toFixed(theForm-1));
         }
         
