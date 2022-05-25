@@ -10,9 +10,9 @@ var B52Settings =
     numberOfTakes:5,
     minnotal: 5,
     workBookScale:5,
-    workBookScaleInc:1.5,
+    workBookScaleInc:1,
     workBookScale2:5,
-    workBookScaleInc2:1.5,
+    workBookScaleInc2:1,
     workbookEmptyCells:20,
     workbookDollars:true,
     workbookAutoScroll:120,
@@ -340,7 +340,7 @@ var B52HTML =
         </div>
             <div style="width:30px;height:100%;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="30" value="5" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="30" value="15" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
                 <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBDepth">500</button>
                 <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBCent">CE</button>
             </div>
@@ -428,8 +428,8 @@ class B52 {
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
-                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/10;
-                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/10;
+                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
+                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
@@ -441,6 +441,7 @@ class B52 {
             that.Stakan1.Center();
             that.Stakan2.Center();
         });
+        $("#B52WBDepth").text(B52Settings.workBookDepth);
     }
 
     BUTTON_B52RenewTransactions(){
