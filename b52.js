@@ -1279,7 +1279,18 @@ class B52Stakan{
             let col = ord.side=="BUY"?"green":"red";
             if($(sid).length)
             {
-                $(sid).css("border","2px solid "+col);
+                $(sid).css("border","3px solid "+col);
+            }
+            else
+            {
+                //search for closest
+                let prices = $(this.#_table).find("tr").map(a=>$(a).children("td")[2].text());
+
+                let closest = prices.reduce(function(prev, curr) {
+                    return (Math.abs(parseFloat(curr) - price) < Math.abs(parseFloat(prev) - price) ? curr : prev);
+                });
+                sid = "#"+this.#_uniqieid+closest.replace(".","_");
+                $(sid).css("border","3px solid "+col);
             }
         });
     }
