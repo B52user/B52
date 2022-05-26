@@ -77,7 +77,8 @@ var B52Settings =
         balance:"fapi/v1/balance",
         workbook: "fapi/v1/depth",
         income:"fapi/v1/income",
-        workbook2:"api/v3/depth"
+        workbook2:"api/v3/depth",
+        kindle:"fapi/v1/klines"
     },
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
@@ -1574,6 +1575,7 @@ class BinanceAdapter {
     _eventOpenPositionsChanged;
     OpenedOrders;
     _eventOpenOrdersChanged;
+    get ExchangeInfo(){return this.#_exchangeInfo}
     #_exchangeInfo;
     WorkBook;
     WorkBook2;
@@ -2075,6 +2077,7 @@ class B52Service
 }
 
 var b52 = new B52();
+
 
 
 //libs afterall
