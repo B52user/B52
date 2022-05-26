@@ -1279,6 +1279,7 @@ class B52Stakan{
     DrawOrders(orders){
         $("tr[isorder='true']").css("border","0px");
         $("tr[isorder='true']").attr("isorder","false");
+        if(!orders.length) return;
         orders.forEach(ord=>{
             let price = ord.price=="0"?ord.stopPrice:ord.price;
             let sid = "#"+this.#_uniqieid+price.replace(".","_");
