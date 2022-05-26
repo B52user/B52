@@ -902,7 +902,7 @@ class B52 {
             });
         });
         that.Binance._eventOpenOrdersChanged.push(()=>{
-            that.Stakan1.DrawOrders(that.Stakan1.OpenedOrders);
+            that.Stakan1.DrawOrders(that.Binance.OpenedOrders);
         });
         return ordService;
     }
@@ -1279,6 +1279,7 @@ class B52Stakan{
     DrawOrders(orders){
         $("tr[isorder='true']").css("border","0px");
         $("tr[isorder='true']").attr("isorder","false");
+        console.log("ords:"+orders.length);
         if(!orders.length) return;
         orders.forEach(ord=>{
             let price = ord.price=="0"?ord.stopPrice:ord.price;
