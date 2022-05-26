@@ -901,6 +901,9 @@ class B52 {
                 });
             });
         });
+        that.Binance._eventOpenOrdersChanged.push(()=>{
+            that.Stakan1.DrawOrders(that.Stakan1.OpenedOrders);
+        });
         return ordService;
     }
 
@@ -1274,6 +1277,8 @@ class B52Stakan{
     }
 
     DrawOrders(orders){
+        $("tr[isorder='true']").css("border","0px");
+        $("tr[isorder='true']").attr("isorder","false");
         orders.forEach(ord=>{
             let price = ord.price=="0"?ord.stopPrice:ord.price;
             let sid = "#"+this.#_uniqieid+price.replace(".","_");
@@ -1292,6 +1297,7 @@ class B52Stakan{
                 });
                 sid = "#"+this.#_uniqieid+closest.replace(".","_");
                 $(sid).css("border","3px solid "+col);
+                $(sid).attr("isorder","true");
             }
         });
     }
