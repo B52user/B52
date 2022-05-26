@@ -322,7 +322,7 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab5">Some 5555 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:200px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;display:flex;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:210px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;display:flex;" hid="true">
         <div>
             <div style="height:10px;background:rgba(82, 82, 82, 0.8);font-size:10px;">FUTURES</div>
             <div class="B52WorkbookContainer">
@@ -339,10 +339,10 @@ var B52HTML =
             </div>
         </div>
             <div style="width:30px;height:100%;">
-                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="30" value="15" id="B52WBBars" style="margin-left:5px;height:100px;width:35px;-webkit-appearance: slider-vertical;">
-                <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBDepth">500</button>
-                <button style="margin-left:4px;width:38px;height:40px;background:rgba(103, 103, 103, 0.3);" id="B52WBCent">CE</button>
+                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:140px;width:20px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="30" value="15" id="B52WBBars" style="margin-left:5px;height:140px;width:20px;-webkit-appearance: slider-vertical;">
+                <button style="margin-left:2px;width:20px;height:30px;background:rgba(103, 103, 103, 0.3);padding: 0px;font-size: 14px;" id="B52WBDepth">500</button>
+                <button style="margin-left:2px;width:20px;height:30px;background:rgba(103, 103, 103, 0.3);padding: 0px;font-size: 14px;" id="B52WBCent">CE</button>
             </div>
         <div>
     </div>
@@ -1285,7 +1285,7 @@ class B52Stakan{
             else
             {
                 //search for closest
-                let prices = $(this.#_table).find("tr").map(a=>$(a).children("td")[2].text());
+                let prices = $(this.#_table).find("tr").filter((a,b)=>$(b).children("td").length).map((a,b)=>$(b).children("td").eq(2).text());
 
                 let closest = prices.reduce(function(prev, curr) {
                     return (Math.abs(parseFloat(curr) - price) < Math.abs(parseFloat(prev) - price) ? curr : prev);
