@@ -44,9 +44,9 @@ class B52Robot_Carl{
 
 b52.Binance
 var r = new B52Robot_Carl({
-    currencyinfo:b52.Binance,
-    maxloss:"",
-    buypositions:"",
-    percent:"",
-    percmin:""
-},b52.Binance)
+    currencyinfo:b52.Binance.ExchangeInfo.symbols.filter(a=>a.symbol=="GMTUSDT")[0],
+    maxloss:0.2,
+    maxbuypositions:10,
+    percent:"auto",
+    percmin:"0.35"
+},b52.Binance);
