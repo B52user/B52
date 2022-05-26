@@ -905,7 +905,7 @@ class B52 {
             });
         });
         that.Binance._eventOpenOrdersChanged.push(()=>{
-            that.Stakan1.DrawOrders(that.Binance.OpenedOrders);
+            if(that.Stakan1!=null) that.Stakan1.DrawOrders(that.Binance.OpenedOrders);
         });
         return ordService;
     }
