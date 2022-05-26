@@ -199,6 +199,9 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
+        ::-webkit-scrollbar {
+            width: 8px;
+          }
 	</style>
     `,
 	B52AreaHtml : `
