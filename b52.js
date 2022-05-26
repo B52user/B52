@@ -1295,8 +1295,7 @@ class B52Stakan{
             else
             {
                 //search for closest
-                let prices = $(this.#_table).find("tr").filter((a,b)=>$(b).children("td").length).map((a,b)=>$(b).children("td").eq(2).text());
-
+                let prices = $(this.#_table).find("tr").filter((a,b)=>$(b).children("td").length).map((a,b)=>$(b).children("td").eq(2).text()).get();
                 let closest = prices.reduce(function(prev, curr) {
                     return (Math.abs(parseFloat(curr) - price) < Math.abs(parseFloat(prev) - price) ? curr : prev);
                 });
