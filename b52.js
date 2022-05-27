@@ -1004,7 +1004,7 @@ class B52 {
         return wbSrv;
     }
 
-    CALC = {
+    static CALC = {
         GetTakes:(maxTakes,minNotal,amount,minTick,price) => {
             let numOfTakes = (amount*price/minNotal)>=maxTakes?maxTakes:Math.floor(amount*price/minNotal);
             let oneTake = Math.floor(amount/numOfTakes/minTick)*minTick;
