@@ -27,7 +27,8 @@ var B52Settings =
         {name:"B52_NOW_0.2",color:"#cc3300"},
 		{name:"B52_NOW_0.5",color:"#cc3300"},
 		{name:"B52_NOW_1.0",color:"#cc3300"},
-        {name:"B52_TAKE_1",color:"#000099"}
+        {name:"B52_TAKE_1",color:"#000099"},
+        {name:"B52_ST.L_1",color:"rgba(165, 42, 42)"},
 	],
     positionsServiceIntervalMS : 1000,
     ordersSerciceIntervalMS : 1000,
