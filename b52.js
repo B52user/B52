@@ -1030,23 +1030,22 @@ class B52 {
         GetOrdersIntervalMaxLoss:(maxOrders,priceFrom,priceTo,stopLoss,maxLoss,minNotal,minTick,pricePerOrder)=>{
             let ordsToReturn = [];
             let minOfPrices  = [priceFrom,priceTo,stopLoss].min();
-            let maxprice = [priceFrom,priceTo,stopLoss].min();
             pricePerOrder = pricePerOrder/100;
             let calcedMedian = (priceFrom+priceTo)/2;
             let combinedLoss = Math.abs(calcedMedian - stopLoss)/stopLoss + pricePerOrder;
             let cotleta = maxLoss/combinedLoss;
             let tickPrice = minTick*minOfPrices; //regarding stop loss as we need to close position for sure
-            let cotletaInCoins = Math.ceil(cotleta/tickPrice);
+            let cotletaInTicks = Math.ceil(cotleta/tickPrice);
             let absMinOrder = (Math.ceil(minnotal/tickPrice) + 1)*tickPrice;
             let ordsNumber = 0;
             if((cotleta/absMinOrder)<1) return []; //imposible
             if((cotleta/absMinOrder)>maxOrders) ordsNumber = maxOrders;
             else ordsNumber = Math.ceil(cotleta/absMinOrder);
 
-            let eachOrderSizeCoins = cotletaInCoins/ordsNumber;
+            let eachOrderSizeInTicks = cotletaInTicks/ordsNumber;
             for(let i=0;i<ordsNumber;i++)
             {
-                ordsToReturn.push({quantity:eachOrderSizeCoins*tickPrice});
+                ordsToReturn.push({quantity:eachOrderSizeInTicks*minTick});
             }
 
             return ordsToReturn;
