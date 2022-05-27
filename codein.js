@@ -29,37 +29,47 @@ class B52Robot_Carl{
     #_positions;
     #_binance;
     #_perc;
-    #_renewcandle;
+    static Renewcandle = true;
+    static Srv = null;
     constructor(params,binance){
         this.#_params = params;
         this.#_binance = binance;
         if(this.#_params.percent!="auto") this.#_perc = parseFloat(this.#_params.percent);
-        this._renewcandle = true;
     }
     Start(){
         let that = this;
         //get last 5 m candle and add as data
-       this._get2Candle().then((c)=>{
-            that.#_lastCandle = c;
-           console.log(that.#_lastCandle);
-           //calc initial if required
-            let percTake = 0;
-            if(this.#_params.percent=="auto"){percTake=this._calcPerc();} else percTake = this.#_params.percent;
-            console.log("perctake "+percTake);
-            //run
+        this._renewCandleStart().then(()=>{
+            //create service and start it
+            B52Robot_Carl.Srv = new B52Service("B52Robot_Carl",500);
+            B52Robot_Carl.Srv.Actions.push(()=>{
+                //do all checks and staff
+                console.log("test");
+                
+            });
+            B52Robot_Carl.Srv.Start();
         });
+        
     }
     Stop(){
-
+        this._renewCandleStop();
+        B52Robot_Carl.Srv.Stop();
     }
     _renewCandleStart(){
-        if (!this.#_renewcandle) return;
-        this._get2Candle().then((c)=>{
-            
+        let that = this;
+        if (!B52Robot_Carl.Renewcandle) return;
+        return new Promise((s,f)=>{
+            that._get2Candle().then((c)=>{
+                that.#_lastCandle = c;
+                console.log(that.#_lastCandle);
+                console.log((c.timeToRefresh.getTime()-(new Date()).getTime()));
+                setTimeout(that._renewCandleStart.bind(that),(c.timeToRefresh.getTime()-(new Date()).getTime()));
+                s();
+            });
         });
     }
     _renewCandleStop(){
-        this.#_renewcandle = false;
+        B52Robot_Carl.Renewcandle = false;
     }
     _calcPerc(){
         let calcPerc = 50*Math.abs(this.#_lastCandle.high - this.#_lastCandle.low) / this.#_lastCandle.low;
@@ -68,6 +78,7 @@ class B52Robot_Carl{
     }
     _klineToCandle(kline){
         return {
+            id:kline[0],
             timeStart:new Date(kline[0]),
             timeEnd:new Date(kline[6]),
             high:parseFloat(kline[2]),
