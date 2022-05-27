@@ -1036,16 +1036,19 @@ class B52 {
             let cotleta = maxLoss/combinedLoss;
             let tickPrice = minTick*minOfPrices; //regarding stop loss as we need to close position for sure
             let cotletaInTicks = Math.ceil(cotleta/tickPrice);
-            let absMinOrder = (Math.ceil(minnotal/tickPrice) + 1)*tickPrice;
+            let absMinOrder = (Math.ceil(minNotal/tickPrice) + 1)*tickPrice;
             let ordsNumber = 0;
             if((cotleta/absMinOrder)<1) return []; //imposible
             if((cotleta/absMinOrder)>maxOrders) ordsNumber = maxOrders;
             else ordsNumber = Math.ceil(cotleta/absMinOrder);
 
             let eachOrderSizeInTicks = cotletaInTicks/ordsNumber;
+            let priceStep = (priceFrom - priceTo)/ordsNumber; //could be negative
+            let currPrice = priceFrom + priceStep;
             for(let i=0;i<ordsNumber;i++)
             {
-                ordsToReturn.push({quantity:eachOrderSizeInTicks*minTick});
+                ordsToReturn.push({quantity:eachOrderSizeInTicks*minTick,price:currPrice});
+                currPrice += priceStep;
             }
 
             return ordsToReturn;
