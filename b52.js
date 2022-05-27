@@ -1027,30 +1027,33 @@ class B52 {
             return toReturn;
         },
 
-        GetOrdersIntervalMaxLoss:(maxOrders,priceFrom,priceTo,stopLoss,maxLoss,minNotal,minTick,pricePerOrder)=>{
+        GetOrdersIntervalMaxLoss:(maxOrders,priceFrom,priceTo,stopLoss,maxLoss,minNotal,minTick,pricePerOrder,priceDigNumber)=>{
             let ordsToReturn = [];
-            let minOfPrices  = [priceFrom,priceTo,stopLoss].min();
+            let minOfPrices  = Math.min(...[priceFrom,priceTo,stopLoss]);
             pricePerOrder = pricePerOrder/100;
             let calcedMedian = (priceFrom+priceTo)/2;
             let combinedLoss = Math.abs(calcedMedian - stopLoss)/stopLoss + pricePerOrder;
             let cotleta = maxLoss/combinedLoss;
-            let tickPrice = minTick*minOfPrices; //regarding stop loss as we need to close position for sure
-            let cotletaInTicks = Math.ceil(cotleta/tickPrice);
-            let absMinOrder = (Math.ceil(minNotal/tickPrice) + 1)*tickPrice;
+            let tickPrice = parseFloat((minTick*minOfPrices).toFixed(priceDigNumber)); //regarding stop loss as we need to close position for sure
+            let cotletaInTicks = Math.floor(cotleta/tickPrice);
+            let absMinOrderInTicks = Math.floor(minNotal/tickPrice) + 1;
             let ordsNumber = 0;
-            if((cotleta/absMinOrder)<1) return []; //imposible
-            if((cotleta/absMinOrder)>maxOrders) ordsNumber = maxOrders;
-            else ordsNumber = Math.ceil(cotleta/absMinOrder);
 
-            let eachOrderSizeInTicks = cotletaInTicks/ordsNumber;
-            let priceStep = (priceFrom - priceTo)/ordsNumber; //could be negative
+            if((cotletaInTicks/absMinOrderInTicks)<1) return []; //imposible
+            if((cotletaInTicks/absMinOrderInTicks)>maxOrders) ordsNumber = maxOrders;
+            else ordsNumber = Math.floor(cotletaInTicks/absMinOrderInTicks);
+
+            let eachOrderSizeInTicks = Math.ceil(cotletaInTicks/ordsNumber);
+            let priceStep = (priceTo - priceFrom)/ordsNumber; //could be negative
+            let minTickDigs = minTick.toString().includes(".")?minTick.toString().split(".")[1].length:0;
+            let quantity = (eachOrderSizeInTicks*minTick).toFixed(minTickDigs);
             let currPrice = priceFrom + priceStep;
             for(let i=0;i<ordsNumber;i++)
             {
-                ordsToReturn.push({quantity:eachOrderSizeInTicks*minTick,price:currPrice});
+                
+                ordsToReturn.push({quantity:quantity,price:currPrice.toFixed(priceDigNumber)});
                 currPrice += priceStep;
             }
-
             return ordsToReturn;
         }
     }
