@@ -48,15 +48,27 @@ class B52Robot_Carl{
             B52Robot_Carl.Srv = new B52Service("B52Robot_Carl",500);
             B52Robot_Carl.Srv.Actions.push(()=>{
                 that.#_binance.MARKET_GetPrice(that.#_params.currencyinfo.symbol).then(currprice=>{
-                    //1. cancell all that not started and depricated
-                    that.#_positions = that.#_positions.filter(a=>a.candle.id==that.#_lastCandle.id||a.orders.length);
+                    //1. cancell all that not started
+                    that.#_positions = that.#_positions.filter(a=>a.orders.length);
                     let bords = that._calcFromToLos();
                     let potentialPositions = B52.CALC.GetOrdersIntervalMaxLoss(10,bords.from,bords.to,bords.loss,that.#_params.maxloss,B52Settings.minnotal,tick,2*B52Settings.marketOrderPrice,precisionNumber);
-                    console.log(potentialPositions);
                     //exclude positions that already in game
                     let existingMaxPrice = parseFloat(that.#_params.direction == "BUY"? Math.max(...that.#_positions.map(a=>a.price)) : Math.min(...that.#_positions.map(a=>a.price)));
                     potentialPositions = potentialPositions.filter(a=>(that.#_params.direction == "BUY")?parseFloat(a.price)>existingMaxPrice:parseFloat(a.price)<existingMaxPrice);
                     console.log(potentialPositions);
+                    potentialPositions.forEach(p=>{
+                        that.#_positions.push({
+                            orders:[],
+                            position:p,
+                            enterPrice:parseFloat(p.price),
+                            price:null
+                        });
+                    });
+                    that.#_positions.filter(a=>(that.#_params.direction == "BUY")?a.enterPrice>currprice:a.enterPrice<currprice).forEach(p=>{
+                        console.log("Buy "+currprice+" "+p.enterPrice);
+                        p.price = currprice;
+                        p.orders.push({xxx:""});
+                    });
                 });
             });
             B52Robot_Carl.Srv.Start();
@@ -96,14 +108,14 @@ class B52Robot_Carl{
         if(that.#_params.direction=="BUY")
         {
             from = parseFloat((that.#_lastCandle.high+that.#_lastCandle.low)/2);
-            to = parseFloat(that.#_lastCandle.low + 0.1*(that.#_lastCandle.high+that.#_lastCandle.low));
-            loss = parseFloat(that.#_lastCandle.low - 0.1*(that.#_lastCandle.high+that.#_lastCandle.low));
+            to = parseFloat(that.#_lastCandle.low + 0.1*(that.#_lastCandle.high-that.#_lastCandle.low));
+            loss = parseFloat(that.#_lastCandle.low - 0.1*(that.#_lastCandle.high-that.#_lastCandle.low));
         }
         else
         {
             from = parseFloat((that.#_lastCandle.high+that.#_lastCandle.low)/2);
-            to = parseFloat(that.#_lastCandle.high - 0.1*(that.#_lastCandle.high+that.#_lastCandle.low));
-            loss = parseFloat(that.#_lastCandle.high + 0.1*(that.#_lastCandle.high+that.#_lastCandle.low));
+            to = parseFloat(that.#_lastCandle.high + 0.1*(that.#_lastCandle.high-that.#_lastCandle.low));
+            loss = parseFloat(that.#_lastCandle.high - 0.1*(that.#_lastCandle.high-that.#_lastCandle.low));
         }
         return {from:from,to:to,loss:loss};
     }
@@ -138,16 +150,17 @@ class B52Robot_Carl{
     }
 }
 
+var r = null;
 B52Tv.GetCurrentCurrencyPair().then(currency=>{
-    var r = new B52Robot_Carl({
-        currencyinfo:b52.Binance.ExchangeInfo.symbols.filter(a=>a.symbol=="GMTUSDT")[0],
+    r = new B52Robot_Carl({
+        currencyinfo:b52.Binance.ExchangeInfo.symbols.filter(a=>a.symbol==currency)[0],
         maxloss:0.4,
         maxbuypositions:10,
         percent:"auto",
         percmin:0.35,
-        direction:"BUY"
+        direction:"SELL"
     },b52.Binance);
     r.Start();
 });
 
-console.log(b52.CALC.GetOrdersIntervalMaxLoss(20,1.471,1.461,1.477,0.5,5,0.1,0.16,3));
+console.log(B52.CALC.GetOrdersIntervalMaxLoss(20,1.471,1.461,1.477,0.5,5,0.1,0.16,3));
