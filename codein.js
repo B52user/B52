@@ -58,7 +58,7 @@ class Gennadiy_Soplizhuy{
                         }).then(openOrd=>{
                             p.ordOpen = openOrd;
                             p.state = "opened";
-                            p.price = openOrd.price;
+                            p.price = currprice;
                             //and stoploss
                             that.#_binance.ORDERS_NewOrder({
                                 symbol: that.#_params.currencyinfo.symbol,
@@ -83,7 +83,7 @@ class Gennadiy_Soplizhuy{
                             side: that.#_params.direction=="BUY"?"SELL":"BUY"
                         }).then(next=>{
                             //cancel stoploss associated
-                            that.#_binance.ORDERS_ChancelSingleOrder(p.stOrder.orderId,p.stOrder.symbol);
+                            //that.#_binance.ORDERS_ChancelSingleOrder(p.stOrder.orderId,p.stOrder.symbol);
                         });
                         let toAdd = {diff:((p.price-currprice)*parseFloat(p.position.quantity)).toFixed(2),open:p.price,close:currprice,quantity:p.position.quantity};
                         console.log(toAdd);
