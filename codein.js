@@ -58,7 +58,7 @@ class Gennadiy_Soplizhuy{
                         }).then(openOrd=>{
                             p.ordOpen = openOrd;
                             p.state = "opened";
-                            p.price = currprice;
+                            p.price = openOrd.price;
                             //and stoploss
                             that.#_binance.ORDERS_NewOrder({
                                 symbol: that.#_params.currencyinfo.symbol,
@@ -75,6 +75,16 @@ class Gennadiy_Soplizhuy{
                         
                     });
                     positions.filter(a=>a.state=="close").forEach(p=>{
+                        //fix
+                        that.#_binance.ORDERS_NewOrder({
+                            symbol: that.#_params.currencyinfo.symbol,
+                            type: "MARKET",
+                            quantity: p.openOrd.origQty,
+                            side: that.#_params.direction=="BUY"?"SELL":"BUY"
+                        }).then(next=>{
+                            //cancel stoploss associated
+                            that.#_binance.ORDERS_ChancelSingleOrder(p.stOrder.orderId,p.stOrder.symbol);
+                        });
                         let toAdd = {diff:((p.price-currprice)*parseFloat(p.position.quantity)).toFixed(2),open:p.price,close:pr,quantity:p.position.quantity};
                         console.log(toAdd);
                         that.Closed.push(toAdd);
@@ -183,7 +193,7 @@ class Gennadiy_Soplizhuy{
             p.state = "open";
             p.busy = true;
             p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*calcPerc/100),
-            p.stop = loss
+            p.stop = loss.toFixed(precisionNumber)
         });
     
         //_06_act_set_close = () => {
@@ -210,7 +220,7 @@ var r = null;
 B52Tv.GetCurrentCurrencyPair().then(currency=>{
     r = new Gennadiy_Soplizhuy({
         currencyinfo:b52.Binance.ExchangeInfo.symbols.filter(a=>a.symbol==currency)[0],
-        maxloss:0.4,
+        maxloss:0.2,
         maxbuypositions:10,
         percent:"auto",
         percmin:0.35,
@@ -275,7 +285,8 @@ function Gennadiy_Soplizhuy_Tick(currprice,params,positions,lastcandle){
     positions.filter(a=>!a.busy).filter(b=>params.direction == "BUY"?b.enterPrice>=currprice:b.enterPrice<=currprice).forEach(p=>{
         p.state = "open";
         p.busy = true;
-        p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*calcPerc/100)
+        p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*calcPerc/100),
+        p.stop = loss.toFixed(precisionNumber)
     });
 
     //_06_act_set_close = () => {
