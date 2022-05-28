@@ -79,13 +79,13 @@ class Gennadiy_Soplizhuy{
                         that.#_binance.ORDERS_NewOrder({
                             symbol: that.#_params.currencyinfo.symbol,
                             type: "MARKET",
-                            quantity: p.openOrd.origQty,
+                            quantity: p.ordOpen.origQty,
                             side: that.#_params.direction=="BUY"?"SELL":"BUY"
                         }).then(next=>{
                             //cancel stoploss associated
                             that.#_binance.ORDERS_ChancelSingleOrder(p.stOrder.orderId,p.stOrder.symbol);
                         });
-                        let toAdd = {diff:((p.price-currprice)*parseFloat(p.position.quantity)).toFixed(2),open:p.price,close:pr,quantity:p.position.quantity};
+                        let toAdd = {diff:((p.price-currprice)*parseFloat(p.position.quantity)).toFixed(2),open:p.price,close:currprice,quantity:p.position.quantity};
                         console.log(toAdd);
                         that.Closed.push(toAdd);
                     });
@@ -147,13 +147,13 @@ class Gennadiy_Soplizhuy{
         {
             from = parseFloat((lastcandle.high+lastcandle.low)/2);
             to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
-            loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
+            loss = parseFloat(lastcandle.low - 0.2*(lastcandle.high-lastcandle.low));
         }
         else
         {
             from = parseFloat((lastcandle.high+lastcandle.low)/2);
             to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
-            loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
+            loss = parseFloat(lastcandle.high - 0.2*(lastcandle.high-lastcandle.low));
         }
         let tick = params.currencyinfo.filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize;
         let precision = parseFloat(params.currencyinfo.filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
@@ -240,13 +240,13 @@ function Gennadiy_Soplizhuy_Tick(currprice,params,positions,lastcandle){
     {
         from = parseFloat((lastcandle.high+lastcandle.low)/2);
         to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
-        loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
+        loss = parseFloat(lastcandle.low - 0.2*(lastcandle.high-lastcandle.low));
     }
     else
     {
         from = parseFloat((lastcandle.high+lastcandle.low)/2);
         to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
-        loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
+        loss = parseFloat(lastcandle.high - 0.2*(lastcandle.high-lastcandle.low));
     }
     let tick = params.currencyinfo.filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize;
     let precision = parseFloat(params.currencyinfo.filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
