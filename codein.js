@@ -30,6 +30,7 @@ class Gennadiy_Soplizhuy{
     #_positions = [];
     #_binance;
     #_perc;
+    Closed = [];
     static Renewcandle = true;
     static Srv = null;
     constructor(params,binance){
@@ -48,17 +49,41 @@ class Gennadiy_Soplizhuy{
                     let positions = Gennadiy_Soplizhuy.Gennadiy_Soplizhuy_Tick(currprice,that.#_params,that.#_positions,that.#_lastCandle);
                     //process them with binance
                     positions.filter(a=>a.state=="open").forEach(p=>{
-                        p.state = "opened",
-                        p.price = pr
+                        //open order
+                        that.#_binance.ORDERS_NewOrder({
+                            symbol: that.#_params.currencyinfo.symbol,
+                            type: "MARKET",
+                            quantity: p.position.quantity,
+                            side: that.#_params.direction
+                        }).then(openOrd=>{
+                            p.ordOpen = openOrd;
+                            p.state = "opened";
+                            p.price = currprice;
+                            //and stoploss
+                            that.#_binance.ORDERS_NewOrder({
+                                symbol: that.#_params.currencyinfo.symbol,
+                                type: "STOP_MARKET",
+                                quantity: p.position.quantity,
+                                side: that.#_params.direction=="BUY"?"SELL":"BUY",
+                                stopPrice: p.stop,
+                                timeInForce: "GTE_GTC",
+                                reduceOnly: "True"
+                            }).then(stOrder=>{
+                                p.stOrder = stOrder;
+                            });
+                        });
+                        
                     });
                     positions.filter(a=>a.state=="close").forEach(p=>{
-                        closed.push({diff:(p.price-pr)*parseFloat(p.position.quantity)});
+                        let toAdd = {diff:((p.price-currprice)*parseFloat(p.position.quantity)).toFixed(2),open:p.price,close:pr,quantity:p.position.quantity};
+                        console.log(toAdd);
+                        that.Closed.push(toAdd);
                     });
                     positions = positions.filter(a=>a.state!="close");
                     that.#_positions = positions;
-                    console.log("------------------------------------------------------------------------------------------");
-                    console.log(that.#_positions);
-                    console.log("------------------------------------------------------------------------------------------");
+                    //console.log("------------------------------------------------------------------------------------------");
+                    //console.log(that.#_positions);
+                    //console.log("------------------------------------------------------------------------------------------");
                 });
             });
             Gennadiy_Soplizhuy.Srv.Start();
@@ -90,11 +115,6 @@ class Gennadiy_Soplizhuy{
     _renewCandleStop(){
         Gennadiy_Soplizhuy.Renewcandle = false;
     }
-    _calcPerc(){
-        let calcPerc = 50*Math.abs(this.#_lastCandle.high - this.#_lastCandle.low) / this.#_lastCandle.low;
-        if(calcPerc<this.#_params.percmin) return this.#_params.percmin;
-        return calcPerc;
-    }
     static _klineToCandle(kline){
         return {
             id:kline[0],
@@ -110,68 +130,69 @@ class Gennadiy_Soplizhuy{
         };
     }
     static Gennadiy_Soplizhuy_Tick(currprice,params,positions,lastcandle){
-        _00_params_bords = () => {
-            let from = 0;
-            let to = 0;
-            let loss = 0;
-            if(params.direction=="BUY")
-            {
-                from = parseFloat((lastcandle.high+lastcandle.low)/2);
-                to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
-                loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
-            }
-            else
-            {
-                from = parseFloat((lastcandle.high+lastcandle.low)/2);
-                to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
-                loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
-            }
-            return {from:from,to:to,loss:loss};
+        let from = 0;
+        let to = 0;
+        let loss = 0;
+        if(params.direction=="BUY")
+        {
+            from = parseFloat((lastcandle.high+lastcandle.low)/2);
+            to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
+            loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
+        }
+        else
+        {
+            from = parseFloat((lastcandle.high+lastcandle.low)/2);
+            to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
+            loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
         }
         let tick = params.currencyinfo.filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize;
         let precision = parseFloat(params.currencyinfo.filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
         let precisionNumber = precision.toString().includes(".")?precision.toString().split(".")[1].length:0;
-        let bords = _00_params_bords();
-        let potential = null;
+        let calcPerc =params.percmin;
+        if(params.percent=="auto")
+        {
+            calcPerc = 50*Math.abs(lastcandle.high - lastcandle.low) / lastcandle.low;
+            if(calcPerc<params.percmin) calcPerc =params.percmin;
+        }
     
-        _01_act_filter_busy = () =>{
-            positions = positions.filter(a=>a.busy);
+        //_01_act_filter_busy = () =>{
+        positions = positions.filter(a=>a.busy);
+    
+        //_02_act_get_potential = () =>{
+        let potential = B52.CALC.GetOrdersIntervalMaxLoss(10,from,to,loss,params.maxloss,B52Settings.minnotal,tick,2*B52Settings.marketOrderPrice,precisionNumber);
+        
+        //_03_act_filter_potential_where_busy = () => {
+        if(positions.length)
+        {
+            //any exist
+            let existingMaxPrice = parseFloat(params.direction == "BUY"? Math.min(...positions.map(a=>a.price)) : Math.max(...positions.map(a=>a.price)));
+            potential = potential.filter(a=>(params.direction == "BUY")?parseFloat(a.price)<existingMaxPrice:parseFloat(a.price)>existingMaxPrice);
         }
-        _02_act_get_potential = () =>{
-            potential = B52.CALC.GetOrdersIntervalMaxLoss(10,bords.from,bords.to,bords.loss,params.maxloss,B52Settings.minnotal,tick,2*B52Settings.marketOrderPrice,precisionNumber);
-        }
-        _03_act_filter_potential_where_busy = () => {
-            if(positions.length)
+        
+        //_04_act_add_potential_to_positions = () => {
+        potential.forEach(p=>{
+            positions.push({
+                busy:false,
+                position:p,
+                enterPrice:parseFloat(p.price)
+            });
+        });
+    
+        //_05_act_set_open = () => {
+        positions.filter(a=>!a.busy).filter(b=>params.direction == "BUY"?b.enterPrice>=currprice:b.enterPrice<=currprice).forEach(p=>{
+            p.state = "open";
+            p.busy = true;
+            p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*calcPerc/100),
+            p.stop = loss
+        });
+    
+        //_06_act_set_close = () => {
+        positions.filter(a=>a.busy).filter(b=>b.state=="opened").forEach(p=>{
+            if((params.direction == "BUY"?currprice>=p.closePrice:currprice<=p.closePrice))
             {
-                //any exist
-                let existingMaxPrice = parseFloat(params.direction == "BUY"? Math.min(...positions.map(a=>a.price)) : Math.max(...positions.map(a=>a.price)));
-                potential = potential.filter(a=>(params.direction == "BUY")?parseFloat(a.price)<existingMaxPrice:parseFloat(a.price)>existingMaxPrice);
+                p.state = "close"
             }
-        }
-        _04_act_add_potential_to_positions = () => {
-            potential.forEach(p=>{
-                positions.push({
-                    busy:false,
-                    position:p,
-                    enterPrice:parseFloat(p.price)
-                });
-            });
-        }
-        _05_act_set_open = () => {
-            positions.filter(a=>!a.busy).filter(b=>params.direction == "BUY"?b.enterPrice>=currprice:b.enterPrice<=currprice).forEach(p=>{
-                p.state = "open";
-                p.busy = true;
-                p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*params.percmin/100)
-            });
-        }
-        _06_act_set_close = () => {
-            positions.filter(a=>a.busy).filter(b=>b.state=="opened").forEach(p=>{
-                if((params.direction == "BUY"?currprice>=p.closePrice:currprice<=p.closePrice))
-                {
-                    p.state = "close"
-                }
-            });
-        }
+        });
         
         /*
         Positions with orders =>
@@ -181,13 +202,6 @@ class Gennadiy_Soplizhuy{
         Mark which to open according the price =>
         Mark which to close according the price
         */
-        _00_params_bords();
-        _01_act_filter_busy();
-        _02_act_get_potential();
-        _03_act_filter_potential_where_busy();
-        _04_act_add_potential_to_positions();
-        _05_act_set_open();
-        _06_act_set_close();
         return positions;
     }
 }
@@ -209,68 +223,68 @@ B52Tv.GetCurrentCurrencyPair().then(currency=>{
 console.log(B52.CALC.GetOrdersIntervalMaxLoss(20,1.471,1.461,1.477,0.5,5,0.1,0.16,3));
 
 function Gennadiy_Soplizhuy_Tick(currprice,params,positions,lastcandle){
-    _00_params_bords = () => {
-        let from = 0;
-        let to = 0;
-        let loss = 0;
-        if(params.direction=="BUY")
-        {
-            from = parseFloat((lastcandle.high+lastcandle.low)/2);
-            to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
-            loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
-        }
-        else
-        {
-            from = parseFloat((lastcandle.high+lastcandle.low)/2);
-            to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
-            loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
-        }
-        return {from:from,to:to,loss:loss};
+    let from = 0;
+    let to = 0;
+    let loss = 0;
+    if(params.direction=="BUY")
+    {
+        from = parseFloat((lastcandle.high+lastcandle.low)/2);
+        to = parseFloat(lastcandle.low + 0.1*(lastcandle.high-lastcandle.low));
+        loss = parseFloat(lastcandle.low - 0.1*(lastcandle.high-lastcandle.low));
+    }
+    else
+    {
+        from = parseFloat((lastcandle.high+lastcandle.low)/2);
+        to = parseFloat(lastcandle.high + 0.1*(lastcandle.high-lastcandle.low));
+        loss = parseFloat(lastcandle.high - 0.1*(lastcandle.high-lastcandle.low));
     }
     let tick = params.currencyinfo.filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize;
     let precision = parseFloat(params.currencyinfo.filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
     let precisionNumber = precision.toString().includes(".")?precision.toString().split(".")[1].length:0;
-    let bords = _00_params_bords();
-    let potential = null;
-
-    _01_act_filter_busy = () =>{
-        positions = positions.filter(a=>a.busy);
-    }
-    _02_act_get_potential = () =>{
-        potential = B52.CALC.GetOrdersIntervalMaxLoss(10,bords.from,bords.to,bords.loss,params.maxloss,B52Settings.minnotal,tick,2*B52Settings.marketOrderPrice,precisionNumber);
-    }
-    _03_act_filter_potential_where_busy = () => {
-        if(positions.length)
+    let calcPerc =params.percmin;
+        if(params.percent=="auto")
         {
-            //any exist
-            let existingMaxPrice = parseFloat(params.direction == "BUY"? Math.min(...positions.map(a=>a.price)) : Math.max(...positions.map(a=>a.price)));
-            potential = potential.filter(a=>(params.direction == "BUY")?parseFloat(a.price)<existingMaxPrice:parseFloat(a.price)>existingMaxPrice);
+            calcPerc = 50*Math.abs(lastcandle.high - lastcandle.low) / lastcandle.low;
+            if(calcPerc<params.percmin) calcPerc =params.percmin;
         }
+    
+    //_01_act_filter_busy = () =>{
+    positions = positions.filter(a=>a.busy);
+
+    //_02_act_get_potential = () =>{
+    let potential = B52.CALC.GetOrdersIntervalMaxLoss(10,from,to,loss,params.maxloss,B52Settings.minnotal,tick,2*B52Settings.marketOrderPrice,precisionNumber);
+    
+    //_03_act_filter_potential_where_busy = () => {
+    if(positions.length)
+    {
+        //any exist
+        let existingMaxPrice = parseFloat(params.direction == "BUY"? Math.min(...positions.map(a=>a.price)) : Math.max(...positions.map(a=>a.price)));
+        potential = potential.filter(a=>(params.direction == "BUY")?parseFloat(a.price)<existingMaxPrice:parseFloat(a.price)>existingMaxPrice);
     }
-    _04_act_add_potential_to_positions = () => {
-        potential.forEach(p=>{
-            positions.push({
-                busy:false,
-                position:p,
-                enterPrice:parseFloat(p.price)
-            });
+    
+    //_04_act_add_potential_to_positions = () => {
+    potential.forEach(p=>{
+        positions.push({
+            busy:false,
+            position:p,
+            enterPrice:parseFloat(p.price)
         });
-    }
-    _05_act_set_open = () => {
-        positions.filter(a=>!a.busy).filter(b=>params.direction == "BUY"?b.enterPrice>=currprice:b.enterPrice<=currprice).forEach(p=>{
-            p.state = "open";
-            p.busy = true;
-            p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*params.percmin/100)
-        });
-    }
-    _06_act_set_close = () => {
-        positions.filter(a=>a.busy).filter(b=>b.state=="opened").forEach(p=>{
-            if((params.direction == "BUY"?currprice>=p.closePrice:currprice<=p.closePrice))
-            {
-                p.state = "close"
-            }
-        });
-    }
+    });
+
+    //_05_act_set_open = () => {
+    positions.filter(a=>!a.busy).filter(b=>params.direction == "BUY"?b.enterPrice>=currprice:b.enterPrice<=currprice).forEach(p=>{
+        p.state = "open";
+        p.busy = true;
+        p.closePrice = currprice + (params.direction == "BUY"?1:-1)*(currprice*calcPerc/100)
+    });
+
+    //_06_act_set_close = () => {
+    positions.filter(a=>a.busy).filter(b=>b.state=="opened").forEach(p=>{
+        if((params.direction == "BUY"?currprice>=p.closePrice:currprice<=p.closePrice))
+        {
+            p.state = "close"
+        }
+    });
     
     /*
     Positions with orders =>
@@ -280,13 +294,6 @@ function Gennadiy_Soplizhuy_Tick(currprice,params,positions,lastcandle){
     Mark which to open according the price =>
     Mark which to close according the price
     */
-    _00_params_bords();
-    _01_act_filter_busy();
-    _02_act_get_potential();
-    _03_act_filter_potential_where_busy();
-    _04_act_add_potential_to_positions();
-    _05_act_set_open();
-    _06_act_set_close();
     return positions;
 }
 
