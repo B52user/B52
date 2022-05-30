@@ -295,7 +295,7 @@ var B52HTML =
                 <div id="B52Ordung" style="width:80%;height:100%;overflow-y:auto;">
                 </div>
                 <div>
-                    <button style="width:50px;height:80px" id="B52OrdersDraw">Draw</button>
+                    <button style="width:50px;height:120px" id="B52OrdersDraw">Draw</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
