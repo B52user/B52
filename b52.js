@@ -593,6 +593,8 @@ class B52 {
             B52Tv.GetAlertMessage(theUniqueName).then(mess=>{
                 B52Tv.GetCurrentCurrencyPair().then(currency=>{
                     let arr = JSON.parse(mess);
+                    console.log("I am sending: ");
+                    console.log(arr);
                     arr.forEach(e=>{
                         e["symbol"] = currency;
                         that.Binance.ORDERS_NewOrder(e).then(resp=>{
