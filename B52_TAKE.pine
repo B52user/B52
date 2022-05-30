@@ -76,8 +76,7 @@ for i = 1 to ultimateTakes
     else
         message := message + "{\"side\":\"" + gettingTakes + "\",\"price\":\"" + str.tostring(currPrice,priceFormat) + "\",\"quantity\":\"" + str.tostring(coinsTaking) + "\",\"type\":\"LIMIT\",\"timeInForce\":\"GTC\"},"
     currPrice := currPrice + (ls?1:-1)*priceGap
-
-message := message + "]"
+message := str.substring(message,0,str.length(message)-1) + "]"
 //end combine packet
 
 alert(str.tostring(message),alert.freq_all) 

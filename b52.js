@@ -572,18 +572,13 @@ class B52 {
                         parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt)>0
                             )
                         {
-                            console.log("!!!! " + parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt).toString());
                             currPos = that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0];
                         }
                         
                         if(currPos!=null){
-                            console.log("2222 ");
-                            console.log(currPos);
                             sets.push({label:"Current position in coins",value:currPos.positionAmt});
                             sets.push({label:"Entry price in $",value:currPos.entryPrice});
                         }
-                        console.log("Sets send: ");
-                        console.log(sets);
                         if(sets.length) B52Tv.SetStrategySettings(sets);
                     });
                 });
