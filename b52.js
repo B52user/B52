@@ -291,7 +291,13 @@ var B52HTML =
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton5">Sets</button>
         </div>
         <div style="height:170px;width:100%;border:1px solid gray;">
-            <div class="B52Tab" id="B52Tab1">Some 1111 interesting text</div>
+            <div class="B52Tab" id="B52Tab1" style="display:flex">
+                <div id="B52Ordung" style="width:80%;height:100%;overflow-y:auto;">
+                </div>
+                <div>
+                    <button style="width:50px;height:80px" id="B52OrdersDraw">Draw</button>
+                </div>
+            </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
                 <div style="width:170px;overflow-y:auto;height:100%;" id="B52PosOpenedList">
                 Positions:
@@ -710,6 +716,12 @@ class B52 {
         $("#B52Tab"+num).show();
     }
 
+    BUTTON_DrawOrderLines(){
+        let that = this;
+        //check strategy is run? not=> run, then set ords
+        let settingsButton = "";
+    }
+
     SetServices()
     {
         let shitService = this.SERVICE_MakeShitService();
@@ -909,7 +921,7 @@ class B52 {
         that.Binance._eventOpenOrdersChanged.push(()=>{
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
                 let ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
-                $("#B52Tab1").empty();
+                $("#B52Ordung").empty();
                 ordersOpened.forEach((o)=>{
                     let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
                     let control = `
@@ -921,10 +933,10 @@ class B52 {
                             ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
                         </div>
                     <div>`;
-                    $("#B52Tab1").append(control);
+                    $("#B52Ordung").append(control);
                     let ordid = o.orderId;
                     $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordid,currency));
-                    $("#B52"+o.clientOrderId+"Line").mouseup(()=>B52Tv.DrawOrderLine(o));
+                    $("#B52OrdersDraw").mouseup(()=>that.BUTTON_DrawOrderLines());
                 });
             });
         });

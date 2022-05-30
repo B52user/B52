@@ -1,0 +1,27 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © nelubian
+
+//@version=5
+indicator("D52Orders",overlay=true,format=format.inherit)
+draws = input.string("",title="DrawArray")
+
+var lines = str.split(draws,'|')
+
+for i=0 to array.size(lines)-1
+    theLine = array.get(lines,i)
+    theValues = str.split(theLine,';')
+    direction = array.get(theValues,0)
+    type = array.get(theValues,1)
+    level = array.get(theValues,2)
+    money = array.get(theValues,3)
+    
+    col1 = color.green
+    col2 = color.olive
+    
+    l = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= col1,style = line.style_dotted,width = 1)
+    line.set_xy1(l, time, level)
+    line.set_xy2(l, time + 1, level)
+    ll = label.new(x=bar_index, y=level, col2, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+    label.set_text(ll, text=str.tostring(money,"###.##"))
+    label.set_xy(ll,bar_index,level)
+
