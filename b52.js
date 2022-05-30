@@ -143,7 +143,7 @@ var B52HTML =
         div.B52OrderItem
         {
             height:24px;
-            width:270px;
+            width:230px;
             margin:2px;
             padding:2px;
             font-size:14px;
@@ -920,9 +920,6 @@ class B52 {
                         <div style="margin-top:5px;width:200px">
                             ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
                         </div>
-                        <div>
-                            <button id="B52${o.clientOrderId}Line">*</button>
-                        </div>
                     <div>`;
                     $("#B52Tab1").append(control);
                     let ordid = o.orderId;
@@ -1664,13 +1661,13 @@ class BinanceAdapter {
             }
             let direction = position>0?"SELL":"BUY";
             let priceToToStop = (position>0?(1+(2*B52Settings.marketOrderPrice/100)):(1-(2*B52Settings.marketOrderPrice/100)))*entryPrice;
-            that.GetPriceFormatting().then(f=>{
+            that.MARKET_GetPriceFormatPrecision(pair).then(f=>{
                 let closeParams = {
                     side:direction,
                     quantity:Math.abs(position),
                     stopPrice:priceToToStop.toFixed(f.length-2),
                     type:"STOP_MARKET",
-                    symbol:B52Tv.GetCurrentCurrencyPair(),
+                    symbol:pair,
                     timeInForce:"GTC"
                 };
                 that.POST_SIGNED_PARAMS(
