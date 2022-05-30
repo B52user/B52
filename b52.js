@@ -1519,7 +1519,7 @@ class B52Tv {
         return new Promise((s,f)=>{
             B52Tv.WaitForElement(B52Settings.tvXpath.b52SettingButton).then(e=>{
                 B52Tv.TriggerMouseEvent(e,"mousedown");
-                let firstInput = "//div[./div[text()='"+sets[0].label+"']]/following-sibling::div[1]//input";
+                let firstInput = "//div[@data-name='indicator-properties-dialog']";
                 B52Tv.WaitForElement(firstInput).then(e1=>{
                     for(let i=0;i<sets.length;i++)
                     {
