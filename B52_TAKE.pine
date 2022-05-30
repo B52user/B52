@@ -21,7 +21,7 @@ buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
 //long or short?
 bool ls = takeTo > entryPrice
 float medianTake = (takeFrom+takeTo)/2
-float expectedGain = math.abs(medianTake - entryPrice)*currentCoins
+float expectedGain = math.abs(medianTake - entryPrice)*currentCoins - currentCoins*medianTake*(buysellfee*2/100)
 float lowestPrice = math.min(entryPrice,takeTo,takeFrom,close)
 float minCoinsPerTake = math.ceil(minnotal/lowestPrice/minQuantity)*minQuantity
 int ultimateTakes = currentCoins/minCoinsPerTake>=numberOfTakes?numberOfTakes:math.floor(currentCoins/minCoinsPerTake)

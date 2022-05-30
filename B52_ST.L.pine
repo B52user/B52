@@ -1,0 +1,53 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © nelubian
+
+//@version=5
+//input start
+indicator("B52_ST.L",overlay=true,format=format.inherit)
+stopLos = input.price(0,title="<< STOP LOSS >>",confirm=true)
+currentSum = input.float(1.0,title="Current position in coins")
+priceFormat = input.string("#.####",title="Price Formatting")
+entryPrice = input.float(0.0,title="Entry price in $")
+buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
+//input end
+
+
+
+//calc start
+//long or short?
+bool ls = stopLos < close
+float expectedLoss = math.abs(stopLos - entryPrice)*currentSum - currentSum*stopLos*(buysellfee*2/100)
+//float potentialGain = ((math.abs(gain-calcLevel)/calcLevel)-((2*buysellfee)/100))*catletDollars
+//calc end
+
+//draw start
+var line line1 = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= color.red,style = line.style_solid,width = 2)
+line.set_xy1(line1, time, stopLos)
+line.set_xy2(line1, time + 1, stopLos)
+line1Label = label.new(x=bar_index, y=stopLos, color=color.maroon, textcolor=color.white, style = label.style_label_lower_left, size = size.small)
+label.set_text(id=line1Label, text=str.tostring(stopLos,priceFormat))
+label.set_xy(line1Label,bar_index,stopLos)
+label.delete(line1Label[1])
+
+var table panel = table.new(position.top_right, 2, 15)
+table.cell(panel, 0, 0, "Params", bgcolor=color.black, text_color=color.gray,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 0, 1, "Expected Loss:", bgcolor=color.maroon, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 1, str.tostring(expectedLoss,"#.##")+"$", bgcolor=color.maroon, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 0, 2, "Current Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 2, str.tostring(currentSum*stopLos,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 0, 3, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+table.cell(panel, 1, 3, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
+
+//draw end
+
+string gettingTakes = ls?"SELL":"BUY"
+
+string message = "[{\"side\":\"" + gettingTakes + "\",\"stopPrice\":\"" + str.tostring(stopLos,priceFormat) + "\",\"quantity\":\"" + str.tostring(currentSum)+"\",\"type\":\"STOP_MARKET\",\"timeInForce\":\"GTC\"}]"
+
+//end combine packet
+
+alert(str.tostring(message),alert.freq_all) 
+
+
+
+
