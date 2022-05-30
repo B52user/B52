@@ -1511,8 +1511,9 @@ class B52Tv {
                     for(let i=0;i<sets.length;i++)
                     {
                         let input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+                        
                         let inputNode = B52Tv.XpathGetFirstItem(input);
-                        B52Tv.SetReactValue(inputNode,sets[i].value);
+                        if(inputNode!=null) B52Tv.SetReactValue(inputNode,sets[i].value);
                     }
                     let ok = B52Tv.XpathGetFirstItem("//button[@data-name='submit-button']");
                     B52Tv.TriggerMouseEvent(ok, "click");
