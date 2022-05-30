@@ -6,7 +6,8 @@
 indicator("B52_TAKE",overlay=true,format=format.inherit)
 takeFrom = input.price(0,title="<< TAKE FROM >>",confirm=true)
 takeTo = input.price(0,title="<< TAKE TO >>",confirm=true)
-currentSum = input.float(1.0,title="Current position in $")
+currentCoins = input.float(1.0,title="Current position in coins")
+entryPrice = input.float(1.0,title="Entry price in $")
 minQuantity = input.float(1.0,title="Min buy quantity")
 priceFormat = input.string("#.####",title="Price Formatting")
 numberOfTakes = input.int(5,title="Number of takes")
@@ -18,9 +19,15 @@ buysellfee = input.float(0.08,title="Buy/Sell Fee in %")
 
 //calc start
 //long or short?
-bool ls = takeTo > close
+bool ls = takeTo > entryPrice
+float medianTake = (takeFrom+takeTo)/2
+float expectedGain = math.abs(medianTake - entryPrice)*currentCoins
+float lowestPrice = math.min(entryPrice,takeTo,takeFrom,close)
+float minCoinsPerTake = math.ceil(minnotal/lowestPrice/minQuantity)*minQuantity
+int ultimateTakes = currentCoins/minCoinsPerTake>=numberOfTakes?numberOfTakes:math.floor(currentCoins/minCoinsPerTake)
+float eachTakeInCoins = math.floor(currentCoins/ultimateTakes)<minCoinsPerTake?minCoinsPerTake:math.floor(currentCoins/ultimateTakes)
+float priceGap = math.abs(takeFrom-takeTo)/ultimateTakes
 
-//float potentialGain = ((math.abs(gain-calcLevel)/calcLevel)-((2*buysellfee)/100))*catletDollars
 //calc end
 
 //draw start
@@ -43,44 +50,37 @@ label.delete(line2Label[1])
 var table panel = table.new(position.top_right, 2, 15)
 table.cell(panel, 0, 0, "Params", bgcolor=color.black, text_color=color.gray,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 1, "Expected Gain:", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 1, 1, str.tostring(potentialGain,"#.##")+"$", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 1, str.tostring(expectedGain,"#.##")+"$", bgcolor=color.olive, text_color=color.white,text_size = size.small,text_halign=text.align_left)
 table.cell(panel, 0, 2, "Current Volume:", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
-table.cell(panel, 1, 2, str.tostring(currentSum,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
+table.cell(panel, 1, 2, str.tostring(currentCoins*entryPrice,"#.##")+"$", bgcolor=color.navy, text_color=color.white,text_size = size.small,text_halign=text.align_left)
 table.cell(panel, 0, 3, "Number of Takes ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 3, str.tostring(realTakesNumber), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 3, str.tostring(ultimateTakes), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 4, "Contracts per take ", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 4, str.tostring(coinsPerTake), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 4, str.tostring(eachTakeInCoins), bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 5, "Take size (approx)", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
-table.cell(panel, 1, 5, str.tostring(takeDollars,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
+table.cell(panel, 1, 5, str.tostring(eachTakeInCoins*medianTake,"#.##")+"$", bgcolor=color.black, text_color=color.white,text_size = size.small, text_halign=text.align_left)
 table.cell(panel, 0, 6, "? ", bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
 table.cell(panel, 1, 6, str.tostring(syminfo.mintick), bgcolor=color.black, text_color=color.gray,text_size = size.tiny, text_halign=text.align_left)
 
 //draw end
 
-string gettingTakes = if ls
-    "BUY"
-else
-    "SELL"
-string gettingLoss = if ls
-    "SELL"
-else
-    "BUY"
-string packet = "["
-float currPrice = level
-string part1 = na
-string part2 = na
+string gettingTakes = ls?"SELL":"BUY"
 
-for i = 1 to realTakesNumber
-    part1 := "{\"side\":\"" + gettingTakes + "\",\"price\":\"" + str.tostring(currPrice,priceFormat)
-    part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake) + "\",\"type\":\"LIMIT\",\"timeInForce\":\"GTC\"},"
-    packet := packet + part1 + part2
+string message = "["
+float currPrice = takeFrom
 
-part1 := "{\"side\":\"" + gettingLoss + "\",\"stopPrice\":\"" + str.tostring(stoploss,priceFormat)
-part2 := "\",\"quantity\":\"" + str.tostring(coinsPerTake*realTakesNumber)+"\",\"type\":\"STOP_MARKET\",\"timeInForce\":\"GTC\"}]"
-packet := packet + part1 + part2
+for i = 1 to ultimateTakes
+    float coinsTaking = i==ultimateTakes?(currentCoins-(i-1)*eachTakeInCoins):eachTakeInCoins
+    if((ls and close>=currPrice) or (not ls and close<=currPrice)) 
+        message := message + "{\"side\":\"" + gettingTakes + "\",\"quantity\":\"" + str.tostring(coinsTaking) + "\",\"type\":\"MARKET\"},"
+    else
+        message := message + "{\"side\":\"" + gettingTakes + "\",\"price\":\"" + str.tostring(currPrice,priceFormat) + "\",\"quantity\":\"" + str.tostring(coinsTaking) + "\",\"type\":\"LIMIT\",\"timeInForce\":\"GTC\"},"
+    currPrice := currPrice + (ls?1:-1)*priceGap
+
+message := message + "]"
 //end combine packet
 
-alert(str.tostring(packet),alert.freq_all) 
+alert(str.tostring(message),alert.freq_all) 
 
 
 

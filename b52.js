@@ -566,6 +566,17 @@ class B52 {
                         if(form!="#.####") sets.push({label:"Price Formatting",value:form});
                         //set maxLoss
                         sets.push({label:B52Settings.maxLossLabel,value:maxLoss});
+                        let currPos = null;
+                        if(that.Binance.OpenedPositions!=null&&
+                        that.Binance.OpenedPositions.filter(a=>a.symbol==currency).length&&
+                        parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt)>0
+                            )
+                            currPos = that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0];
+                        
+                        if(currPos!=null){
+                            sets.push({label:"Current position in coins",value:currPos.positionAmt});
+                            sets.push({label:"Entry price in $",value:currPos.entryPrice});
+                        }
                         
                         if(sets.length) B52Tv.SetStrategySettings(sets);
                     });
@@ -784,6 +795,7 @@ class B52 {
                     $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
                         if(!that.Fixes.length) that.Fixes = B52.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
+                        console.log(that.Fixes);
                         $("#B52SellPart").text("FIX ("+that.Fixes.length+") ("+ ((profit-charge)/that.Fixes.length).toFixed(2) + ")");
                     });  
                     
