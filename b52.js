@@ -359,7 +359,7 @@ var B52Log = {
     _eventLogChanged:[],
     Info : (message,obj=null)=>{
         B52Log._log.push({type:"info",mess:message,obj:obj});
-        //if(obj!=null)console.log(obj);
+        
     },
     GetLog : ()=>{
         return B52Log._log;
@@ -571,13 +571,19 @@ class B52 {
                         that.Binance.OpenedPositions.filter(a=>a.symbol==currency).length&&
                         parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt)>0
                             )
+                        {
+                            console.log("!!!! " + parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt).toString());
                             currPos = that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0];
+                        }
                         
                         if(currPos!=null){
+                            console.log("2222 ");
+                            console.log(currPos);
                             sets.push({label:"Current position in coins",value:currPos.positionAmt});
                             sets.push({label:"Entry price in $",value:currPos.entryPrice});
                         }
-                        
+                        console.log("Sets send: ");
+                        console.log(sets);
                         if(sets.length) B52Tv.SetStrategySettings(sets);
                     });
                 });
@@ -627,7 +633,7 @@ class B52 {
             {
                 $("#B52Tabs").show();$("#B52Workbook").show();
                 $("#B52TabButton1").mouseup();
-                console.log("starting");
+                
                 this.Srvs.Workbook1.Start();
                 this.Srvs.Workbook2.Start();
                 this.Stakan1.Center();
@@ -643,7 +649,7 @@ class B52 {
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();$("#B52Workbook").hide();
-            console.log("stopping");
+            
             this.Srvs.Workbook1.Stop();
             this.Srvs.Workbook2.Stop();
         }
@@ -795,8 +801,18 @@ class B52 {
                     $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
                         if(!that.Fixes.length) that.Fixes = B52.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
-                        console.log(that.Fixes);
-                        $("#B52SellPart").text("FIX ("+that.Fixes.length+") ("+ ((profit-charge)/that.Fixes.length).toFixed(2) + ")");
+                        if(!that.Fixes.length) //disable
+                        {
+                            $("#B52SellPart").css("background-color","#262626");
+                            $("#B52SellPart").css("color","#636363");
+                        }
+                        else{
+                            let toAdd = "("+that.Fixes.length+") ("+ ((profit-charge)/that.Fixes.length).toFixed(2) + ")";
+                            $("#B52SellPart").text("FIX "+toAdd);
+                            $("#B52SellPart").css("background-color",pickAcolorForIt);
+                            $("#B52SellPart").css("color","white");
+                        }
+                        
                     });  
                     
                     let colorFilter = (profit-charge)>0?"green":"red";
@@ -804,8 +820,6 @@ class B52 {
                     let pickAcolorForIt = B52Settings.redToGreen.filter(a=>a.dir==colorFilter&&colorProp>=a.perc).sort((a,b)=>a.perc>b.perc?1:-1)[0].col;
                     $("#B52SellAll").css("background-color",pickAcolorForIt);
                     $("#B52SellAll").css("color","white");
-                    $("#B52SellPart").css("background-color",pickAcolorForIt);
-                    $("#B52SellPart").css("color","white");
                     $("#B52NLStop").css("background-color","green");
                     $("#B52NLStop").css("color","white");
                 }
