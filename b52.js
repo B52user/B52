@@ -80,7 +80,8 @@ var B52Settings =
         workbook: "fapi/v1/depth",
         income:"fapi/v1/income",
         workbook2:"api/v3/depth",
-        kindle:"fapi/v1/klines"
+        kindle:"fapi/v1/klines",
+        exchangeInfoSpot:"api/v3/exchangeInfo",
     },
     workbookColors:{
         ask:"rgba(165, 42, 42, .4)",
@@ -178,7 +179,7 @@ var B52HTML =
         div.B52WorkbookContainer
         {
             overflow-y:auto;
-            height:98%;
+            height:97%;
         }
         div.B52RiskPosItem
         {
@@ -336,7 +337,7 @@ var B52HTML =
     </div>
     <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:210px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;display:flex;" hid="true">
         <div>
-            <div style="height:10px;background:rgba(82, 82, 82, 0.8);font-size:10px;">FUTURES</div>
+            <div style="height:15px;background:rgba(82, 82, 82, 0.8);font-size:12px;">FUTURES</div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable">
                 </table>
@@ -344,7 +345,7 @@ var B52HTML =
         </div>
         <div style="width:10px;height:100%;"></div>
         <div>
-        <div style="height:10px;background:rgba(82, 82, 82, 0.8);font-size:10px;">SPOT</div>
+        <div style="height:15px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable2">
                 </table>
@@ -455,6 +456,15 @@ class B52 {
         });
         $("#B52WBDepth").text(B52Settings.workBookDepth);
         $("#B52OrdersDraw").mouseup(()=>that.BUTTON_DrawOrderLines());
+
+        $("#B52SpotName").change(()=>{
+            $("#B52SpotName").val();
+            if(that.Stakan2!=null) that.Stakan2.ReDraw();
+        });
+        B52Tv.GetCurrentCurrencyPair().then(currency=>{
+            $("#B52SpotName").val(currency);
+            $("#B52SpotName").trigger("change");
+        });
     }
 
     BUTTON_B52RenewTransactions(){
@@ -800,6 +810,17 @@ class B52 {
                 if(B52Tv.XpathItemCount(shit)>0) B52Tv.TriggerMouseEvent(B52Tv.XpathGetFirstItem(shit),"click");
             });
         });
+        shitService.Actions.push(()=>{
+            //detect currency change
+            B52Tv.GetCurrentCurrencyPair().then(currency=>{
+                if($("#B52SpotName").attr("autovalue")!=currency)
+                {
+                    $("#B52SpotName").val(currency);
+                    $("#B52SpotName").trigger("change");
+                    $("#B52SpotName").attr("autovalue",currency);
+                }
+            });
+        });
         return shitService;
     }
 
@@ -1015,6 +1036,7 @@ class B52 {
 
     #_workbook_lock2;
     Stakan2;
+    #_spotCurrency = "";
     SERVICE_MakeWorBookService2(){
         let that = this;
         this.#_workbook_lock2 = false;
@@ -1023,37 +1045,39 @@ class B52 {
             if(!that.#_workbook_lock2)
                 {
                     that.#_workbook_lock2 = true;
-                    that.Binance.MARKET_GetSpotOrderBook().then(wb=>{
-                        that.Binance.WorkBook2 = wb;
-                        that.#_workbook_lock2 = false;
-                        //run events
-                        that.Binance._eventWorkbookChanged2.forEach(a=>a());
-                    });
+                    let spotCurrency = $("#B52SpotName").val();
+                    if(spotCurrency!="")
+                    {
+                        that.Binance.MARKET_GetSpotOrderBook(spotCurrency).then(wb=>{
+                            that.Binance.WorkBook2 = wb;
+                            that.#_workbook_lock2 = false;
+                            //run events
+                            that.Binance._eventWorkbookChanged2.forEach(a=>a());
+                        });
+                    }
                 }
         });
         
         that.Binance._eventWorkbookChanged2.push(()=>{
-            B52Tv.GetCurrentCurrencyPair().then(currency=>{
-                that.Binance.MARKET_GetPriceFormatPrecision(currency).then(form=>{
-                    that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(that.Stakan2==null) {
-                            that.Stakan2 = new B52Stakan(
-                                document.getElementById("B52WorkBookTable2"),
-                                form,
-                                tick,
-                                that.Binance.WorkBook2,
-                                "_2"
-                            );
-                            that.Stakan2.ReDraw();
-                            that.Stakan2.Center();
-                        }
-                        else {
-                            //refine will redraw automatically if required
-                            that.Stakan2.Refine(that.Binance.WorkBook2,form,tick);
-                        }
-                    });
+            let currency = $("#B52SpotName").val();
+            that.Binance.MARKET_SPOT_GetPriceFormatPrecision(currency).then(form=>{
+                that.Binance.MARKET_SPOT_GetTickSize(currency).then(tick=>{
+                    if(that.Stakan2==null) {
+                        that.Stakan2 = new B52Stakan(
+                            document.getElementById("B52WorkBookTable2"),
+                            form,
+                            tick,
+                            that.Binance.WorkBook2,
+                            "_2"
+                        );
+                        that.Stakan2.ReDraw();
+                        that.Stakan2.Center();
+                    }
+                    else {
+                        //refine will redraw automatically if required
+                        that.Stakan2.Refine(that.Binance.WorkBook2,form,tick);
+                    }
                 });
-                
             });
         });
         return wbSrv;
@@ -1687,7 +1711,9 @@ class BinanceAdapter {
     OpenedOrders;
     _eventOpenOrdersChanged;
     get ExchangeInfo(){return this.#_exchangeInfo}
+    get ExchangeInfoSpot(){return this.#_spot_exchangeInfo}
     #_exchangeInfo;
+    #_spot_exchangeInfo;
     WorkBook;
     WorkBook2;
     _eventWorkbookChanged;
@@ -1921,6 +1947,64 @@ class BinanceAdapter {
     	});
     }
 
+    MARKET_SPOT_GetExchangeInfo(){
+        let that = this;
+        return new Promise((s,f)=>{
+            if(that.#_spot_exchangeInfo!=null)
+            {
+                s(that.#_spot_exchangeInfo);
+                return;
+            }
+            that.GET_SPOT_ANON_PARAMS(
+                B52Settings.binanceSettings.exchangeInfoSpot
+                ).then((resp)=>{
+                    B52Log.Info(`MARKET_SPOT_GetExchangeInfo. `, resp);
+                    that.#_spot_exchangeInfo = resp;
+                    s(that.#_spot_exchangeInfo);
+                });
+        });
+    }
+
+	MARKET_SPOT_GetTickSize(currency)
+	{
+		let that = this;
+		return new Promise((s,f)=>
+		{
+            that.MARKET_SPOT_GetExchangeInfo().then(info=>{
+                let theSymb = info.symbols.filter(a=>a.symbol==currency);
+                if(!theSymb.length) {
+                    B52Log.Info("MARKET_SPOT_GetTickSize couldn't find symbol in exchange info: "+currency);
+                    f();
+                }
+                else
+                {
+                    var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+                    s(theMinSize);
+                }
+            });
+		});
+	}
+
+    MARKET_SPOT_GetPriceFormatPrecision(currency)
+	{
+		let that = this;
+		return new Promise((s,f)=>
+		{
+			that.MARKET_SPOT_GetExchangeInfo().then(info=>{
+                let theSymb = info.symbols.filter(a=>a.symbol==currency);
+                if(!theSymb.length) {
+                    B52Log.Info("MARKET_SPOT_GetPriceFormatPrecision couldn't find symbol in exchange info: "+currency);
+                    f();
+                }
+                else
+                {
+                    var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
+                    s(tickSize.toString());
+                }
+		    });
+    	});
+    }
+
     DELETE_SIGNED_PARAMS(url,accessKey,secretKey,params={}){
         return new Promise((s,f)=>{
             fetch("https://fapi.binance.com/fapi/v1/time")
@@ -2110,21 +2194,19 @@ class BinanceAdapter {
         });
     }
 
-    MARKET_GetSpotOrderBook(){
+    MARKET_GetSpotOrderBook(currency){
         let that = this;
         return new Promise((s,f)=>{
-            B52Tv.GetCurrentCurrencyPair().then(currency=>{
-                that.GET_SPOT_ANON_PARAMS(
-                    B52Settings.binanceSettings.workbook2,
-                    {
-                        symbol:currency,
-                        limit:B52Settings.workBookDepth
-                    }
-                    ).then((resp)=>{
-                        B52Log.Info(`MARKET_GetSpotOrderBook. `, resp);
-                        s(resp);
-                    });
-            });
+            that.GET_SPOT_ANON_PARAMS(
+                B52Settings.binanceSettings.workbook2,
+                {
+                    symbol:currency,
+                    limit:B52Settings.workBookDepth
+                }
+                ).then((resp)=>{
+                    B52Log.Info(`MARKET_GetSpotOrderBook. `, resp);
+                    s(resp);
+                });
         });
     }
 }
