@@ -19,6 +19,7 @@ var B52Settings =
     workBookDepth:100,
     workBookColorPerc:0.005,
     workBookMaxRows:600,
+    drawLinesStratName:"D52Orders",
 	sButtons : 
 	[
         {name:"B52_ZONE_0.2",color:"#006600"},
@@ -295,7 +296,7 @@ var B52HTML =
                 <div id="B52Ordung" style="width:80%;height:100%;overflow-y:auto;">
                 </div>
                 <div>
-                    <button style="width:50px;height:120px" id="B52OrdersDraw">Draw</button>
+                    <button style="width:58px;height:164px;background-color:darkslategray;margin-top:3px" id="B52OrdersDraw">Draw</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
@@ -453,6 +454,7 @@ class B52 {
             that.Stakan2.Center();
         });
         $("#B52WBDepth").text(B52Settings.workBookDepth);
+        $("#B52OrdersDraw").mouseup(()=>that.BUTTON_DrawOrderLines());
     }
 
     BUTTON_B52RenewTransactions(){
@@ -719,7 +721,26 @@ class B52 {
     BUTTON_DrawOrderLines(){
         let that = this;
         //check strategy is run? not=> run, then set ords
-        let settingsButton = "";
+        let settingsButton = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + B52Settings.drawLinesStratName + "')]]//div[@data-name='legend-settings-action']";
+        let ordersString = "";
+        that.Binance.OpenedOrders.forEach(o=>{
+            let interPrice = o.price=="0"?parseFloat(o.stopPrice):parseFloat(o.price);
+            let interType = o.origType.includes("STOP")?"STOP":o.origType;
+            ordersString += o.side + ";" +
+                            interType +";" + 
+                            interPrice.toString() + ";"+ 
+                            parseFloat(o.origQty) + "|";
+        });
+        if(ordersString.length) ordersString = ordersString.substring(0,ordersString.length-1);
+        if(B52Tv.XpathItemCount(settingsButton)>0){
+            B52Tv.SetAnyStrategySettings(B52Settings.drawLinesStratName,[{label:"DrawArray",value:ordersString}]);
+        }
+        else
+        {
+            B52Tv.RunFavIndicator(B52Settings.drawLinesStratName).then(()=>{
+                B52Tv.SetAnyStrategySettings(B52Settings.drawLinesStratName,[{label:"DrawArray",value:ordersString}]);
+            });
+        }
     }
 
     SetServices()
@@ -936,7 +957,7 @@ class B52 {
                     $("#B52Ordung").append(control);
                     let ordid = o.orderId;
                     $("#B52"+o.clientOrderId).mouseup(()=>that.Binance.ORDERS_ChancelSingleOrder(ordid,currency));
-                    $("#B52OrdersDraw").mouseup(()=>that.BUTTON_DrawOrderLines());
+                    
                 });
             });
         });
@@ -1416,7 +1437,8 @@ class B52Tv {
         return new Promise((s,f)=>{
             B52Tv.WaitForElement(fav).then((e)=>{
                 B52Tv.TriggerMouseEvent(e, "click");
-                B52Tv.WaitForElement(B52Settings.tvXpath.b52SettingButton).then((e2)=>{
+                let setButt = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + name + "')]]//div[@data-name='legend-settings-action']";
+                B52Tv.WaitForElement(setButt).then((e2)=>{
                     s();
                 });
             });
@@ -1527,6 +1549,29 @@ class B52Tv {
 	{
         return new Promise((s,f)=>{
             B52Tv.WaitForElement(B52Settings.tvXpath.b52SettingButton).then(e=>{
+                B52Tv.TriggerMouseEvent(e,"mousedown");
+                let firstInput = "//div[@data-name='indicator-properties-dialog']";
+                B52Tv.WaitForElement(firstInput).then(e1=>{
+                    for(let i=0;i<sets.length;i++)
+                    {
+                        let input = "//div[./div[text()='"+sets[i].label+"']]/following-sibling::div[1]//input";
+                        
+                        let inputNode = B52Tv.XpathGetFirstItem(input);
+                        if(inputNode!=null) B52Tv.SetReactValue(inputNode,sets[i].value);
+                    }
+                    let ok = B52Tv.XpathGetFirstItem("//button[@data-name='submit-button']");
+                    B52Tv.TriggerMouseEvent(ok, "click");
+                    s();
+                });
+            });
+        });
+	}
+
+    static SetAnyStrategySettings(stratName,sets)
+	{
+        return new Promise((s,f)=>{
+            let settingsButton = "//div[@data-name='legend-source-item' and .//div[contains(text(),'" + stratName + "')]]//div[@data-name='legend-settings-action']";
+            B52Tv.WaitForElement(settingsButton).then(e=>{
                 B52Tv.TriggerMouseEvent(e,"mousedown");
                 let firstInput = "//div[@data-name='indicator-properties-dialog']";
                 B52Tv.WaitForElement(firstInput).then(e1=>{

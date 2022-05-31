@@ -3,7 +3,7 @@
 
 //@version=5
 indicator("D52Orders",overlay=true,format=format.inherit)
-draws = input.string("BUY;LIMIT;31000;0.1|SELL;STOP;30000;0.2",title="DrawArray")
+draws = input.string("",title="DrawArray")
 
 var lines = str.split(draws,'|')
 int arrSize = array.size(lines) - 1
@@ -14,8 +14,8 @@ for i = 0 to arrSize
     theValues = str.split(theLine,';')
     direction = array.get(theValues,0)
     type = array.get(theValues,1)
-    level = array.get(theValues,2)
-    mmoney = array.get(theValues,3)
+    level = str.tonumber(array.get(theValues,2))
+    mmoney = str.tonumber(array.get(theValues,3))*level
     color col1 = na
     color col2 = na
     if type=="LIMIT" and direction=="BUY"
@@ -31,13 +31,13 @@ for i = 0 to arrSize
         col1 := color.orange
         col2 := color.orange
     l = line.new(na,na,na,na,xloc = xloc.bar_time,extend = extend.both,color= col1,style = line.style_dotted,width = 1)
-    line.set_xy1(l, time, str.tonumber(level))
-    line.set_xy2(l, time + 1, str.tonumber(level))
+    line.set_xy1(l, time, level)
+    line.set_xy2(l, time + 1, level)
     if not na(array.get(labels,i))
         pl = array.get(labels,i)
         label.delete(pl)
-    ll = label.new(x=bar_index, y=str.tonumber(level),color=col2, textcolor=color.white, style=label.style_label_lower_left, size=size.small)
-    label.set_text(ll, text=str.tostring(str.tonumber(mmoney),"###.##"))
-    label.set_xy(ll,bar_index+30,str.tonumber(level))
+    ll = label.new(x=bar_index, y=level,color=col2, textcolor=color.white, style=label.style_label_lower_left, size=size.small)
+    label.set_text(ll, text="$"+str.tostring(mmoney,"###.##"))
+    label.set_xy(ll,bar_index+15,level)
     label.delete(ll[1])
     array.set(labels,i,ll)
