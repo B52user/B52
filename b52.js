@@ -17,6 +17,7 @@ var B52Settings =
     workbookDollars:true,
     workbookAutoScroll:120,
     workBookDepth:100,
+    workBookDepth2:100,
     workBookColorPerc:0.005,
     workBookMaxRows:600,
     drawLinesStratName:"D52Orders",
@@ -112,27 +113,26 @@ var B52HTML =
 		div.B52 button {
 			border: "1px solid gray";
 			margin:1px;
-			
 		}
 		button.B52StrategyButton {
 			margin:2px;
-			padding-top:5px;
-			padding-bottom:5px;
-			font-size:15px;
-			width:51px;
+			padding:1px;
+			font-size:13px;
+			width:35px;
+            height:35px;
 		}
 		button.B52BigButton {
 			padding-top:0px;
 			padding-bottom:0px;
-			font-size:15px;
-			width:70px;
-			height:42px;
+			font-size:13px;
+			width:50px;
+			height:35px;
 		}
         button.B52TabButton
         {
             border:1px solid gray;
             width: 50px;
-            height:30px;
+            height:20px;
             margin: 1px;
             text-align: center;
         }
@@ -179,7 +179,7 @@ var B52HTML =
         div.B52WorkbookContainer
         {
             overflow-y:auto;
-            height:97%;
+            height:96%;
         }
         div.B52RiskPosItem
         {
@@ -203,73 +203,47 @@ var B52HTML =
             background:black;
             padding-top:0px;
         }
+        button.B52AdditionalButton
+        {
+            margin-left:0px;
+            width:45px;
+            height:30px;
+            background:rgba(103, 103, 103, 0.3);
+            padding: 0px;
+            font-size: 14px;
+        }
         ::-webkit-scrollbar {
             width: 8px;
           }
 	</style>
     `,
 	B52AreaHtml : `
-    <div id="B52CloseOpen" class="B52" style="margin:-2px;height:100px;width:30px;background-color:#404040;display:flex;margin-right:2px;right:355px;bottom:2px;">
-            <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:30px;height:120px;display:flex;margin:0px;padding:0px;" closed="false">
-                <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
-                    <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
-                        c0.702-6.54-1.503-12.887-6.121-17.507c-8.12-8.11-22.271-8.11-30.408,0c-2.688,2.688-4.611,6.11-5.58,9.917
-                        c-0.066,0.204-0.113,0.414-0.155,0.624c-0.469,2.127-0.603,4.326-0.404,6.552l-4.467,83.623
-                        c-1.338,7.033,0.851,14.195,5.893,19.244c4.068,4.069,9.377,6.146,15.404,6.237c0.21,0.021,0.42,0.036,0.636,0.036
-                        c0.097,0,0.194,0,0.289-0.005l85.046-4.552c2.114,0.199,4.257,0.078,6.282-0.341c0.473-0.053,0.93-0.174,1.36-0.348
-                        c3.6-0.997,6.851-2.865,9.433-5.454c8.378-8.377,8.378-22.021,0-30.409c-4.565-4.566-10.985-6.781-17.49-6.116
-                        c-0.127,0-0.258,0.011-0.39,0.021l-32.199,2.966l57.072-57.065C247.709,161.089,247.709,147.445,239.326,139.072z"/>
-                    <path fill="white" d="M115.66,108.334c-0.011,0.131-0.021,0.26-0.021,0.389c-0.704,6.535,1.512,12.879,6.124,17.497
-                        c4.063,4.058,9.459,6.293,15.208,6.293c5.745,0,11.142-2.236,15.198-6.293c2.705-2.698,4.625-6.111,5.581-9.891
-                        c0.062-0.209,0.116-0.419,0.163-0.635c0.473-2.123,0.603-4.32,0.404-6.556l4.473-83.621c1.343-7.031-0.836-14.197-5.89-19.239
-                        c-4.085-4.089-9.629-6.535-15.444-6.247c-0.288-0.031-0.6-0.036-0.883-0.026L55.526,4.553c-2.1-0.184-4.212-0.076-6.229,0.339
-                        c-0.501,0.052-0.984,0.176-1.441,0.36c-3.596,1-6.837,2.871-9.406,5.44c-8.381,8.386-8.381,22.027,0,30.402
-                        c4.569,4.569,10.965,6.795,17.443,6.124c0.145,0,0.289-0.011,0.436-0.023l32.208-2.966l-57.074,57.066
-                        c-4.065,4.053-6.302,9.449-6.302,15.195c0,5.747,2.237,11.149,6.297,15.208c4.063,4.063,9.459,6.299,15.205,6.299
-                        c5.743,0,11.14-2.236,15.203-6.294l56.887-56.893L115.66,108.334z"/>
-                </svg>
+    <div id="B52CloseOpen" class="B52" style="margin:-2px;height:70px;width:20px;background-color:#404040;display:flex;margin-right:2px;right:365px;bottom:2px;">
+            <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:20px;height:120px;display:flex;margin:0px;padding:0px;font-size:30px;padding-top:18px;padding-left:1px;" closed="false">
+            ⇕
             </button>
 	</div>
-	<div id="B52Area1" class="B52" style="right:72px;bottom:2px;border:1px solid gray;height:96px;width:285px;border-right:none;display:flex;">
+	<div id="B52Area1" class="B52" style="right:55px;bottom:2px;border:1px solid gray;height:65px;width:310px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons" style="overflow-y: auto;">
 		</div>
 	</div>
-	<div id="B52Area2" class="B52" style="right:2px;bottom:2px;border:1px solid gray;height:300px;width:70px;">
-		<div id="B52ExpandButton" style="margin:1px;height:35px;width:70px;background-color:black;display:flex">
+	<div id="B52Area2" class="B52" style="right:2px;bottom:2px;border:1px solid gray;height:257px;width:50px;">
+		<div id="B52ExpandButton" style="margin:1px;height:35px;width:48px;background-color:black;display:flex">
             <div>
-                <button style="width:67px;display:flex" id="B52Window2Open">
-                    <div style="height:28px;width:28px">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 270.774 270.775" style="margin:auto">
-                            <path fill="white" d="M239.326,139.072c-8.12-8.129-22.284-8.129-30.404,0l-56.894,56.883l3.086-33.529c0.01-0.125,0.022-0.252,0.022-0.378
-                                c0.702-6.54-1.503-12.887-6.121-17.507c-8.12-8.11-22.271-8.11-30.408,0c-2.688,2.688-4.611,6.11-5.58,9.917
-                                c-0.066,0.204-0.113,0.414-0.155,0.624c-0.469,2.127-0.603,4.326-0.404,6.552l-4.467,83.623
-                                c-1.338,7.033,0.851,14.195,5.893,19.244c4.068,4.069,9.377,6.146,15.404,6.237c0.21,0.021,0.42,0.036,0.636,0.036
-                                c0.097,0,0.194,0,0.289-0.005l85.046-4.552c2.114,0.199,4.257,0.078,6.282-0.341c0.473-0.053,0.93-0.174,1.36-0.348
-                                c3.6-0.997,6.851-2.865,9.433-5.454c8.378-8.377,8.378-22.021,0-30.409c-4.565-4.566-10.985-6.781-17.49-6.116
-                                c-0.127,0-0.258,0.011-0.39,0.021l-32.199,2.966l57.072-57.065C247.709,161.089,247.709,147.445,239.326,139.072z"/>
-                            <path fill="white" d="M115.66,108.334c-0.011,0.131-0.021,0.26-0.021,0.389c-0.704,6.535,1.512,12.879,6.124,17.497
-                                c4.063,4.058,9.459,6.293,15.208,6.293c5.745,0,11.142-2.236,15.198-6.293c2.705-2.698,4.625-6.111,5.581-9.891
-                                c0.062-0.209,0.116-0.419,0.163-0.635c0.473-2.123,0.603-4.32,0.404-6.556l4.473-83.621c1.343-7.031-0.836-14.197-5.89-19.239
-                                c-4.085-4.089-9.629-6.535-15.444-6.247c-0.288-0.031-0.6-0.036-0.883-0.026L55.526,4.553c-2.1-0.184-4.212-0.076-6.229,0.339
-                                c-0.501,0.052-0.984,0.176-1.441,0.36c-3.596,1-6.837,2.871-9.406,5.44c-8.381,8.386-8.381,22.027,0,30.402
-                                c4.569,4.569,10.965,6.795,17.443,6.124c0.145,0,0.289-0.011,0.436-0.023l32.208-2.966l-57.074,57.066
-                                c-4.065,4.053-6.302,9.449-6.302,15.195c0,5.747,2.237,11.149,6.297,15.208c4.063,4.063,9.459,6.299,15.205,6.299
-                                c5.743,0,11.14-2.236,15.203-6.294l56.887-56.893L115.66,108.334z"/>
-                        </svg>
-                    </div>
+                <button style="width:50px;display:flex;padding:0px" id="B52Window2Open">
                     <div>
-                    <div style="height:14px" id="B52Balance">
-                    </div>
-                    <div style="height:14px" id="B52BalanceChange">
+                        <div style="height:14px" id="B52Balance">
+                        </div>
+                        <div style="height:14px" id="B52BalanceChange">
                     </div>
                 </button>
             </div>
 		</div>
         <div>
-            <button id='B52NLStop' class="B52BigButton" style="background-color:green">STOP NO L.</button>
+            <button id='B52NLStop' class="B52BigButton" style="background-color:green">S.NO.L</button>
 		</div>
         <div>
-            <button id='B52COrders' class="B52BigButton" style="background-color:#000099">C.ORDS</button>
+            <button id='B52COrders' class="B52BigButton" style="background-color:#000099">C.ORD</button>
 		</div>
         <div>
             <button id='B52SellPart' class="B52BigButton" style="background-color:green">FIX</button>
@@ -278,26 +252,26 @@ var B52HTML =
             <button id='B52SellAll' class="B52BigButton" style="background-color:green">FIXALL</button>
 		</div>
 		<div>
-			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START!</button>
+			<button id='B52StartBinance' class="B52BigButton" style="background-color:maroon">START</button>
 		</div>
 		<div>
 			<button id='B52ClearChart' class="B52BigButton" style="background-color:#000099">CLEAR</button>
 		</div>
 	</div>
-    <div id="B52Tabs" class="B52" style="margin:1px;height:200px;width:312px;background:rgba(0, 0, 0, .6);right:75px;bottom:102px;" hid="true">
-        <div style="display:flex;height:30px;width:100%"">
+    <div id="B52Tabs" class="B52" style="margin:1px;height:185px;width:285px;background:rgba(0, 0, 0, .6);right:104px;bottom:74px;" hid="true">
+        <div style="display:flex;height:20px;width:100%"">
             <button class="B52TabButton" style="background:rgba(0, 162, 11, .5)" id="B52TabButton1">Ords</button>
             <button class="B52TabButton" style="background:rgba(202, 86, 0, .5)" id="B52TabButton2">Risk</button>
             <button class="B52TabButton" style="background:rgba(0, 3, 202, .5)" id="B52TabButton3">Inc</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton4">Log</button>
             <button class="B52TabButton" style="background:rgba(0, 0, 0, .5)" id="B52TabButton5">Sets</button>
         </div>
-        <div style="height:170px;width:100%;border:1px solid gray;">
+        <div style="height:167px;width:100%;border:1px solid gray;">
             <div class="B52Tab" id="B52Tab1" style="display:flex">
-                <div id="B52Ordung" style="width:80%;height:100%;overflow-y:auto;">
+                <div id="B52Ordung" style="width:242px;height:100%;overflow-y:auto;">
                 </div>
                 <div>
-                    <button style="width:58px;height:164px;background-color:darkslategray;margin-top:3px" id="B52OrdersDraw">Draw</button>
+                    <button style="width:40px;height:160px;background-color:darkslategray;margin-top:3px;padding:0px" id="B52OrdersDraw">Draw</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
@@ -335,9 +309,9 @@ var B52HTML =
             <div class="B52Tab" id="B52Tab5">Some 5555 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:400px;width:210px;background:rgba(0, 0, 0, .6);right:5px;bottom:308px;display:flex;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:430px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
         <div>
-            <div style="height:15px;background:rgba(82, 82, 82, 0.8);font-size:12px;">FUTURES</div>
+            <div style="height:20px;background:rgba(82, 82, 82, 0.8);font-size:12px;">FUTURES</div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable">
                 </table>
@@ -345,19 +319,23 @@ var B52HTML =
         </div>
         <div style="width:10px;height:100%;"></div>
         <div>
-        <div style="height:15px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
+            <div style="height:20px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable2">
                 </table>
             </div>
         </div>
-            <div style="width:30px;height:100%;">
-                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="margin-left:5px;height:140px;width:20px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="30" value="15" id="B52WBBars" style="margin-left:5px;height:140px;width:20px;-webkit-appearance: slider-vertical;">
-                <button style="margin-left:2px;width:20px;height:30px;background:rgba(103, 103, 103, 0.3);padding: 0px;font-size: 14px;" id="B52WBDepth">500</button>
-                <button style="margin-left:2px;width:20px;height:30px;background:rgba(103, 103, 103, 0.3);padding: 0px;font-size: 14px;" id="B52WBCent">CE</button>
-            </div>
-        <div>
+        <div style="width:20px;height:100%;">
+                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="10" value="5" id="B52WBScale2" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="3" value="15" id="B52WBBars" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="3" value="15" id="B52WBBars2" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
+        </div>
+    </div>
+    <div id="B52AdditionalButtons" class="B52" style="width:47px;height:182px;right:55px;bottom:75px;">
+        <button class="B52AdditionalButton" style="background:rgba(0, 138, 127, 0.8);" id="B52WBDepth">F500</button>
+        <button class="B52AdditionalButton" style="background:rgba(0, 138, 127, 0.8);" id="B52SWBDepth">S500</button>
+        <button class="B52AdditionalButton" style="background:rgba(134, 138, 0, 0.5);" id="B52WBCent">CE</button>          
     </div>
     `
 }
@@ -399,6 +377,7 @@ class B52 {
         this.SetServices();
         $("#B52Tabs").hide();
         $("#B52Workbook").hide();
+        $("#B52AdditionalButtons").hide();
     }
 
     static groupBy(list, keyGetter) {
@@ -435,26 +414,46 @@ class B52 {
         let scaleSlider = document.getElementById("B52WBScale");
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
-                B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
-                that.Stakan1.ReDraw();
-                that.Stakan2.ReDraw();
+                //B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
+                if(that.Stakan1!=null)that.Stakan1.ReDraw();
+                //if(that.Stakan2!=null)that.Stakan2.ReDraw();
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
                 B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
+                //B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
+        };
+        let scaleSlider3 = document.getElementById("B52WBScale2");
+        scaleSlider3.onchange = (e)=>{
+                //B52Settings.workBookScale = parseFloat(scaleSlider3.value);
+                B52Settings.workBookScale2 = parseFloat(scaleSlider3.value);
+                //if(that.Stakan1!=null)that.Stakan1.ReDraw();
+                if(that.Stakan2!=null)that.Stakan2.ReDraw();
+        };
+        let scaleSlider4 = document.getElementById("B52WBBars2");
+        scaleSlider4.onchange = (e)=>{
+                //B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
                 B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
-            $("#B52WBDepth").text(B52Settings.workBookDepth);
-            that.Stakan1.ReDraw();
-            that.Stakan2.ReDraw();
+            $("#B52WBDepth").text("F"+B52Settings.workBookDepth);
+            if(that.Stakan1!=null)that.Stakan1.ReDraw();
+            if(that.Stakan2!=null)that.Stakan2.ReDraw();
         });
+        $("#B52SWBDepth").mouseup(()=>{
+            B52Settings.workBookDepth2=B52Settings.workBookDepth2==100?500:100;
+            $("#B52SWBDepth").text("S"+B52Settings.workBookDepth2);
+            if(that.Stakan1!=null)that.Stakan1.ReDraw();
+            if(that.Stakan2!=null)that.Stakan2.ReDraw();
+        });
+        
         $("#B52WBCent").mouseup(()=>{
-            that.Stakan1.Center();
-            that.Stakan2.Center();
+            if(that.Stakan1!=null)that.Stakan1.Center();
+            if(that.Stakan2!=null)that.Stakan2.Center();
         });
-        $("#B52WBDepth").text(B52Settings.workBookDepth);
+        $("#B52WBDepth").text("F"+B52Settings.workBookDepth);
+        $("#B52SWBDepth").text("S"+B52Settings.workBookDepth2);
         $("#B52OrdersDraw").mouseup(()=>that.BUTTON_DrawOrderLines());
 
         $("#B52SpotName").change(()=>{
@@ -642,13 +641,15 @@ class B52 {
         {
             //open
             $("#B52CloseOpenButton").attr("closed","false");
-            $("#B52CloseOpen").css("right","355px");
+            $("#B52CloseOpen").css("right","365px");
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").show();
             $("#B52Area2").show();
             if(!closed2)
             {
-                $("#B52Tabs").show();$("#B52Workbook").show();
+                $("#B52Tabs").show();
+                $("#B52Workbook").show();
+                $("#B52AdditionalButtons").show();
                 $("#B52TabButton1").mouseup();
                 
                 this.Srvs.Workbook1.Start();
@@ -661,11 +662,13 @@ class B52 {
         {
             //close
             $("#B52CloseOpenButton").attr("closed","true");
-            $("#B52CloseOpen").css("right","2px");
+            $("#B52CloseOpen").css("right","0px");
             $("#B52CloseOpen").css("bottom","2px");
             $("#B52Area1").hide();
             $("#B52Area2").hide();
-            $("#B52Tabs").hide();$("#B52Workbook").hide();
+            $("#B52Tabs").hide();
+            $("#B52Workbook").hide();
+            $("#B52AdditionalButtons").hide();
             
             this.Srvs.Workbook1.Stop();
             this.Srvs.Workbook2.Stop();
@@ -707,6 +710,7 @@ class B52 {
             $("#B52Tabs").attr("hid","true");
             $("#B52Tabs").hide();
             $("#B52Workbook").hide();
+            $("#B52AdditionalButtons").hide();
             this.Srvs.Workbook1.Stop();
             this.Srvs.Workbook2.Stop();
         }
@@ -715,6 +719,7 @@ class B52 {
             $("#B52Tabs").attr("hid","false");
             $("#B52Tabs").show();
             $("#B52Workbook").show();
+            $("#B52AdditionalButtons").show();
             $("#B52TabButton1").mouseup();
             this.Srvs.Workbook1.Start();
             this.Srvs.Workbook2.Start();
@@ -2201,7 +2206,7 @@ class BinanceAdapter {
                 B52Settings.binanceSettings.workbook2,
                 {
                     symbol:currency,
-                    limit:B52Settings.workBookDepth
+                    limit:B52Settings.workBookDepth2
                 }
                 ).then((resp)=>{
                     B52Log.Info(`MARKET_GetSpotOrderBook. `, resp);
