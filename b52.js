@@ -158,12 +158,15 @@ var B52HTML =
         }
         div.B52OrderItem button
         {
-            height:23px;
-            width:23px;
+            height:30px;
+            width:30px;
             text-align: center;
             font-size:17px;
-            background:black;
-            padding-top:0px;
+            background:rgba(35, 35, 35, 0.6);
+            padding:0px;
+            margin-top: -2px;
+            margin-left: -3px;
+            border: 1px solid darkslategray;
         }
         tr.B52WBrow
         {
@@ -201,8 +204,11 @@ var B52HTML =
             width:23px;
             text-align: center;
             font-size:17px;
-            background:black;
-            padding-top:0px;
+            background:rgba(35, 35, 35, 0.6);
+            padding:0px;
+            margin-top: -2px;
+            margin-left: -3px;
+            border: 1px solid darkslategray;
         }
         button.B52AdditionalButton
         {
@@ -281,7 +287,7 @@ var B52HTML =
                     <div style="width:120px;height:100%;overflow-y:auto;" id="B52OrdersOpenedList">Orders:</div>
                 </div>
                 <div>
-                    <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px" id="B52RenewAllPositions">⟳</button>
+                    <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px;font-size:18px;" id="B52RenewAllPositions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab3" style="display:flex">
@@ -290,7 +296,7 @@ var B52HTML =
                     <div style="width:120px;height:100%;overflow-y:auto;" id="B52IncomeDays">Income by day:</div>
                 </div>
                 <div>
-                    <button style="width:40px;height:40px;background:rgba(70, 172, 0, 0.5);margin-top:3px;padding:0px" id="B52RenewTransactions">⟳</button>
+                    <button style="width:40px;height:40px;background:rgba(70, 172, 0, 0.5);margin-top:3px;padding:0px;font-size:18px;" id="B52RenewTransactions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
@@ -532,13 +538,13 @@ class B52 {
     BUTTON_B52RenewAllOrders() {
         let that = this;
         that.Binance.ORDERS_GetAllOpenedOrders().then(ords=>{
-            $("#B52OrdersOpenedList").empty();
+            $("#B52OrdersOpenedList").html("Orders:");
             ords.forEach((o)=>{
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+o.side)[0].col;
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
                     <div style="width:18px;">
-                        <button id="B52${o.clientOrderId}OC">x</button>
+                        <button id="B52${o.clientOrderId}OC">✘</button>
                     </div>
                     <div style="margin-top:5px;width:110px">
                         ${o.symbol} $${(o.origQty*parseFloat(o.price=="0"?o.stopPrice:o.price).toFixed(2))}
@@ -907,10 +913,10 @@ class B52 {
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
                 let control = `
                 <div class="B52RiskPosItem" style="background:${col}">
-                    <div style="width:05px;">
-                        <button id="B52${p.symbol}POS">x</button>
+                    <div style="width:18px;">
+                        <button id="B52${p.symbol}POS">✘</button>
                     </div>
-                    <div style="margin-top:5px;width:110px">
+                    <div style="margin-top:4px;width:110px">
                         ${p.symbol} $${parseFloat(p.unRealizedProfit).toFixed(2)}
                     </div>
                 <div>`;
@@ -964,7 +970,7 @@ class B52 {
                     let control = `
                     <div class="B52OrderItem" style="background:${col}">
                         <div style="width:25px;">
-                            <button id="B52${o.clientOrderId}">x</button>
+                            <button id="B52${o.clientOrderId}">✘</button>
                         </div>
                         <div style="margin-top:5px;width:200px">
                             ${(o.price=="0"?o.stopPrice:o.price)+" "+o.origQty}
