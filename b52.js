@@ -182,7 +182,7 @@ var B52HTML =
         div.B52WorkbookContainer
         {
             overflow-y:auto;
-            height:96%;
+            height:430px;
         }
         div.B52RiskPosItem
         {
@@ -303,16 +303,16 @@ var B52HTML =
         </div>
     </div>
     <div id="B52Workbook" class="B52" style="margin:1px;height:450px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
-        <div>
-            <div style="height:20px;background:rgba(82, 82, 82, 0.8);font-size:12px;">FUTURES</div>
+        <div style="height: 100%;">
+            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;padding-top:3px;" id="B52FuturesX">FUTURES</div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable">
                 </table>
             </div>
         </div>
         <div style="width:10px;height:100%;"></div>
-        <div>
-            <div style="height:20px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
+        <div style="height: 100%;">
+            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex;padding-top:3px" id="B52SpotX">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable2">
                 </table>
