@@ -10,9 +10,8 @@ var B52Settings =
     numberOfTakes:5,
     minnotal: 5,
     workBookScale:5,
-    workBookScaleInc:1,
+    workBookScaleInc:15,
     workBookScale2:5,
-    workBookScaleInc2:1,
     workbookEmptyCells:20,
     workbookDollars:true,
     workbookShorten:1,
@@ -320,10 +319,9 @@ var B52HTML =
             </div>
         </div>
         <div style="width:20px;height:100%;">
-                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="10" value="5" id="B52WBScale2" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="3" value="2" id="B52WBBars" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="3" value="2" id="B52WBBars2" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="10" value="5" id="B52WBScale" style="height:140px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="10" value="5" id="B52WBScale2" style="height:140px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="30" value="15" id="B52WBBars" style="height:140px;width:16px;-webkit-appearance: slider-vertical;">
         </div>
     </div>
     <div id="B52AdditionalButtons" class="B52" style="width:47px;height:182px;right:55px;bottom:75px;">
@@ -339,7 +337,11 @@ var B52Log = {
     _eventLogChanged:[],
     Info : (message,obj=null)=>{
         B52Log._log.push({type:"info",mess:message,obj:obj});
-        
+        //console.log(message);
+    },
+    Error : (message,obj=null)=>{
+        B52Log._log.push({type:"error",mess:message,obj:obj});
+        console.log(message);
     },
     GetLog : ()=>{
         return B52Log._log;
@@ -408,26 +410,16 @@ class B52 {
         let scaleSlider = document.getElementById("B52WBScale");
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
-                //B52Settings.workBookScale2 = parseFloat(scaleSlider.value);
                 if(that.Stakan1!=null)that.Stakan1.ReDraw();
-                //if(that.Stakan2!=null)that.Stakan2.ReDraw();
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
-                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/3;
-                //B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
+                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value);
         };
         let scaleSlider3 = document.getElementById("B52WBScale2");
         scaleSlider3.onchange = (e)=>{
-                //B52Settings.workBookScale = parseFloat(scaleSlider3.value);
                 B52Settings.workBookScale2 = parseFloat(scaleSlider3.value);
-                //if(that.Stakan1!=null)that.Stakan1.ReDraw();
                 if(that.Stakan2!=null)that.Stakan2.ReDraw();
-        };
-        let scaleSlider4 = document.getElementById("B52WBBars2");
-        scaleSlider4.onchange = (e)=>{
-                //B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
-                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/3;
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
@@ -466,11 +458,11 @@ class B52 {
             $("#B52Transactions").html("Transactions:");
             $("#B52IncomeDays").html("Income by day:");
             //filter by "COMMISSION" and "REALIZED_PNL" then append date then draw
-            var curCoin = "";
-            var curCoinDate = "";
-            var curCoinSum = 0.0;
-            var curDayDate = "";
-            var curDaySum = 0.0;
+            let curCoin = "";
+            let curCoinDate = "";
+            let curCoinSum = 0.0;
+            let curDayDate = "";
+            let curDaySum = 0.0;
             let trans = income.filter(a=>a.incomeType=="COMMISSION"||a.incomeType=="REALIZED_PNL");
             trans.forEach((t)=>{
                 let inc = parseFloat(t.income);
@@ -590,12 +582,18 @@ class B52 {
                             sets.push({label:"Current position in coins",value:currPos.positionAmt});
                             sets.push({label:"Entry price in $",value:currPos.entryPrice});
                         }
-                        console.log("Sending sets");
-                        console.log(sets);
                         if(sets.length) B52Tv.SetStrategySettings(sets);
+                    }).catch(error=>{
+                        B52Log.Error("BUTTON_B52Strategy Fail Getting MARKET_GetPriceFormatPrecision " + currency, error);
                     });
+                }).catch(error=>{
+                    B52Log.Error("BUTTON_B52Strategy Fail Getting MARKET_GetTickSize " + currency, error);
                 });
+            }).catch(error=>{
+                B52Log.Error("BUTTON_B52Strategy Error getting currency from TV", error);
             });
+        }).catch(error=>{
+            B52Log.Error("BUTTON_B52Strategy Error running Fav indicator from TV " + currency, error);
         });
     }
 
@@ -606,13 +604,13 @@ class B52 {
             B52Tv.GetAlertMessage(theUniqueName).then(mess=>{
                 B52Tv.GetCurrentCurrencyPair().then(currency=>{
                     let arr = JSON.parse(mess);
-                    console.log("I am sending: ");
-                    console.log(arr);
                     arr.forEach(e=>{
                         e["symbol"] = currency;
                         that.Binance.ORDERS_NewOrder(e).then(resp=>{
                             B52Log.Info("BUTTON_B52StartBinance",resp);
                             console.log(resp);
+                        }).catch(error=>{
+                            B52Log.Error("BUTTON_B52StartBinance FAILED SEDING ORDER "+JSON.stringify(e), error);
                         });
                     });
                 });
@@ -699,7 +697,7 @@ class B52 {
     }
 
     BUTTON_B52Window2Open(){
-        var closed = $("#B52Tabs").attr("hid")=="true";
+        let closed = $("#B52Tabs").attr("hid")=="true";
         
         if(!closed)
         {
@@ -838,7 +836,11 @@ class B52 {
                     that.Binance.ORDERS_GetAllPositions().then(pos=>{
                         that.Binance.OpenedPositions = pos;
                         that.#_openedPositions_lock = false;
-                        //run events
+                        that.Binance._eventOpenPositionsChanged.forEach(a=>a());
+                    }).catch(error=>{
+                        B52Log.Error("SERVICE_MakeRiskService failed getting positions, erasing", error);
+                        that.Binance.OpenedPositions = null;
+                        that.#_openedPositions_lock = false;
                         that.Binance._eventOpenPositionsChanged.forEach(a=>a());
                     });
                 }
@@ -867,7 +869,9 @@ class B52 {
                             $("#B52SellPart").css("color","white");
                         }
                         
-                    });  
+                    }).catch(error=>{
+                        B52Log.Error("SERVICE_MakeRiskService coudln't redraw FIX buttons as coudn't get MARKET_GetTickSize ",error);
+                    });
                     
                     let colorFilter = (profit-charge)>0?"green":"red";
                     let colorProp = Math.abs((profit-charge)/entryPrice*Math.abs(amount));
@@ -904,11 +908,14 @@ class B52 {
                         $("#B52BalanceChange").text("$"+(currBalance-prevBalance).toFixed(2));
                     }
                 }
+            }).catch(error=>{
+                B52Log.Error("SERVICE_MakeRiskService couldn't renew balance and redraw button ", error);
             });
         });
         that.Binance._eventOpenPositionsChanged.push(()=>{
-            let riskOpened = that.Binance.OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
             $("#B52PosOpenedList").html("Positions:");
+            if(that.Binance.OpenedPositions==null) return;
+            let riskOpened = that.Binance.OpenedPositions.filter(a=>parseFloat(a.positionAmt)!=0||parseFloat(a.unRealizedProfit)!=0||parseFloat(a.entryPrice)!=0);
             riskOpened.forEach((p)=>{
                 let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(parseFloat(p.unRealizedProfit)>0?"BUY":"SELL"))[0].col;
                 let control = `
@@ -940,7 +947,11 @@ class B52 {
                         that.Binance.ORDERS_GetOpenOrders(currency).then(ords=>{
                             that.Binance.OpenedOrders = ords;
                             that.#_openedOrders_lock = false;
-                            //run events
+                            that.Binance._eventOpenOrdersChanged.forEach(a=>a());
+                        }).catch(error=>{
+                            B52Log.Error("SERVICE_MakeOrderService failed getting orders, erasing", error);
+                            that.Binance.OpenedOrders = null;
+                            that.#_openedOrders_lock = false;
                             that.Binance._eventOpenOrdersChanged.forEach(a=>a());
                         });
                     });
@@ -963,8 +974,9 @@ class B52 {
         });
         that.Binance._eventOpenOrdersChanged.push(()=>{
             B52Tv.GetCurrentCurrencyPair().then(currency=>{
-                let ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
                 $("#B52Ordung").empty();
+                if(!that.Binance.OpenedOrders.length) return;
+                let ordersOpened = that.Binance.OpenedOrders.sort((a,b)=>parseFloat((a.price=="0"?a.stopPrice:a.price))>parseFloat((b.price=="0"?b.stopPrice:b.price))?-1:1);
                 ordersOpened.forEach((o)=>{
                     let col = B52Settings.orderColors.filter(a=>a.name==o.origType+o.side)[0].col;
                     let control = `
@@ -1004,6 +1016,11 @@ class B52 {
                         that.#_workbook_lock = false;
                         //run events
                         that.Binance._eventWorkbookChanged.forEach(a=>a());
+                    }).catch(error=>{
+                        B52Log.Error("SERVICE_MakeWorBookService coudln't renew orderbook 1 due to error clearing it",error);
+                        that.Binance.WorkBook = null;
+                        that.#_workbook_lock = false;
+                        that.Binance._eventWorkbookChanged.forEach(a=>a());
                     });
                 }
         });
@@ -1027,9 +1044,14 @@ class B52 {
                             //refine will redraw automatically if required
                             that.Stakan1.Refine(that.Binance.WorkBook,form,tick);
                         }
+                    }).catch(error=>{
+                        B52Log.Error("SERVICE_MakeWorBookService coudln't process stakan because couldn't get MARKET_GetTickSize",error);
+                        if(that.Stakan1!=null)that.Stakan1.Clear();
                     });
+                }).catch(error=>{
+                    B52Log.Error("SERVICE_MakeWorBookService coudln't process stakan because couldn't get MARKET_GetPriceFormatPrecision",error);
+                    if(that.Stakan1!=null)that.Stakan1.Clear();
                 });
-                
             });
         });
         return wbSrv;
@@ -1037,7 +1059,6 @@ class B52 {
 
     #_workbook_lock2;
     Stakan2;
-    #_spotCurrency = "";
     SERVICE_MakeWorBookService2(){
         let that = this;
         this.#_workbook_lock2 = false;
@@ -1054,6 +1075,11 @@ class B52 {
                             that.#_workbook_lock2 = false;
                             //run events
                             that.Binance._eventWorkbookChanged2.forEach(a=>a());
+                        }).catch(error=>{
+                            B52Log.Error("SERVICE_MakeWorBookService2 coudln't renew orderbook 2 due to error clearing it",error);
+                            that.Binance.WorkBook2 = null;
+                            that.#_workbook_lock2 = false;
+                            that.Binance._eventWorkbookChanged2.forEach(a=>a());
                         });
                     }
                 }
@@ -1064,6 +1090,7 @@ class B52 {
             that.Binance.MARKET_SPOT_GetPriceFormatPrecision(currency).then(form=>{
                 that.Binance.MARKET_SPOT_GetTickSize(currency).then(tick=>{
                     if(that.Stakan2==null) {
+                        
                         that.Stakan2 = new B52Stakan(
                             document.getElementById("B52WorkBookTable2"),
                             form,
@@ -1078,7 +1105,13 @@ class B52 {
                         //refine will redraw automatically if required
                         that.Stakan2.Refine(that.Binance.WorkBook2,form,tick);
                     }
+                }).catch(error=>{
+                    B52Log.Error("SERVICE_MakeWorBookService2 coudln't process stakan because couldn't get MARKET_SPOT_GetTickSize",error);
+                    if(that.Stakan2!=null)that.Stakan2.Clear();
                 });
+            }).catch(error=>{
+                B52Log.Error("SERVICE_MakeWorBookService2 coudln't process stakan because couldn't get MARKET_SPOT_GetPriceFormatPrecision",error);
+                if(that.Stakan2!=null)that.Stakan2.Clear();
             });
         });
         return wbSrv;
@@ -1158,13 +1191,14 @@ class B52Stakan{
         this.#_uniqieid = uniqueid;
         this.#_colaPerc = null;
         this.#_lastColaPercPrice = null;
-        this.#_maxSum = null;
+        this.#_maxSum = 0;
         this.#_wbFrom = null;
         this.#_lastProcessedWB = null;
         this.#_wbEnd = null;
     }
 
     ReDraw(){
+        this.#_maxSum = 0;
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
@@ -1247,7 +1281,7 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
                             
             //size of bar
-            let scaleSize = Math.round(100*sum/(this.#_maxSum*B52Settings.workBookScaleInc));
+            let scaleSize = Math.round(100*sum*(B52Settings.workBookScaleInc/15)/(this.#_maxSum));
             //color of bar
             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
             //color of the background main
@@ -1328,7 +1362,7 @@ class B52Stakan{
             if(sum>this.#_maxSum)this.#_maxSum=sum;
 
             //size of bar
-            let scaleSize = Math.round(100*sum/(this.#_maxSum*B52Settings.workBookScaleInc));
+            let scaleSize = Math.round(100*sum*(B52Settings.workBookScaleInc/15)/(this.#_maxSum));
             //color of bar
             let scaleColor = scaleSize>50?(scaleSize>90?B52Settings.workbookColors.big2:B52Settings.workbookColors.big1):B52Settings.workbookColors.bidscale;
 
@@ -1476,13 +1510,17 @@ class B52Stakan{
             }
         });
     }
+
+    Clear(){
+        this.#_table.innerHTML =  "";
+    }
 }
 
 class B52Tv {
     constructor() {
     }
     static TriggerMouseEvent(node, eventType) {
-        var clickEvent = document.createEvent('MouseEvents');
+        let clickEvent = document.createEvent('MouseEvents');
         clickEvent.initEvent(eventType, true, true);
         node.dispatchEvent(clickEvent);
     }
@@ -1502,7 +1540,7 @@ class B52Tv {
         return document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
     }
     static XpathGetFirstItem(xpath) {
-        var items = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
+        let items = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
         return items.iterateNext();
     }
 
@@ -1819,7 +1857,11 @@ class BinanceAdapter {
                     that.#_secretKey,
                     closeParams).then((resp)=>{
                         B52Log.Info("No Loss set sucess. ", resp);
+                    }).catch(error=>{
+                        B52Log.Error("Fail Setting NOLOS. ", error);
                     });
+            }).catch(error=>{
+                B52Log.Error("Fail Getting MARKET_GetPriceFormatPrecision for pair = "+pair, error);
             });
         });
     }
@@ -1846,6 +1888,8 @@ class BinanceAdapter {
             that.#_secretKey,
             closeParams).then((resp)=>{
                 B52Log.Info(`Position fixed for ${currency}. `, resp);
+            }).catch(error=>{
+                B52Log.Error("Fail Fixing poisitons for currency = "+currency, error);
             });
     }
 
@@ -1859,11 +1903,7 @@ class BinanceAdapter {
         }
         let direction = pos>0?"SELL":"BUY";
         that.MARKET_GetPriceFormatPrecision(currency).then(prec=>{
-            let pos
-            if(prec.length!=1)
-            {
 
-            }
             let closeParams = {
                 side:direction,
                 quantity:coins,
@@ -1877,7 +1917,11 @@ class BinanceAdapter {
                 that.#_secretKey,
                 closeParams).then((resp)=>{
                     B52Log.Info(`Position fixed for ${currency}. `, resp);
-                });
+                }).catch(error=>{
+                    B52Log.Error("Fail Fixing sinlge position for pair = "+currency, error);
+                });;
+        }).catch(error=>{
+            B52Log.Error("Fail Getting MARKET_GetPriceFormatPrecision for pair = "+currency, error);
         });
     }
 
@@ -1897,6 +1941,8 @@ class BinanceAdapter {
             that.#_secretKey,
             closeParams).then((resp)=>{
                 B52Log.Info(`Chanceled all opened orders for ${currency}. `, resp);
+            }).catch(error=>{
+                B52Log.Error("Fail Canceling all orders for pair = "+currency, error);
             });
     }
 
@@ -1917,6 +1963,9 @@ class BinanceAdapter {
                 params).then((resp)=>{
                     B52Log.Info(`MARKET_GetPrice for ${currency}. `, resp);
                     s(parseFloat(resp.lastPrice));
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting Price for pair = "+currency, error);
+                    f(error);
                 });
         });
     }
@@ -1932,6 +1981,9 @@ class BinanceAdapter {
                 params).then((resp)=>{
                     B52Log.Info(`ORDERS_GetOpenOrders for ${currency}. `, resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting Opened orders for pair = "+currency, error);
+                    f(error);
                 });
         });
     }
@@ -1945,6 +1997,9 @@ class BinanceAdapter {
                 that.#_secretKey).then((resp)=>{
                     B52Log.Info(`ORDERS_GetAllPositions. `, resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting all opened risk positions", error);
+                    f(error);
                 });
         });
     }
@@ -1963,6 +2018,9 @@ class BinanceAdapter {
                     B52Log.Info(`MARKET_GetExchangeInfo. `, resp);
                     that.#_exchangeInfo = resp;
                     s(that.#_exchangeInfo);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting futures exchange info", error);
+                    f(error);
                 });
         });
     }
@@ -1975,14 +2033,17 @@ class BinanceAdapter {
             that.MARKET_GetExchangeInfo().then(info=>{
                 let theSymb = info.symbols.filter(a=>a.symbol==currency);
                 if(!theSymb.length) {
-                    B52Log.Info("MARKET_GetSize couldn't find symbol in exchange info: "+currency);
-                    f();
+                    B52Log.Error("MARKET_GetSize couldn't find symbol in exchange info: "+currency);
+                    f("MARKET_GetSize couldn't find symbol in exchange info: "+currency);
                 }
                 else
                 {
-                    var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+                    let theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
                     s(theMinSize);
                 }
+            }).catch(error=>{
+                B52Log.Error("Fail Getting futures exchange info", error);
+                f(error);
             });
 		});
 	}
@@ -2000,10 +2061,14 @@ class BinanceAdapter {
                 }
                 else
                 {
-                    var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
-                    s(tickSize.toString());
+                    let microTick = theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize;
+                    let tickSize = parseFloat(microTick);
+                    s(tickSize.toString().includes("e")?microTick:tickSize.toString());
                 }
-		    });
+		    }).catch(error=>{
+                B52Log.Error("Fail Getting futures exchange info", error);
+                f(error);
+            });
     	});
     }
 
@@ -2021,6 +2086,9 @@ class BinanceAdapter {
                     B52Log.Info(`MARKET_SPOT_GetExchangeInfo. `, resp);
                     that.#_spot_exchangeInfo = resp;
                     s(that.#_spot_exchangeInfo);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting spot exchange info", error);
+                    f(error);
                 });
         });
     }
@@ -2033,14 +2101,17 @@ class BinanceAdapter {
             that.MARKET_SPOT_GetExchangeInfo().then(info=>{
                 let theSymb = info.symbols.filter(a=>a.symbol==currency);
                 if(!theSymb.length) {
-                    B52Log.Info("MARKET_SPOT_GetTickSize couldn't find symbol in exchange info: "+currency);
-                    f();
+                    B52Log.Error("MARKET_SPOT_GetTickSize couldn't find symbol in exchange info: "+currency);
+                    f("MARKET_SPOT_GetTickSize couldn't find symbol in exchange info: "+currency);
                 }
                 else
                 {
-                    var theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
+                    let theMinSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'LOT_SIZE')[0].stepSize);
                     s(theMinSize);
                 }
+            }).catch(error=>{
+                B52Log.Error("Fail Getting spot exchange info", error);
+                f(error);
             });
 		});
 	}
@@ -2053,13 +2124,14 @@ class BinanceAdapter {
 			that.MARKET_SPOT_GetExchangeInfo().then(info=>{
                 let theSymb = info.symbols.filter(a=>a.symbol==currency);
                 if(!theSymb.length) {
-                    B52Log.Info("MARKET_SPOT_GetPriceFormatPrecision couldn't find symbol in exchange info: "+currency);
-                    f();
+                    B52Log.Error("MARKET_SPOT_GetPriceFormatPrecision couldn't find symbol in exchange info: "+currency);
+                    f("MARKET_SPOT_GetPriceFormatPrecision couldn't find symbol in exchange info: "+currency);
                 }
                 else
                 {
-                    var tickSize = parseFloat(theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize);
-                    s(tickSize.toString());
+                    let microTick = theSymb[0].filters.filter(a => a.filterType == 'PRICE_FILTER')[0].tickSize;
+                    let tickSize = parseFloat(microTick);
+                    s(tickSize.toString().includes("e")?microTick:tickSize.toString());
                 }
 		    });
     	});
@@ -2080,9 +2152,15 @@ class BinanceAdapter {
                         .then(resp => {
                             s(resp);
                         })
-                        .catch(error => B52Log.Info("DELETE_SIGNED_PARAMS ERROR: ",error));
+                        .catch(error => {
+                            B52Log.Info("DELETE_SIGNED_PARAMS ERROR: ",error);
+                            f(error);
+                        });
             })
-            .catch(error => B52Log.Info("DELETE_SIGNED_PARAMS ERROR: ",error));
+            .catch(error => {
+                B52Log.Error("DELETE_SIGNED_PARAMS ERROR: ",error);
+                f(error);
+            });
         });
     }
 
@@ -2102,9 +2180,15 @@ class BinanceAdapter {
                         .then(resp => {
                             s(resp);
                         })
-                        .catch(error => B52Log.Info("POST_SIGNED_PARAMS ERROR: ",error));
+                        .catch(error => {
+                            B52Log.Info("POST_SIGNED_PARAMS ERROR: ",error);
+                            f(error);
+                        });
             })
-            .catch(error => B52Log.Info("POST_SIGNED_PARAMS ERROR: ",error));
+            .catch(error => {
+                B52Log.Error("POST_SIGNED_PARAMS ERROR: ",error);
+                f(error);
+            });
         });
     }
     
@@ -2120,7 +2204,10 @@ class BinanceAdapter {
                 .then(resp => {
                     s(resp);
                 })
-                .catch(error => B52Log.Info("GET_ANON_PARAMS ERROR: ",error));
+                .catch(error => {
+                    B52Log.Error("GET_ANON_PARAMS ERROR: ",error);
+                    f(error);
+                });
         });
     }
 
@@ -2136,7 +2223,10 @@ class BinanceAdapter {
                 .then(resp => {
                     s(resp);
                 })
-                .catch(error => B52Log.Info("GET_SPOT_ANON_PARAMS ERROR: ",error));
+                .catch(error => {
+                    B52Log.Error("GET_SPOT_ANON_PARAMS ERROR: ",error);
+                    f(error);
+                });
         });
     }
 
@@ -2155,19 +2245,28 @@ class BinanceAdapter {
                         .then(resp => {
                             s(resp);
                         })
-                        .catch(error => B52Log.Info("GET_SIGNED_PARAMS ERROR: ",error));
+                        .catch(error => {
+                            B52Log.Error("GET_SIGNED_PARAMS ERROR: ",error);
+                            f(error);
+                        });
             })
-            .catch(error => B52Log.Info("GET_SIGNED_PARAMS ERROR: ",error));
+            .catch(error => {
+                B52Log.Error("GET_SIGNED_PARAMS ERROR: ",error);
+                f(error);
+            });
         });
     }
 
     ORDERS_GetBalance() {
-            var that = this;
+            let that = this;
             return new Promise((s,f)=>{
                 that.GET_SIGNED_PARAMS(B52Settings.binanceSettings.balance,
                     that.#_accessKey,
                     that.#_secretKey).then((resp)=>{
                         s(resp.filter(a=>a.asset=="USDT")[0].balance);
+                    }).catch(error=>{
+                        B52Log.Error("Fail Getting balance for wallet ", error);
+                        f(error);
                     });
             });
     }
@@ -2190,6 +2289,9 @@ class BinanceAdapter {
             closeParams
         ).then(resp=>{
             B52Log.Info(`ORDERS_ChancelSingleOrder for orderid=${orderid} and currency=${currency} done.`,resp);
+        }).catch(error=>{
+            B52Log.Error("Fail Getting spot exchange info", error);
+            f(error);
         });
     }
 
@@ -2203,6 +2305,9 @@ class BinanceAdapter {
                 order).then((resp)=>{
                     B52Log.Info("ORDERS_NewOrder. ", resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail creating new order ", error);
+                    f(error);
                 });
         });
     }
@@ -2220,6 +2325,9 @@ class BinanceAdapter {
                     ).then((resp)=>{
                         B52Log.Info(`MARKET_GetCurrentOrderBook. `, resp);
                         s(resp);
+                    }).catch(error=>{
+                        B52Log.Error("Fail Getting futures order book for " + currency, error);
+                        f(error);
                     });
             });
         });
@@ -2235,6 +2343,9 @@ class BinanceAdapter {
                 ).then((resp)=>{
                     B52Log.Info(`ORDERS_GetAllOpenedOrders. `, resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting absolutely all opened orders ", error);
+                    f(error);
                 });
         });
     }
@@ -2250,6 +2361,9 @@ class BinanceAdapter {
                 ).then((resp)=>{
                     B52Log.Info(`ORDERS_GetIncome. `, resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting income ", error);
+                    f(error);
                 });
         });
     }
@@ -2266,6 +2380,9 @@ class BinanceAdapter {
                 ).then((resp)=>{
                     B52Log.Info(`MARKET_GetSpotOrderBook. `, resp);
                     s(resp);
+                }).catch(error=>{
+                    B52Log.Error("Fail Getting spot order book for " + currency, error);
+                    f(error);
                 });
         });
     }
@@ -2283,7 +2400,7 @@ class B52Widget {
     }
 
     Build() {
-        var that = this;
+        let that = this;
         $('body').append(B52HTML.B52StyleDark+B52HTML.B52AreaHtml);
 	    that.FillButtonsIn(B52Settings.sButtons);
         $("div.B52 button").each((i,b)=>{
@@ -2294,7 +2411,7 @@ class B52Widget {
 	{
 	    buttons.forEach(b=>
 		{
-		   	var splitted = b.name.split('_');
+		   	let splitted = b.name.split('_');
 			$("#B52StrategyButtons").append("<button class='B52StrategyButton' id='"+b.name+"' style='background-color:"+b.color+"' origcolor='"+b.color+"'>"+splitted[1]+" " + splitted[2] +"</button>");
 		});
 	}
