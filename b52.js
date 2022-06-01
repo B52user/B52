@@ -287,7 +287,7 @@ var B52HTML =
                     <div style="width:100px;overflow-y:auto;height:100%;" id="B52Transactions">Transactions:</div>
                     <div style="width:100px;height:100%;overflow-y:auto;" id="B52IncomeDays">Income by day:</div>
                 <div>
-                    <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px" id="B52RenewTransactions">⟳</button>
+                    <button style="width:40px;height:40px;background:rgba(70, 172, 0, 0.5);margin-top:3px;padding:0px" id="B52RenewTransactions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
