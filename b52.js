@@ -219,7 +219,7 @@ var B52HTML =
     `,
 	B52AreaHtml : `
     <div id="B52CloseOpen" class="B52" style="margin:-2px;height:70px;width:20px;background-color:#404040;display:flex;margin-right:2px;right:365px;bottom:2px;">
-            <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:20px;height:120px;display:flex;margin:0px;padding:0px;font-size:30px;padding-top:18px;padding-left:1px;" closed="false">
+            <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:100%;height:100px;display:flex;margin:0px;padding:0px;font-size:30px;padding-top:18px;padding-left:1px;" closed="false">
             ⇕
             </button>
 	</div>
@@ -275,41 +275,26 @@ var B52HTML =
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
-                <div style="width:170px;overflow-y:auto;height:100%;" id="B52PosOpenedList">
-                Positions:
-                </div>
-                <div style="width:180px;">
-                    <div style="width:100%;display:flex">Orders: 
-                        <button id="B52RenewAllPositions" style="width:20px;height:20px;background:black;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
-                                <path fill="white" d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div style="width:100%;height:144px;overflow-y: auto;" id="B52OrdersOpenedList">
-                    </div>
+                <div style="width:242px;height:100%;">
+                    <div style="width:100px;overflow-y:auto;height:100%;" id="B52PosOpenedList">Positions:</div>
+                    <div style="width:100px;height:100%;overflow-y:auto;" id="B52OrdersOpenedList">Orders:</div>
+                <div>
+                    <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px" id="B52RenewAllPositions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab3" style="display:flex">
-                <div style="width:170px;overflow-y:auto;height:100%;" id="B52Transactions">
-                    Transactions:
-                </div>
-                <div style="width:100px;overflow-y:auto;height:100%;" id="B52IncomeDays">
-                    Income by day:
-                </div>
-                <div style="width:30px;height:30px;">
-                    <button id="B52RenewTransactions" style="width:40px;height:30px;background:black;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
-                            <path fill="white" d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
-                        </svg>
-                    </button>
+                <div style="width:242px;height:100%;">
+                    <div style="width:100px;overflow-y:auto;height:100%;" id="B52Transactions">Transactions:</div>
+                    <div style="width:100px;height:100%;overflow-y:auto;" id="B52IncomeDays">Income by day:</div>
+                <div>
+                    <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px" id="B52RenewTransactions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
             <div class="B52Tab" id="B52Tab5">Some 5555 interesting text</div>
         </div>
     </div>
-    <div id="B52Workbook" class="B52" style="margin:1px;height:430px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
+    <div id="B52Workbook" class="B52" style="margin:1px;height:450px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
         <div>
             <div style="height:20px;background:rgba(82, 82, 82, 0.8);font-size:12px;">FUTURES</div>
             <div class="B52WorkbookContainer">
@@ -328,8 +313,8 @@ var B52HTML =
         <div style="width:20px;height:100%;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
                 <input type="range" min="1" max="10" value="5" id="B52WBScale2" style="height:110px;width:16px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="3" value="15" id="B52WBBars" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
-                <input type="range" min="1" max="3" value="15" id="B52WBBars2" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="3" value="2" id="B52WBBars" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
+                <input type="range" min="1" max="3" value="2" id="B52WBBars2" style="height:90px;width:16px;-webkit-appearance: slider-vertical;">
         </div>
     </div>
     <div id="B52AdditionalButtons" class="B52" style="width:47px;height:182px;right:55px;bottom:75px;">
@@ -420,7 +405,7 @@ class B52 {
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
-                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
+                B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/3;
                 //B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
         };
         let scaleSlider3 = document.getElementById("B52WBScale2");
@@ -433,7 +418,7 @@ class B52 {
         let scaleSlider4 = document.getElementById("B52WBBars2");
         scaleSlider4.onchange = (e)=>{
                 //B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value)/15;
-                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/15;
+                B52Settings.workBookScaleInc2 = parseFloat(scaleSlider2.value)/3;
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
@@ -643,6 +628,7 @@ class B52 {
             $("#B52CloseOpenButton").attr("closed","false");
             $("#B52CloseOpen").css("right","365px");
             $("#B52CloseOpen").css("bottom","2px");
+            $("#B52CloseOpen").css("width","20px");
             $("#B52Area1").show();
             $("#B52Area2").show();
             if(!closed2)
@@ -662,8 +648,9 @@ class B52 {
         {
             //close
             $("#B52CloseOpenButton").attr("closed","true");
-            $("#B52CloseOpen").css("right","0px");
+            $("#B52CloseOpen").css("right","2px");
             $("#B52CloseOpen").css("bottom","2px");
+            $("#B52CloseOpen").css("width","30px");
             $("#B52Area1").hide();
             $("#B52Area2").hide();
             $("#B52Tabs").hide();
