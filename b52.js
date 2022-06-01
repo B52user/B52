@@ -15,6 +15,7 @@ var B52Settings =
     workBookScaleInc2:1,
     workbookEmptyCells:20,
     workbookDollars:true,
+    workbookShorten:1,
     workbookAutoScroll:120,
     workBookDepth:100,
     workBookDepth2:100,
@@ -275,17 +276,19 @@ var B52HTML =
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab2" style="display:flex">
-                <div style="width:242px;height:100%;">
-                    <div style="width:100px;overflow-y:auto;height:100%;" id="B52PosOpenedList">Positions:</div>
-                    <div style="width:100px;height:100%;overflow-y:auto;" id="B52OrdersOpenedList">Orders:</div>
+                <div style="width:242px;height:100%;display:flex">
+                    <div style="width:120px;overflow-y:auto;height:100%;" id="B52PosOpenedList">Positions:</div>
+                    <div style="width:120px;height:100%;overflow-y:auto;" id="B52OrdersOpenedList">Orders:</div>
+                </div>
                 <div>
                     <button style="width:40px;height:40px;background:rgba(200, 0, 104, 0.5);margin-top:3px;padding:0px" id="B52RenewAllPositions">⟳</button>
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab3" style="display:flex">
-                <div style="width:242px;height:100%;">
-                    <div style="width:100px;overflow-y:auto;height:100%;" id="B52Transactions">Transactions:</div>
-                    <div style="width:100px;height:100%;overflow-y:auto;" id="B52IncomeDays">Income by day:</div>
+                <div style="width:242px;height:100%;display:flex">
+                    <div style="width:120px;overflow-y:auto;height:100%;" id="B52Transactions">Transactions:</div>
+                    <div style="width:120px;height:100%;overflow-y:auto;" id="B52IncomeDays">Income by day:</div>
+                </div>
                 <div>
                     <button style="width:40px;height:40px;background:rgba(70, 172, 0, 0.5);margin-top:3px;padding:0px" id="B52RenewTransactions">⟳</button>
                 </div>
@@ -1249,13 +1252,43 @@ class B52Stakan{
                 this.#_colaPerc = this.#_colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                 this.#_lastColaPercPrice = currPrice;
             }
+            //convert sum to string and shorten if so
+            let sumString = "";
+            if(B52Settings.workbookDollars)
+            {
+                if(B52Settings.workbookShorten>0)
+                {
+                    let fixes = B52Settings.workbookShorten==1?1:2;
+                    let divideBy = parseInt("1"+"000".repeat(B52Settings.workbookShorten));
+                    let letter = B52Settings.workbookShorten==1?"k":B52Settings.workbookShorten==2?"m":B52Settings.workbookShorten==3?"b":"?";
+                    sumString = "$"+(sum/divideBy).toFixed(fixes)+letter;
+                }
+                else
+                {
+                    sumString = "$"+(sum).toFixed(0);
+                }
+            }
+            else
+            {
+                if(B52Settings.workbookShorten>0)
+                {
+                    let fixes = B52Settings.workbookShorten==1?1:2;
+                    let divideBy = parseInt("1"+"000".repeat(B52Settings.workbookShorten));
+                    let letter = B52Settings.workbookShorten==1?"k":B52Settings.workbookShorten==2?"m":B52Settings.workbookShorten==3?"b":"?";
+                    sumString = (sum/divideBy).toFixed(fixes)+letter;
+                }
+                else
+                {
+                    sumString = (sum).toFixed(theTick);
+                }
+            }
             //we are ready to add element
             toReturn.push({
                 background:cola,
                 scaleColor:this.#_colaPerc,
                 barColor:scaleColor,
                 barSize: scaleSize,
-                sumText:B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                sumText:sumString,
                 priceText:currPrice.toFixed(theForm),
                 thisIsPrice: false
             });
@@ -1299,13 +1332,42 @@ class B52Stakan{
                 this.#_colaPerc = this.#_colaPerc==B52Settings.workbookColors.bar025_1?B52Settings.workbookColors.bar025_2:B52Settings.workbookColors.bar025_1;
                 this.#_lastColaPercPrice = currPrice;
             }
+            let sumString = "";
+            if(B52Settings.workbookDollars)
+            {
+                if(B52Settings.workbookShorten>0)
+                {
+                    let fixes = B52Settings.workbookShorten==1?1:2;
+                    let divideBy = parseInt("1"+"000".repeat(B52Settings.workbookShorten));
+                    let letter = B52Settings.workbookShorten==1?"k":B52Settings.workbookShorten==2?"m":B52Settings.workbookShorten==3?"b":"?";
+                    sumString = "$"+(sum/divideBy).toFixed(fixes)+letter;
+                }
+                else
+                {
+                    sumString = "$"+(sum).toFixed(0);
+                }
+            }
+            else
+            {
+                if(B52Settings.workbookShorten>0)
+                {
+                    let fixes = B52Settings.workbookShorten==1?1:2;
+                    let divideBy = parseInt("1"+"000".repeat(B52Settings.workbookShorten));
+                    let letter = B52Settings.workbookShorten==1?"k":B52Settings.workbookShorten==2?"m":B52Settings.workbookShorten==3?"b":"?";
+                    sumString = (sum/divideBy).toFixed(fixes)+letter;
+                }
+                else
+                {
+                    sumString = (sum).toFixed(theTick);
+                }
+            }
             //we are ready to add element
             toReturn.push({
                 background:cola,
                 scaleColor:this.#_colaPerc,
                 barColor:scaleColor,
                 barSize: scaleSize,
-                sumText:B52Settings.workbookDollars?"$"+sum.toFixed(0):sum.toFixed(theTick),
+                sumText:sumString,
                 priceText:currPrice.toFixed(theForm),
                 thisIsPrice: false
             });
