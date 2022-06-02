@@ -311,7 +311,7 @@ var B52HTML =
     </div>
     <div id="B52Workbook" class="B52" style="margin:1px;height:450px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
         <div style="height: 100%;">
-            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;padding-top:3px;" id="B52FuturesX">FUTURES</div>
+            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;padding-top:3px;" id="B52FuturesX">FUTURES X5</div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable">
                 </table>
@@ -319,7 +319,10 @@ var B52HTML =
         </div>
         <div style="width:10px;height:100%;"></div>
         <div style="height: 100%;">
-            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex;padding-top:3px" id="B52SpotX">SPOT <input type="text" id="B52SpotName" style="width:55px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
+            <div style="height:16px;background:rgba(82, 82, 82, 0.8);font-size:12px;display:flex;padding-top:3px">
+                <div id="B52SpotX">SPOT X5</div>
+                <div><input type="text" id="B52SpotName" style="width:30px;border:1px solid gray;margin-top:-2px;margin-left:2px"></div>
+            </div>
             <div class="B52WorkbookContainer">
                 <table id="B52WorkBookTable2">
                 </table>
@@ -334,7 +337,7 @@ var B52HTML =
     <div id="B52AdditionalButtons" class="B52" style="width:47px;height:182px;right:55px;bottom:75px;">
         <button class="B52AdditionalButton" style="background:rgba(0, 138, 127, 0.8);" id="B52WBDepth">F500</button>
         <button class="B52AdditionalButton" style="background:rgba(0, 138, 127, 0.8);" id="B52SWBDepth">S500</button>
-        <button class="B52AdditionalButton" style="background:rgba(134, 138, 0, 0.5);" id="B52WBCent">CE</button>          
+        <button class="B52AdditionalButton" style="background:rgba(134, 138, 0, 0.5);" id="B52WBCent">CE</button>
     </div>
     `
 }
@@ -404,6 +407,7 @@ class B52 {
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
                 if(that.Stakan1!=null)that.Stakan1.ReDraw();
+                $("#B52FuturesX").text("FUTURES X"+scaleSlider.value);
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
@@ -415,6 +419,7 @@ class B52 {
         scaleSlider3.onchange = (e)=>{
                 B52Settings.workBookScale2 = parseFloat(scaleSlider3.value);
                 if(that.Stakan2!=null)that.Stakan2.ReDraw();
+                $("#B52SpotX").text("SPOT X"+scaleSlider3.value);
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
