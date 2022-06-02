@@ -1273,7 +1273,7 @@ class B52Stakan{
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
             html+=`<tr id="${this.#_uniqieid}${tr.priceText.replace(".","_")}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
-            <td style="width:5px;background:${tr.scaleColor}">.</td>
+            <td style="width:5px;background:${tr.scaleColor}"></td>
             <td style="width: 50px;background:linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat;">
             ${tr.sumText}
             </td>
@@ -1310,6 +1310,7 @@ class B52Stakan{
     }
 
     ProcessWB(){
+        this.#_colaPerc=null;
         //out json
         let scale = B52Settings.workBookScale;
         let step = parseFloat(this.#_form)*scale;
