@@ -1514,7 +1514,7 @@ class B52Stakan{
 
     CalcBorders(){
         //calc data
-        let scale = B52Settings.workBookScale;
+        let scale = this.#_scale;
         let step = parseFloat(this.#_form)*scale;
         step = parseFloat(step.toFixed(this.#_form.length));
         let theForm = step<1?step.toString().length-2:0;
