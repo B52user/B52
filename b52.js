@@ -218,6 +218,14 @@ var B52HTML =
             padding: 0px;
             font-size: 14px;
         }
+        div.B52Income
+        {
+            height:14px;
+            margin:2px;
+            padding:2px;
+            font-size:12px;
+            display:flex;
+        }
         ::-webkit-scrollbar {
             width: 8px;
           }
@@ -406,7 +414,7 @@ class B52 {
         let scaleSlider = document.getElementById("B52WBScale");
         scaleSlider.onchange = (e)=>{
                 B52Settings.workBookScale = parseFloat(scaleSlider.value);
-                if(that.Stakan1!=null)that.Stakan1.ReDraw();
+                if(that.Stakan1!=null) that.Stakan1.ReDraw(B52Settings.workBookScale);
                 $("#B52FuturesX").text("FUTURES X"+scaleSlider.value);
         };
         let scaleSlider2 = document.getElementById("B52WBBars");
@@ -418,7 +426,7 @@ class B52 {
         let scaleSlider3 = document.getElementById("B52WBScale2");
         scaleSlider3.onchange = (e)=>{
                 B52Settings.workBookScale2 = parseFloat(scaleSlider3.value);
-                if(that.Stakan2!=null)that.Stakan2.ReDraw();
+                if(that.Stakan2!=null)that.Stakan2.ReDraw(B52Settings.workBookScale2);
                 $("#B52SpotX").text("SPT X"+scaleSlider3.value);
         };
         $("#B52WBDepth").mouseup(()=>{
@@ -524,7 +532,7 @@ class B52 {
                     {
                         let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
                         let control = `
-                            <div class="B52RiskPosItem" style="background:${col};width:100px;">
+                            <div class="B52Income" style="background:${col};width:100px;">
                                     ${curDayDate} $${curDaySum.toFixed(2)}
                             <div>`;
                         $("#B52IncomeDays").prepend(control);
@@ -540,13 +548,13 @@ class B52 {
             });
             let col = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curCoinSum>0?"BUY":"SELL"))[0].col;
                 let control = `
-                    <div class="B52RiskPosItem" style="background:${col};width:140px;overflow:hidden;white-space: nowrap;">
+                    <div class="B52Income" style="background:${col};width:140px;overflow:hidden;white-space: nowrap;">
                         $${curCoinSum.toFixed(2)} ${curCoin} ${curCoinDate}
                     <div>`;
                 $("#B52Transactions").prepend(control);
                 let col2 = B52Settings.orderColors.filter(a=>a.name=="LIMIT"+(curDaySum>0?"BUY":"SELL"))[0].col;
                 let control2 = `
-                    <div class="B52RiskPosItem" style="background:${col2};width:100px;">
+                    <div class="B52Income" style="background:${col2};width:100px;">
                             ${curDayDate} $${curDaySum.toFixed(2)}
                     <div>`;
                 $("#B52IncomeDays").prepend(control2);
@@ -1271,7 +1279,8 @@ class B52Stakan{
         this.#_scale = scale;
     }
 
-    ReDraw(){
+    ReDraw(scale=null){
+        if(scale!=null) this.#_scale = scale;
         this.#_maxSum = 0;
         let html = "";
         this.#_lastProcessedWB = this.ProcessWB();
