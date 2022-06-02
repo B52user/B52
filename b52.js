@@ -299,7 +299,13 @@ var B52HTML =
                 </div>
             </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
-            <div class="B52Tab" id="B52Tab5">Some 5555 interesting text</div>
+            <div class="B52Tab" id="B52Tab5" style="display:flex;overflow-y:auto;">
+                <button id="B52ShitServiceStatus" style="width:50px;height:30px;">Shit Service ⟳</button>
+                <button id="B52OrdersServiceStatus" style="width:50px;height:30px;">Order Service ⟳</button>
+                <button id="B52RiskServiceStatus" style="width:50px;height:30px;">Risk Service ⟳</button>
+                <button id="B52Workbook1ServiceStatus" style="width:50px;height:30px;">Workbook1 Service ⟳</button>
+                <button id="B52Workbook2ServiceStatus" style="width:50px;height:30px;">Workbook2 Service ⟳</button>
+            </div>
         </div>
     </div>
     <div id="B52Workbook" class="B52" style="margin:1px;height:450px;width:210px;background:rgba(0, 0, 0, .6);right:0px;bottom:264px;display:flex;" hid="true">
@@ -376,20 +382,6 @@ class B52 {
         $("#B52AdditionalButtons").hide();
     }
 
-    static groupBy(list, keyGetter) {
-        const map = new Map();
-        list.forEach((item) => {
-             const key = keyGetter(item);
-             const collection = map.get(key);
-             if (!collection) {
-                 map.set(key, [item]);
-             } else {
-                 collection.push(item);
-             }
-        });
-        return map;
-    }
-
     SetButtonEvents(){
         let that = this;
         $(this.#_w.Button("B52ClearChart")).mouseup(() => {B52Tv.ClearSecretStrategies();});
@@ -415,6 +407,8 @@ class B52 {
         let scaleSlider2 = document.getElementById("B52WBBars");
         scaleSlider2.onchange = (e)=>{
                 B52Settings.workBookScaleInc = parseFloat(scaleSlider2.value);
+                if(that.Stakan2!=null)that.Stakan2.ReDraw();
+                if(that.Stakan1!=null)that.Stakan1.ReDraw();
         };
         let scaleSlider3 = document.getElementById("B52WBScale2");
         scaleSlider3.onchange = (e)=>{
@@ -449,6 +443,32 @@ class B52 {
         B52Tv.GetCurrentCurrencyPair().then(currency=>{
             $("#B52SpotName").val(currency);
             $("#B52SpotName").trigger("change");
+        });
+
+        $("#B52ShitServiceStatus").mouseup(()=>{
+            that.Srvs.Shit.Stop();
+            that.Srvs.Shit = this.SERVICE_MakeShitService();
+            that.Srvs.Shit.Start();
+        });
+        $("#B52OrdersServiceStatus").mouseup(()=>{
+            that.Srvs.Orders.Stop();
+            that.Srvs.Orders = this.SERVICE_MakeOrderService();
+            that.Srvs.Orders.Start();
+        });
+        $("#B52RiskServiceStatus").mouseup(()=>{
+            that.Srvs.Risk.Stop();
+            that.Srvs.Risk = this.SERVICE_MakeRiskService();
+            that.Srvs.Risk.Start();
+        });
+        $("#B52Workbook1ServiceStatus").mouseup(()=>{
+            that.Srvs.Workbook1.Stop();
+            that.Srvs.Workbook1 = this.SERVICE_MakeWorBookService();
+            that.Srvs.Workbook1.Start();
+        });
+        $("#B52Workbook2ServiceStatus").mouseup(()=>{
+            that.Srvs.Workbook2.Stop();
+            that.Srvs.Workbook2 = this.SERVICE_MakeWorBookService2();
+            that.Srvs.Workbook2.Start();
         });
     }
 
@@ -773,6 +793,34 @@ class B52 {
         let wSrv2 = this.SERVICE_MakeWorBookService2();
         wSrv2.Start();
         this.#_srvs["Workbook2"] = wSrv2;
+
+        let contolSrv = this.SERVICE_ControlService();
+        contolSrv.Start();
+        this.#_srvs["Control"] = contolSrv;
+    }
+
+    SERVICE_ControlService(){
+        let that = this;
+        let control = new B52Service("Control",300);
+        control.Actions.push(()=>{
+            let shitTime = (new Date().getTime() - that.Srvs.Shit.LastTimeActive);
+            let shitTimeColor = shitTime<2000?"rgba(47, 129, 0, 0.7)":shitTime<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
+            $("#B52ShitServiceStatus").css("background",shitTimeColor);
+            let ordersTime = (new Date().getTime() - that.Srvs.Orders.LastTimeActive);
+            let ordersTimeColor = ordersTime<2000?"rgba(47, 129, 0, 0.7)":ordersTime<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
+            $("#B52OrdersServiceStatus").css("background",ordersTimeColor);
+            let riskTime = (new Date().getTime() - that.Srvs.Risk.LastTimeActive);
+            let riskTimeColor = riskTime<2000?"rgba(47, 129, 0, 0.7)":riskTime<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
+            $("#B52RiskServiceStatus").css("background",riskTimeColor);
+            let w1Time = (new Date().getTime() - that.Srvs.Workbook1.LastTimeActive);
+            let w1TimeColor = w1Time<2000?"rgba(47, 129, 0, 0.7)":w1Time<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
+            $("#B52Workbook1ServiceStatus").css("background",w1TimeColor);
+            let w2Time = (new Date().getTime() - that.Srvs.WorkBook2.LastTimeActive);
+            let w2TimeColor = w2Time<2000?"rgba(47, 129, 0, 0.7)":w2Time<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
+            $("#B52Workbook2ServiceStatus").css("background",w2TimeColor);
+
+        });
+        return control;
     }
 
     SERVICE_MakeShitService(){
@@ -2423,11 +2471,13 @@ class B52Service
     #_service;
     #_name;
     Actions;
+    LastTimeActive;
     static Srvs = [];
     constructor(name,freq){
         this.#_freq = freq;
         this.#_name = name;
         this.Actions = [];
+        this.LastTimeActive = new Date().getTime();
     }
     Start() {
 		let that = this;
@@ -2436,6 +2486,7 @@ class B52Service
 			for (let i = 0; i < that.Actions.length; i++) {
  			   that.Actions[i]();
 			}
+            that.LastTimeActive = new Date().getTime();
 		}
         , this.#_freq);
         B52Service.Srvs.push({name:this.#_name,id:this.#_service});
