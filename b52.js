@@ -419,7 +419,7 @@ class B52 {
         scaleSlider3.onchange = (e)=>{
                 B52Settings.workBookScale2 = parseFloat(scaleSlider3.value);
                 if(that.Stakan2!=null)that.Stakan2.ReDraw();
-                $("#B52SpotX").text("SPOT X"+scaleSlider3.value);
+                $("#B52SpotX").text("SPT X"+scaleSlider3.value);
         };
         $("#B52WBDepth").mouseup(()=>{
             B52Settings.workBookDepth=B52Settings.workBookDepth==100?500:100;
@@ -1105,14 +1105,15 @@ class B52 {
                                 form,
                                 tick,
                                 that.Binance.WorkBook,
-                                "_1"
+                                "_1",
+                                B52Settings.workBookScale
                             );
                             that.Stakan1.ReDraw();
                             that.Stakan1.Center();
                         }
                         else {
                             //refine will redraw automatically if required
-                            that.Stakan1.Refine(that.Binance.WorkBook,form,tick);
+                            that.Stakan1.Refine(that.Binance.WorkBook,form,tick,B52Settings.workBookScale);
                         }
                     }).catch(error=>{
                         B52Log.Error("SERVICE_MakeWorBookService coudln't process stakan because couldn't get MARKET_GetTickSize",error);
@@ -1166,14 +1167,15 @@ class B52 {
                             form,
                             tick,
                             that.Binance.WorkBook2,
-                            "_2"
+                            "_2",
+                            B52Settings.workBookScale2
                         );
                         that.Stakan2.ReDraw();
                         that.Stakan2.Center();
                     }
                     else {
                         //refine will redraw automatically if required
-                        that.Stakan2.Refine(that.Binance.WorkBook2,form,tick);
+                        that.Stakan2.Refine(that.Binance.WorkBook2,form,tick,B52Settings.workBookScale2);
                     }
                 }).catch(error=>{
                     B52Log.Error("SERVICE_MakeWorBookService2 coudln't process stakan because couldn't get MARKET_SPOT_GetTickSize",error);
@@ -1253,7 +1255,8 @@ class B52Stakan{
     #_wbFrom;
     #_uniqieid;
     #_wbEnd;
-    constructor(tableElement,form,tick,wb,uniqueid){
+    #_scale;
+    constructor(tableElement,form,tick,wb,uniqueid,scale){
         this.#_table = tableElement;
         this.#_form = form;
         this.#_tick = tick;
@@ -1265,6 +1268,7 @@ class B52Stakan{
         this.#_wbFrom = null;
         this.#_lastProcessedWB = null;
         this.#_wbEnd = null;
+        this.#_scale = scale;
     }
 
     ReDraw(){
@@ -1273,7 +1277,7 @@ class B52Stakan{
         this.#_lastProcessedWB = this.ProcessWB();
         this.#_lastProcessedWB.forEach(tr=>{
             html+=`<tr id="${this.#_uniqieid}${tr.priceText.replace(".","_")}" class="B52WBrow" style="background:${tr.background}"${(tr.thisIsPrice?" priceat=\"true\"":"")}>
-            <td style="width:5px;background:${tr.scaleColor}"></td>
+            <td style="width:5px;background:${tr.scaleColor}">.</td>
             <td style="width: 50px;background:linear-gradient(to right,${tr.barColor} ${tr.barSize}%, transparent 0) no-repeat;">
             ${tr.sumText}
             </td>
@@ -1285,10 +1289,11 @@ class B52Stakan{
     }
 
     #_lastProcessedWB;
-    Refine(newwb,form,tick){
+    Refine(newwb,form,tick,scale){
         this.#_form = form;
         this.#_tick = tick;
         this.#_wb = newwb;
+        this.#_scale = scale;
         //calculate if we are redrawing
         if(this.CalcBorders().redraw) 
         {
@@ -1312,7 +1317,7 @@ class B52Stakan{
     ProcessWB(){
         this.#_colaPerc=null;
         //out json
-        let scale = B52Settings.workBookScale;
+        let scale = this.#_scale;
         let step = parseFloat(this.#_form)*scale;
         step = parseFloat(step.toFixed(this.#_form.length));
         //num of decimals in sum
