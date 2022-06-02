@@ -1419,8 +1419,11 @@ class B52Stakan{
             });
         }
         //set top as a price
-        toReturn[toReturn.length-1].background = B52Settings.workbookColors.posask;
-        toReturn[toReturn.length-1].thisIsPrice = true;
+        if(toReturn.length>0)
+        {
+            toReturn[toReturn.length-1].background = B52Settings.workbookColors.posask;
+            toReturn[toReturn.length-1].thisIsPrice = true;
+        }
 
         //color top of bids
         cola = B52Settings.workbookColors.posbid;
