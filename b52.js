@@ -225,9 +225,10 @@ var B52HTML =
     `,
 	B52AreaHtml : `
     <div id="B52CloseOpen" class="B52" style="margin:-2px;height:70px;width:20px;background-color:#404040;display:flex;margin-right:2px;right:365px;bottom:2px;">
-            <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:100%;height:100px;display:flex;margin:0px;padding:0px;font-size:30px;padding-top:18px;padding-left:1px;" closed="false">
+        <div style="height:100%;width:5px;background:aqua;" id="B52timeleft"></div>    
+        <button id="B52CloseOpenButton" style="background-color:transparent;border:none;width:20px;height:100px;display:flex;margin:auto;padding:0px;font-size:30px;padding-top:18px;padding-left:1px;" closed="false">
             ⇕
-            </button>
+        </button>
 	</div>
 	<div id="B52Area1" class="B52" style="right:55px;bottom:2px;border:1px solid gray;height:65px;width:310px;border-right:none;display:flex;">
 		<div id="B52StrategyButtons" style="overflow-y: auto;">
@@ -300,11 +301,11 @@ var B52HTML =
             </div>
             <div class="B52Tab" id="B52Tab4">Some 4444 interesting text</div>
             <div class="B52Tab" id="B52Tab5" style="display:flex;overflow-y:auto;">
-                <button id="B52ShitServiceStatus" style="width:50px;height:30px;">Shit Service ⟳</button>
-                <button id="B52OrdersServiceStatus" style="width:50px;height:30px;">Order Service ⟳</button>
-                <button id="B52RiskServiceStatus" style="width:50px;height:30px;">Risk Service ⟳</button>
-                <button id="B52Workbook1ServiceStatus" style="width:50px;height:30px;">Workbook1 Service ⟳</button>
-                <button id="B52Workbook2ServiceStatus" style="width:50px;height:30px;">Workbook2 Service ⟳</button>
+                <button id="B52ShitServiceStatus" style="width:60px;height:60px;">SHIT SRV ⟳</button>
+                <button id="B52OrdersServiceStatus" style="width:60px;height:60px;">ORD SRV ⟳</button>
+                <button id="B52RiskServiceStatus" style="width:60px;height:60px;">RISK SRV ⟳</button>
+                <button id="B52Workbook1ServiceStatus" style="width:60px;height:60px;">WB1 SRV ⟳</button>
+                <button id="B52Workbook2ServiceStatus" style="width:60px;height:60px;">WB2 SRV ⟳</button>
             </div>
         </div>
     </div>
@@ -801,7 +802,7 @@ class B52 {
 
     SERVICE_ControlService(){
         let that = this;
-        let control = new B52Service("Control",300);
+        let control = new B52Service("Control",1000);
         control.Actions.push(()=>{
             let shitTime = (new Date().getTime() - that.Srvs.Shit.LastTimeActive);
             let shitTimeColor = shitTime<2000?"rgba(47, 129, 0, 0.7)":shitTime<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
@@ -815,10 +816,26 @@ class B52 {
             let w1Time = (new Date().getTime() - that.Srvs.Workbook1.LastTimeActive);
             let w1TimeColor = w1Time<2000?"rgba(47, 129, 0, 0.7)":w1Time<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
             $("#B52Workbook1ServiceStatus").css("background",w1TimeColor);
-            let w2Time = (new Date().getTime() - that.Srvs.WorkBook2.LastTimeActive);
+            let w2Time = (new Date().getTime() - that.Srvs.Workbook2.LastTimeActive);
             let w2TimeColor = w2Time<2000?"rgba(47, 129, 0, 0.7)":w2Time<5000?"rgba(143, 135, 0, 0.7)":"rgba(164, 25, 0, 0.7)";
             $("#B52Workbook2ServiceStatus").css("background",w2TimeColor);
 
+        });
+        control.Actions.push(()=>{
+            let mathList = [
+                {name:"1m",interval:60000},
+                {name:"5m",interval:5*60000},
+                {name:"15m",interval:15*60000},
+                {name:"30m",interval:30*60000},
+                {name:"1h",interval:60*60000},
+                {name:"4h",interval:4*60*60000}
+            ];
+            let theTimeInterval = $("div#header-toolbar-intervals").text();
+            let midnight = new Date();
+            midnight.setHours(0,0,0,0);
+            let percent = Math.floor(100*(1-(((new Date().getTime()) - midnight.getTime())/mathList.filter(a=>a.name==theTimeInterval)[0].interval)%1));
+            let theColor = "linear-gradient(to top,aqua "+percent+"%, transparent 0) no-repeat";
+            $("#B52timeleft").css("background",theColor);
         });
         return control;
     }
