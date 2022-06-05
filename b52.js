@@ -606,19 +606,17 @@ class B52 {
                         let currPos = null;
                         if(that.Binance.OpenedPositions!=null&&
                         that.Binance.OpenedPositions.filter(a=>a.symbol==currency).length&&
-                        parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt)>0
+                        parseFloat(that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0].positionAmt)!=0
                             )
                         {
                             currPos = that.Binance.OpenedPositions.filter(a=>a.symbol==currency)[0];
                         }
                         
                         if(currPos!=null){
-                            sets.push({label:"Current position in coins",value:currPos.positionAmt});
+                            sets.push({label:"Current position in coins",value:Math.abs(parseFloat(currPos.positionAmt))});
                             sets.push({label:"Entry price in $",value:currPos.entryPrice});
                         }
                         if(sets.length) {
-                            console.log("I am sending");
-                            console.log(sets);
                             B52Tv.SetStrategySettings(sets);
                         }
                     }).catch(error=>{
