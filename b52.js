@@ -616,7 +616,11 @@ class B52 {
                             sets.push({label:"Current position in coins",value:currPos.positionAmt});
                             sets.push({label:"Entry price in $",value:currPos.entryPrice});
                         }
-                        if(sets.length) B52Tv.SetStrategySettings(sets);
+                        if(sets.length) {
+                            console.log("I am sending");
+                            console.log(sets);
+                            B52Tv.SetStrategySettings(sets);
+                        }
                     }).catch(error=>{
                         B52Log.Error("BUTTON_B52Strategy Fail Getting MARKET_GetPriceFormatPrecision " + currency, error);
                     });
