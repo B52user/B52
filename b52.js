@@ -936,7 +936,7 @@ class B52 {
                     let charge = (2*B52Settings.marketOrderPrice/100)*entryPrice*Math.abs(amount);
                     $("#B52SellAll").text("FIXALL ("+ (profit-charge).toFixed(2) + ")");
                     that.Binance.MARKET_GetTickSize(currency).then(tick=>{
-                        if(!that.Fixes.length) that.Fixes = B52.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,amount,tick,entryPrice);
+                        if(!that.Fixes.length) that.Fixes = B52.CALC.GetTakes(B52Settings.numberOfTakes,B52Settings.minnotal,Math.abs(amount),tick,entryPrice);
                         if(!that.Fixes.length) //disable
                         {
                             $("#B52SellPart").css("background-color","#262626");
